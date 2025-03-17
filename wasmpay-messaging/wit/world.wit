@@ -1,0 +1,18 @@
+package wasmpay:platform@0.1.0;
+
+interface validation {
+   record transaction {
+       id: string,
+       amount: s64,
+       currency: string,
+       status: string,
+   }
+
+   validate: func(transaction: transaction) -> bool;
+}
+
+world validate-messenger {
+   import validation;
+
+   export wasmcloud:messaging/handler@0.2.0;
+}

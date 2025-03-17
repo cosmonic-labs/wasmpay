@@ -1,0 +1,5 @@
+package wasmcloud:hello;
+
+world hello {
+   export wasmpay:platform/validation@0.1.0;
+}

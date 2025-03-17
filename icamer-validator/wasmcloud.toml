@@ -1,0 +1,18 @@
+name = "icamer-validator"
+language = "tinygo"
+type = "component"
+version = "0.1.0"
+
+[component]
+wasm_target = "wasm32-wasip2"
+build_command = "./build.sh"
+build_artifact = "build/nordhaven-validator.composed.wasm"
+
+[[registry.pull.sources]]
+target = "wasmpay:platform"
+source = "file://../wasmpay-messaging/wit/world.wit"
+
+[[dev.overrides.imports]] 
+interface_spec = "wasmcloud:messaging@0.2.0"
+image_ref = "wasmcloud+builtin://messaging-nats"
+config = { values = { subscription = "wasmcloud.dev" } }
