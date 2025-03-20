@@ -1,0 +1,10 @@
+**/.terraform/**
+**/.terraform*
+**/terraform.tfstate*
+.DS_Store
+deploy/local/outputs/*
+deploy/cloud/kubeconfig*
+deploy/cloud/outputs/**
+deploy/cloud/modules/*/tmp/**
+node_modules
+dist

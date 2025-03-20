@@ -1,0 +1,12 @@
+{
+  "name": "@repo/tsconfig",
+  "version": "0.0.0",
+  "main": "tsconfig.json",
+  "author": "Cosmonic",
+  "license": "Apache-2.0",
+  "exports": {
+    "./tsconfig.app.json": "./tsconfig.app.json",
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.node.json": "./tsconfig.node.json"
+  }
+}

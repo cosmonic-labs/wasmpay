@@ -1,0 +1,30 @@
+{
+  "name": "@repo/common",
+  "version": "0.0.1",
+  "author": "Cosmonic",
+  "license": "Apache-2.0",
+  "type": "module",
+  "devDependencies": {
+    "@repo/tsconfig": "^0.0.0",
+    "@types/react": "^18.3.3",
+    "react": "^18.3.1"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  },
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    "./services/config/useConfig": "./src/services/config/useConfig.ts",
+    "./services/config/context": "./src/services/config/context.tsx",
+    "./services/backend/useApi": "./src/services/backend/hooks/useApi.ts",
+    "./services/backend/types": "./src/services/backend/types.ts",
+    "./services/backend/utils/getBaseUrl": "./src/services/backend/utils/getBaseUrl.ts",
+    "./services/backend/utils/expandTaskFromPartial": "./src/services/backend/utils/expandTaskFromPartial.ts",
+    "./services/backend/utils/getStatusFlagsFromTask": "./src/services/backend/utils/getStatusFlagsFromTask.ts",
+    "./services/backend/utils/toBytesString": "./src/services/backend/utils/toBytesString.ts",
+    "./services/user/useUser": "./src/services/user/hooks/useUser.ts",
+    "./services/user/useTransactions": "./src/services/user/hooks/useTransactions.ts"
+  }
+}

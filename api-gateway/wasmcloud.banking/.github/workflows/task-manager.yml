@@ -1,0 +1,64 @@
+name: components / task-manager
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'components/task-manager/**'
+      - '.github/workflows/task-manager.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'components/task-manager/**'
+      - '.github/workflows/task-manager.yml'
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./components/task-manager
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: cosmonic-labs/demo/task-manager
+  IMAGE_TAG: '0.1.2'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'Build and Push' || 'Build' }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup TinyGo
+        uses: acifani/setup-tinygo@v2
+        with:
+          tinygo-version: '0.33.0'
+
+      - name: Install wasm-tools
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-tools@1.219.1
+
+      - name: Install wash-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wash-cli@0.36.1
+
+      - name: Build component
+        id: wash-build
+        run: |
+          wash build
+
+      - name: Publish component
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          WASH_REG_USER: ${{ github.repository_owner }}
+          WASH_REG_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          wash push --allow-latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ./build/task_manager_s.wasm

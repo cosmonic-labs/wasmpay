@@ -1,0 +1,111 @@
+name: providers / http-router
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - providers/http-router/**
+      - client/apps/**
+      - .github/workflows/http-router.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - providers/http-router/**
+      - client/apps/**
+      - .github/workflows/http-router.yml
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: cosmonic-labs/demo/http-router
+  IMAGE_TAG: '0.2.1'
+
+jobs:
+  ui:
+    runs-on: ubuntu-latest
+    name: Build UI
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: npm
+          cache-dependency-path: ./package-lock.json
+
+      - name: Install TS Dependencies
+        run: npm install
+
+      - name: Build UI assets
+        run: npm run build --workspaces --if-present
+
+      - name: Upload UI assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui
+          path: ./client/apps/*/dist
+          if-no-files-found: error
+
+  build:
+    runs-on: ubuntu-latest
+    name: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'Build and Push' || 'Build' }}
+    permissions:
+      contents: read
+      packages: write
+    needs: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'providers/http-router/go.mod'
+
+      - name: Install wit-bindgen-wrpc
+        uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: wrpc
+          git: https://github.com/bytecodealliance/wrpc.git
+          tag: v0.13.0
+
+      - name: Install wash-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wash-cli@0.36.1
+
+      - name: Download UI assets
+        uses: actions/download-artifact@v4
+        with:
+          name: ui
+          path: ./providers/http-router/apps/
+
+      - name: Build provider across linux + mac for x86 and arm
+        working-directory: providers/http-router
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o http-router.x86_64-linux
+          GOOS=linux GOARCH=arm64 go build -o http-router.aarch64-linux
+          GOOS=darwin GOARCH=amd64 go build -o http-router.x86_64-macos
+          GOOS=darwin GOARCH=arm64 go build -o http-router.aarch64-macos
+          wash par create --compress --arch x86_64-linux --vendor cosmonic --name http-router --binary http-router.x86_64-linux
+          wash par insert --arch aarch64-linux --binary http-router.aarch64-linux http-router.par.gz
+          wash par insert --arch x86_64-macos --binary http-router.x86_64-macos http-router.par.gz
+          wash par insert --arch aarch64-macos --binary http-router.aarch64-macos http-router.par.gz
+
+      - name: Publish provider
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: providers/http-router
+        env:
+          WASH_REG_USER: ${{ github.repository_owner }}
+          WASH_REG_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          wash push --allow-latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ./http-router.par.gz

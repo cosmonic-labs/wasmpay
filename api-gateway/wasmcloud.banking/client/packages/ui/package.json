@@ -1,0 +1,56 @@
+{
+  "name": "@repo/ui",
+  "version": "0.0.1",
+  "author": "cosmonic",
+  "license": "Apache-2.0",
+  "type": "module",
+  "devDependencies": {
+    "@repo/tsconfig": "^0.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "class-variance-authority": "^0.7.0",
+    "classix": "^2.2.0",
+    "immer": "^10.1.1",
+    "lucide-react": "^0.428.0",
+    "react-hook-form": "^7.53.0",
+    "tailwind-merge": "^2.5.4",
+    "zod": "^3.23.8",
+    "zustand": "^4.5.5"
+  },
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./Button": "./src/components/Button.tsx",
+    "./ButtonBlob": "./src/components/ButtonBlob.tsx",
+    "./Card": "./src/components/Card.tsx",
+    "./Dialog": "./src/components/Dialog.tsx",
+    "./Dropdown": "./src/components/Dropdown.tsx",
+    "./Form": "./src/components/Form.tsx",
+    "./Input": "./src/components/Input.tsx",
+    "./InputPassword": "./src/components/InputPassword.tsx",
+    "./Heading": "./src/components/Heading.tsx",
+    "./Loader": "./src/components/Loader.tsx",
+    "./Pill": "./src/components/Pill.tsx",
+    "./cn": "./src/utils/cn.ts",
+    "./theme/useTheme": "./src/theme/hooks/useTheme.ts",
+    "./theme/ThemeToggle": "./src/theme/components/ThemeToggle.tsx",
+    "./theme/addThemeEventListeners": "./src/theme/utils/addThemeEventListeners.ts",
+    "./drag-and-drop/DragPortalProvider": "./src/drag-and-drop/components/DragPortalProvider.tsx",
+    "./drag-and-drop/useDragging": "./src/drag-and-drop/hooks/useDragging.ts"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

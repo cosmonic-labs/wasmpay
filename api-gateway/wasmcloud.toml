@@ -1,0 +1,9 @@
+name = "api-gateway"
+language = "tinygo"
+type = "component"
+version = "0.1.0"
+wit = "../wit"
+
+[component]
+wit_world = "api-gateway"
+wasm_target = "wasm32-wasip2"

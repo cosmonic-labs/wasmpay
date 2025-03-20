@@ -1,0 +1,64 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: wasmcloud-banking
+  annotations:
+    app: banking
+  labels:
+    wasmcloud.dev/generated-by: wash-dev
+spec:
+  components:
+    - name: api
+      type: component
+      properties:
+        # image: file:///banking-app_s.wasm
+        # Alternatively, to use the published version
+        image: ghcr.io/brooksmtownsend/banking-demo:0.1.0
+      traits:
+        - type: spreadscaler
+          properties:
+            instances: 100
+        - type: link
+          properties:
+            namespace: wasi
+            package: http
+            interfaces: [outgoing-handler]
+            target:
+              name: http-client
+        - type: link
+          properties:
+            namespace: wasi
+            package: keyvalue
+            interfaces: [store]
+            target:
+              name: nats-kv
+              config:
+                - name: wasi-keyvalue-config
+                  properties:
+                    cluster_uri: nats://127.0.0.1:4222
+                    enable_bucket_auto_create: 'true'
+                    bucket: wasmcloud
+    - name: http-server
+      type: capability
+      properties:
+        image: ghcr.io/wasmcloud/http-server:0.24.0
+        config:
+          - name: wasi-http-config
+            properties:
+              address: '0.0.0.0:8000'
+      traits:
+        - type: link
+          properties:
+            target: api
+            namespace: wasi
+            package: http
+            interfaces: [incoming-handler]
+    - name: http-client
+      type: capability
+      properties:
+        image: ghcr.io/wasmcloud/http-client:0.12.1
+    - name: nats-kv
+      type: capability
+      properties:
+        image: ghcr.io/wasmcloud/keyvalue-nats:0.3.1
+        # image: ghcr.io/wasmcloud/keyvalue-redis:0.28.1

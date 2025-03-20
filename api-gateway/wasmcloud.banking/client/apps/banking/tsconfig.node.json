@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "types": ["vite/client"],
+    "noEmit": false,
+    "emitDeclarationOnly": true
+  },
+  "include": ["vite.config.ts", "tailwind.config.ts"],
+  "extends": "@repo/tsconfig/tsconfig.node.json"
+}

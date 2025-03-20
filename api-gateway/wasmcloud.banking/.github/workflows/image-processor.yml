@@ -1,0 +1,60 @@
+name: components / image-processor
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'components/image-processor/**'
+      - '.github/workflows/image-processor.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'components/image-processor/**'
+      - '.github/workflows/image-processor.yml'
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./components/image-processor
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: cosmonic-labs/demo/image-processor
+  IMAGE_TAG: '0.1.1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') && 'Build and Push' || 'Build' }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add wasm32-wasip2
+        run: |
+          rustup update stable --no-self-update
+          rustup default stable
+          rustup target add wasm32-wasip2
+
+      - name: Install wash-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wash-cli@0.36.1
+
+      - name: Build component
+        id: wash-build
+        run: |
+          wash build
+
+      - name: Publish component
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          WASH_REG_USER: ${{ github.repository_owner }}
+          WASH_REG_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          wash push --allow-latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ./build/image_processor_s.wasm
