@@ -1,0 +1,87 @@
+name: Deploy Artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      claude_artifact:
+        type: string
+        description: Link to the claude artifact to download
+        required: true
+
+env:
+  TINYGO_VERSION: 0.36.0
+  WASH_VERSION: 0.40.0
+  COSMONIC_CONTROL_CHART_VERSION: 0.1.1
+  WASMCLOUD_HOST_CHART_VERSION: 0.8.6
+  ARCH: amd64
+
+jobs:
+  build-from-claude:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Install wac and wasm-tools
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wac-cli,wasm-tools@1.223.1,wash@${{ env.WASH_VERSION }}
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.23
+      - name: Install tinygo
+        run: |
+          wget https://github.com/tinygo-org/tinygo/releases/download/v${{ env.TINYGO_VERSION }}/tinygo_${{ env.TINYGO_VERSION }}_${{ env.ARCH }}.deb
+          sudo dpkg -i tinygo_${{ env.TINYGO_VERSION }}_${{ env.ARCH }}.deb
+      - name: Install pup and nats # used for HTML parsing
+        run: |
+          go install github.com/ericchiang/pup@5a57cf111366c7c08999a34b2afd7ba36d58a96d
+          go install github.com/nats-io/natscli/nats@latest
+      - name: Download code
+        working-directory: untrusted-validator
+        run: |
+          curl ${{ github.event.inputs.claude_artifact }} -s | pup -p 'code json{}'|jq -r ".[0].text" > main.go
+      - name: Build Wasm component
+        working-directory: untrusted-validator
+        run: |
+          wash build
+          wash inspect --wit ./build/untrusted_validator.wasm
+          wash inspect --wit ./build/untrusted_validator.composed_s.wasm
+      - name: Run Wasm component
+        working-directory: untrusted-validator
+        run: |
+          WASMCLOUD_EXPERIMENTAL_FEATURES=builtin-messaging-nats wash up -d
+          for i in {1..30}; do
+            if wash get inventory > /dev/null 2>&1; then
+                echo "Command succeeded on attempt $i"
+                break
+            fi
+            echo "Attempt $i failed, retrying in 1 second..."
+            sleep 1
+          done
+          wash start component ./build/untrusted_validator.composed_s.wasm untrusted
+          wash config put dev subscriptions=wasmcloud.dev cluster_uris=nats://127.0.0.1:4222
+          wash link put nats untrusted --source-config dev --interfaces handler wasmcloud messaging
+          wash link put untrusted nats --interfaces consumer wasmcloud messaging
+          wash start provider wasmcloud+builtin://messaging-nats nats || true
+          for i in {1..30}; do
+            if nats req "wasmcloud.dev" '{"id":"txn_123456","origin":{"id":"bank_001","name":"First National Bank","country":"USA","currency":"USD"},"destination":{"id":"bank_002","name":"Global Trust","country":"UK","currency":"GBP"},"amount":{"name":"US Dollar","symbol":"$","amount":10000},"status":"completed"}'; then
+                echo "Command succeeded on attempt $i"
+                break
+            fi
+            echo "Attempt $i failed, retrying in 1 second..."
+            sleep 1
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          # Name of the artifact to upload.
+          # Optional. Default is 'artifact'
+          name: untrusted_components
+
+          # A file, directory or wildcard pattern that describes what to upload
+          # Required.
+          path: untrusted-validator/build/*.wasm
