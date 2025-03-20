@@ -2,6 +2,8 @@ name = "wasmpay-messaging"
 version = "0.1.0"
 language = "rust"
 type = "component"
+wit = "../wit"
 
 [component]
 wasm_target = "wasm32-wasip2"
+wit_world = "validator-messenger"

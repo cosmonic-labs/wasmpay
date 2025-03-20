@@ -1,5 +1,7 @@
 mod generated {
     wit_bindgen::generate!({
+        world: "validator-messenger",
+        path: "../wit",
         generate_all,
         additional_derives: [serde::Serialize, serde::Deserialize, Default],
     });
@@ -10,7 +12,7 @@ mod generated {
 
 use generated::exports::wasmcloud::messaging::handler::Guest as MessagingHandler;
 use generated::wasmcloud::messaging::types::BrokerMessage as IncomingMessage;
-use generated::wasmpay::platform::validation::validate;
+use generated::wasmpay;
 use generated::Component;
 
 use wasmcloud_component::wasmcloud::messaging::consumer::{publish, BrokerMessage};
@@ -23,7 +25,7 @@ impl MessagingHandler for Component {
             debug!("received request to validate transaction");
             let response = if let Ok(transaction) = serde_json::from_slice(&msg.body) {
                 info!("Validating transaction: {transaction:?}");
-                let res = validate(&transaction);
+                let res: bool = wasmpay::platform::validation::validate(&transaction);
                 BrokerMessage {
                     subject,
                     body: format!("Transaction should be approved {res}").into_bytes(),

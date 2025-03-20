@@ -29,11 +29,11 @@ fi
 # TODO: also pull the wasmpay-messaging component
 
 # Build component
-cargo build --target wasm32-wasip2
+# cargo build --target wasm32-wasip2
 
 # Compose component
-# cargo build --release --target wasm32-wasip2
+cargo build --release --target wasm32-wasip2
 wac plug ../wasmpay-messaging/wasmpay_messaging.wasm \
-    --plug ./target/wasm32-wasip2/debug/nordhaven_validator.wasm \
+    --plug ./target/wasm32-wasip2/release/nordhaven_validator.wasm \
     -o ./build/nordhaven-validator.composed.wasm
-    # --plug ./target/wasm32-wasip2/release/nordhaven_validator.wasm \
+    # --plug ./target/wasm32-wasip2/debug/nordhaven_validator.wasm \

@@ -26,7 +26,6 @@ then
     fi
     cargo binstall wash-cli --force -y
 fi
-# TODO: also pull the wasmpay-messaging component
 
 # Build component
 go generate ./...
@@ -36,11 +35,11 @@ tinygo build \
     -gc leaking \
     -scheduler none \
     --target=wasip2 \
-    --wit-package ./wit \
-    --wit-world hello \
-    -o ./build/nordhaven_validator.wasm
+    --wit-package ../wit \
+    --wit-world validator \
+    -o ./build/icamer_validator.wasm
 
 # Compose component
 wac plug ../wasmpay-messaging/wasmpay_messaging.wasm \
-    --plug ./build/nordhaven_validator.wasm \
-    -o ./build/nordhaven-validator.composed.wasm
+    --plug ./build/icamer_validator.wasm \
+    -o ./build/icamer_validator.composed.wasm
