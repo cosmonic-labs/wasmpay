@@ -1,0 +1,57 @@
+package wasmpay:platform@0.1.0;
+
+// Types involved in the wasmpay platform
+interface types {
+   record bank {
+      id: string,
+      name: string,
+      country: string,
+      currency: string,
+   }
+   record currency {
+      name: string,
+      symbol: string,
+      amount: s64,
+   }
+   record transaction {
+      id: string,
+      origin: bank,
+      destination: bank,
+      amount: currency,
+      status: string,
+   }
+}
+
+// Function to validate a transaction
+interface validation {
+   use types.{transaction};
+   validate: func(transaction: transaction) -> bool;
+}
+
+// API gateway component to handle incoming requests
+// and route them to the transaction manager
+world api-gateway {
+   include wasmcloud:component-go/imports@0.1.0;
+
+   import validation;
+   export wasi:http/incoming-handler@0.2.0;
+}
+
+// The transaction manager is responsible for processing
+// transactions, including validation with bank validator components
+world transaction-manager {
+   import validation;
+   export validation;
+}
+
+// Wrapper component to handle messaging logic for validator components
+world validator-messenger {
+   import validation;
+   export wasmcloud:messaging/handler@0.2.0;
+}
+
+// Implemented by banks to validate transactions using their own rules
+world validator {
+   include wasmcloud:component-go/imports@0.1.0;
+   export validation;
+}
