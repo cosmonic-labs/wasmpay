@@ -1,6 +1,6 @@
 module github.com/cosmonic-labs/wasmpay/api-gateway
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/julienschmidt/httprouter v1.3.0
