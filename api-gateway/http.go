@@ -14,7 +14,7 @@ import (
 	"go.wasmcloud.dev/component/log/wasilog"
 )
 
-//go:embed wasmcloud.banking/client/apps/banking/dist
+//go:embed wasmcloud.banking/client/apps/banking/dist/*
 var staticAssets embed.FS
 
 // Router creates a [http.Handler] and registers the application-specific
