@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	// Generated interfaces
-	"github.com/cosmonic-labs/wasmpay/gen/wasmpay/platform/types"
+	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmpay/platform/types"
 	"github.com/julienschmidt/httprouter"
 	"go.wasmcloud.dev/component/log/wasilog"
 )
