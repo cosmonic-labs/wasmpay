@@ -2,7 +2,7 @@
 package main
 
 import (
-	validation "icamer-validator/gen/wasmpay/platform/validation"
+	validation "github.com/cosmonic-labs/wasmpay/icamer-validator/gen/wasmpay/platform/validation"
 )
 
 func init() {

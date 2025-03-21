@@ -1,4 +1,4 @@
-module untrusted-validator
+module github.com/cosmonic-labs/wasmpay/untrusted-validator
 
 go 1.23.0
 

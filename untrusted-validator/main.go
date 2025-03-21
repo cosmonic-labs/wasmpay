@@ -2,7 +2,7 @@
 package main
 
 import (
-	validation "untrusted-validator/gen/wasmpay/platform/validation"
+	validation "github.com/cosmonic-labs/wasmpay/untrusted-validator/gen/wasmpay/platform/validation"
 )
 
 func init() {

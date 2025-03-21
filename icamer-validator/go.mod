@@ -1,4 +1,4 @@
-module icamer-validator
+module github.com/cosmonic-labs/wasmpay/icamer-validator
 
 go 1.23.0
 

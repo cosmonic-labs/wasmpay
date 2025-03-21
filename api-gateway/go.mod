@@ -1,4 +1,4 @@
-module github.com/cosmonic/wasmpay
+module github.com/cosmonic-labs/wasmpay/api-gateway
 
 go 1.23.0
 
