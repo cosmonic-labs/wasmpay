@@ -1,10 +1,12 @@
 package signer
 
 import (
+	"bytes"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"io"
 	"maps"
 	"net/http"
 	"net/url"
@@ -31,7 +33,7 @@ const (
 var ignoredHeaders = []string{"Authorization", "User-Agent", "X-Amzn-Trace-Id", "Expect", "Transfer-Encoding"}
 
 type HTTPSigner interface {
-	SignHTTP(ctx context.Context, credentials aws.Credentials, r *http.Request, payloadHash string, service string, region string, signingTime time.Time) error
+	SignHTTP(ctx context.Context, credentials aws.Credentials, r *http.Request, service string, region string, signingTime time.Time) error
 }
 
 type Signer struct{}
@@ -40,14 +42,13 @@ func NewSigner() *Signer {
 	return &Signer{}
 }
 
-func (s Signer) SignHTTP(ctx context.Context, credentials aws.Credentials, r *http.Request, payloadHash string, service string, region string, signingTime time.Time) error {
+func (s Signer) SignHTTP(ctx context.Context, credentials aws.Credentials, r *http.Request, service string, region string, signingTime time.Time) error {
 	signer := &httpSigner{
 		Request:     r,
 		ServiceName: service,
 		Region:      region,
 		Time:        signingTime,
 		Credentials: credentials,
-		PayloadHash: payloadHash,
 	}
 
 	err := signer.Build()
@@ -70,6 +71,18 @@ func (s *httpSigner) Build() error {
 	req := s.Request
 	query := req.URL.Query()
 	headers := req.Header
+
+	var err error
+	payload := req.Body
+	payload, req.Body, err = duplicateBody(payload)
+	if err != nil {
+		return err
+	}
+
+	// Calculate the payload hash from request body
+	h := sha256.New()
+	_, _ = io.Copy(h, payload)
+	s.PayloadHash = hex.EncodeToString(h.Sum(nil))
 
 	// Set required signing fields
 	s.setRequiredSigningFields(headers, query)
@@ -273,4 +286,26 @@ func hmacSha256(key, data []byte) []byte {
 	hmac := hmac.New(sha256.New, []byte(key))
 	hmac.Write([]byte(data))
 	return hmac.Sum(nil)
+}
+
+// duplicateBody reads all of b to memory and then returns two equivalent
+// ReadClosers yielding the same bytes.
+//
+// It returns an error if the initial slurp of all bytes fails. It does not attempt
+// to make the returned ReadClosers have identical error-matching behavior.
+//
+// Originally: https://github.com/golang/go/blob/master/src/net/http/httputil/dump.go#L20-L38
+func duplicateBody(b io.ReadCloser) (r1, r2 io.ReadCloser, err error) {
+	if b == nil || b == http.NoBody {
+		// No copying needed. Preserve the magic sentinel meaning of NoBody.
+		return http.NoBody, http.NoBody, nil
+	}
+	var buf bytes.Buffer
+	if _, err = buf.ReadFrom(b); err != nil {
+		return nil, b, err
+	}
+	if err = b.Close(); err != nil {
+		return nil, b, err
+	}
+	return io.NopCloser(&buf), io.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }

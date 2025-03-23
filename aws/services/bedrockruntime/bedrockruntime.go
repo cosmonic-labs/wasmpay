@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -110,12 +108,7 @@ func (c *Client) sendRequest(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	// Calculate the payload hash from request body
-	h := sha256.New()
-	_, _ = io.Copy(h, req.Body)
-	payloadHash := hex.EncodeToString(h.Sum(nil))
-
-	err = signer.SignHTTP(ctx, credentials, req, payloadHash, serviceName, c.cfg.Region, time.Now().UTC())
+	err = signer.SignHTTP(ctx, credentials, req, serviceName, c.cfg.Region, time.Now().UTC())
 	if err != nil {
 		return nil, err
 	}

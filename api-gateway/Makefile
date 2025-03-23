@@ -14,7 +14,7 @@ build-wasm-tgo: ## Build this Wasm app with TinyGo
 	tinygo build -target wasip2 -wit-world hello -wit-package wit -o build/http-hello-world.wasm
 
 build-wasm: ## Build this Wasm app (with wash)
-	wash build
+	wash build --skip-fetch
 
 run-wasm: build-wasm-tgo ## Run this Wasm app
 	wasmtime serve -Scommon ./build/http-hello-world.wasm
