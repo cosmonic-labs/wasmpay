@@ -26,7 +26,7 @@ inputs:
   node-version:
     description: "Node version"
     required: false
-    default: "stable"
+    default: "18"
 
 runs:
   using: "composite"
@@ -38,7 +38,7 @@ runs:
           toolchain: ${{ inputs.rust-toolchain }}
       # Go Setup
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5.2.0
         with:
           go-version-file: ${{ inputs.go-version-file }}
           cache-dependency-path: ${{ inputs.go-cache-dependency-path }}
