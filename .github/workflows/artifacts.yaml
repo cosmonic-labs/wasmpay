@@ -30,6 +30,12 @@ jobs:
           # Build cache
           go-cache-dependency-path: '*/go.sum'
       
+      # Donut Component Build
+      - name: Build Donut Component
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: wasmpay-messaging
+
       # API Gateway Build
       - name: Build Banking UI
         working-directory: api-gateway/wasmcloud.banking
@@ -50,3 +56,10 @@ jobs:
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           artifact: build/api-gateway_s.wasm
           image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:latest
+    
+
+      # Transaction Manager Build
+      - name: Build Transaction Manager
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: transaction-manager
