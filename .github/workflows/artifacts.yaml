@@ -49,4 +49,4 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           artifact: build/api-gateway_s.wasm
-          image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:${{ github.head_ref || github.ref_name }}
+          image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:latest

@@ -20,7 +20,7 @@ inputs:
     required: false
   push-args:
     description: "wash push arguments"
-    default: ""
+    default: "--allow-latest"
     required: false
 runs:
   using: "composite"
