@@ -27,6 +27,7 @@ var staticAssets embed.FS
 const (
 	ModelAmazonNovaMicro = "amazon.nova-micro-v1:0"
 	ModelAmazonNovaLite  = "us.amazon.nova-lite-v1:0"
+	defaultRegion        = "us-east-2"
 )
 
 // Router creates a [http.Handler] and registers the application-specific
@@ -117,6 +118,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request, params httprouter.Para
 
 type BedrockRequest struct {
 	RoleArn string `json:"role_arn,omitempty"`
+	Region  string `json:"region,omitempty"`
 	Token   string `json:"token,omitempty"`
 }
 
@@ -146,8 +148,12 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	}
 	roleArn := req.RoleArn
 	token := req.Token
+	region := req.Region
+	if region == "" {
+		region = defaultRegion
+	}
 
-	stsCfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion("us-east-2"))
+	stsCfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(region))
 	if err != nil {
 		logger.Error("failed to load aws config for sts", "error", err)
 		http.Error(w, "Failed to load AWS config for STS", http.StatusBadRequest)
@@ -167,9 +173,9 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		return
 	}
 
-	brrCfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion("us-east-2"), config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(out.Credentials.AccessKeyID, out.Credentials.SecretAccessKey, out.Credentials.SessionToken)))
+	brrCfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(region), config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(out.Credentials.AccessKeyID, out.Credentials.SecretAccessKey, out.Credentials.SessionToken)))
 	if err != nil {
-		logger.Error("failed to load aws config for bedrock runtime", "error", err)
+		logger.Error("failed to load AWS config for Bedrock Runtime", "error", err)
 		http.Error(w, "Failed to load AWS config for Bedrock Runtime", http.StatusBadRequest)
 		return
 	}
