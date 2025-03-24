@@ -34,7 +34,6 @@ runs:
   steps:
       # Rust Setup
       - name: Install Rust
-        shell: "bash"
         uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ inputs.rust-toolchain }}
