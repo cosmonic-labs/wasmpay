@@ -1,0 +1,35 @@
+name: artifacts
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Environment Setup
+      - name: Setup Wash
+        uses: .github/actions/wash-setup
+        with:
+          go-version-file: go.work
+      
+      # API Gateway Build
+      - name: Build Banking UI
+        working-directory: api-gateway/wasmcloud.banking
+        run: |
+          npm ci
+          npm run build --workspaces --if-present
+      
+      - name: Build and Push Component
+        uses: .github/actions/wash-build
+        with:
+          working-directory: api-gateway

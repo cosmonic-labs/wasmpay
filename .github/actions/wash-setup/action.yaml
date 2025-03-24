@@ -1,0 +1,59 @@
+name: "wash: Setup"
+description: This action installs wash and necessary web assembly tools for Rust & Go projects
+inputs:
+  go-version-file:
+    description: "Path to go.work or go.mod file"
+    required: false
+  tinygo-version:
+    description: "Tinygo version"
+    required: false
+    default: "0.36.0"
+  tinygo-arch:
+    description: "Tinygo architecture"
+    required: false
+    default: "amd64"
+  wasm-tools-version:
+    description: "Wasm-tools version"
+    required: false
+    default: "1.223.1"
+  wash-version:
+    description: "Wash version"
+    required: false
+    default: "0.40.0"
+  rust-toolchain:
+    description: "Rust toolchain"
+    required: false
+    default: "stable"
+  node-version:
+    description: "Node version"
+    required: false
+    default: "stable"
+
+runs:
+  using: "composite"
+  steps:
+      # Rust Setup
+      - name: Install Rust
+        shell: "bash"
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ inputs.rust-toolchain }}
+      # Go Setup
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version-file: ${{ inputs.go-version-file }}
+      - name: Install tinygo
+        shell: "bash"
+        run: |
+          wget https://github.com/tinygo-org/tinygo/releases/download/v${{ inputs.tinygo-version }}/tinygo_${{ inputs.tinygo-version }}_${{ inputs.tinygo-arch }}.deb
+          sudo dpkg -i tinygo_${{ inputs.tinygo-version }}_${{ inputs.tinygo-arch }}.deb
+      # Node/Typescript Setup
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      # WASM Setup
+      - name: Install wac and wasm-tools
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wac-cli,wasm-tools@${{ inputs.wasm-tools-version }},wash@${{ inputs.wash-version }}
