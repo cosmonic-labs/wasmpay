@@ -27,6 +27,8 @@ jobs:
         uses: ./.github/actions/wash-setup
         with:
           go-version-file: go.work
+          # Build cache
+          go-cache-dependency-path: '*/go.sum'
       
       # API Gateway Build
       - name: Build Banking UI
@@ -35,6 +37,7 @@ jobs:
           npm ci
           npm run build --workspaces --if-present
       
-      - uses: ./.github/actions/wash-build
+      - name: Build and Push API Gateway
+        uses: ./.github/actions/wash-build
         with:
           working-directory: api-gateway
