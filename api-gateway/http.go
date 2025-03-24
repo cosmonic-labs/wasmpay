@@ -16,6 +16,7 @@ import (
 	"github.com/cosmonic-labs/wasmpay/aws/config"
 	"github.com/cosmonic-labs/wasmpay/aws/credentials"
 	"github.com/cosmonic-labs/wasmpay/aws/services/bedrockruntime"
+	brtypes "github.com/cosmonic-labs/wasmpay/aws/services/bedrockruntime/types"
 	"github.com/cosmonic-labs/wasmpay/aws/services/sts"
 	"github.com/julienschmidt/httprouter"
 	"go.wasmcloud.dev/component/log/wasilog"
@@ -25,9 +26,10 @@ import (
 var staticAssets embed.FS
 
 const (
-	ModelAmazonNovaMicro = "amazon.nova-micro-v1:0"
-	ModelAmazonNovaLite  = "us.amazon.nova-lite-v1:0"
-	defaultRegion        = "us-east-2"
+	ModelAmazonNovaMicro      = "us.amazon.nova-micro-v1:0"
+	ModelAmazonNovaLite       = "us.amazon.nova-lite-v1:0"
+	ModelAnthropicClaudeHaiku = "us.anthropic.claude-3-5-haiku-20241022-v1:0"
+	defaultRegion             = "us-east-2"
 )
 
 // Router creates a [http.Handler] and registers the application-specific
@@ -122,19 +124,6 @@ type BedrockRequest struct {
 	Token   string `json:"token,omitempty"`
 }
 
-type NovaTextRequest struct {
-	InputText string `json:"inputText"`
-	// TODO(joonas): Re-enable text generation config once bedrock requests are working.
-	// TextGenerationConfig TextGenerationConfig `json:"textGenerationConfig"`
-}
-
-type TextGenerationConfig struct {
-	Temperature   float64  `json:"temperature"`
-	TopP          float64  `json:"topP"`
-	MaxTokenCount int      `json:"maxTokenCount"`
-	StopSequences []string `json:"stopSequences,omitempty"`
-}
-
 func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	ctx := context.Background()
 	logger := wasilog.ContextLogger("bedrock-handler")
@@ -161,7 +150,7 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	}
 
 	stsClient := sts.NewFromConfig(stsCfg)
-	out, err := stsClient.AssumeRoleWithWebIdentity(ctx, &sts.AssumeRoleWithWebIdentityInput{
+	stsOut, err := stsClient.AssumeRoleWithWebIdentity(ctx, &sts.AssumeRoleWithWebIdentityInput{
 		RoleArn:          roleArn,
 		RoleSessionName:  "greetings-from-go",
 		DurationSeconds:  900,
@@ -173,31 +162,42 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		return
 	}
 
-	brrCfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(region), config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(out.Credentials.AccessKeyID, out.Credentials.SecretAccessKey, out.Credentials.SessionToken)))
+	brCfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(region), config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(stsOut.Credentials.AccessKeyID, stsOut.Credentials.SecretAccessKey, stsOut.Credentials.SessionToken)))
 	if err != nil {
 		logger.Error("failed to load AWS config for Bedrock Runtime", "error", err)
 		http.Error(w, "Failed to load AWS config for Bedrock Runtime", http.StatusBadRequest)
 		return
 	}
 
-	reqBytes, err := json.Marshal(NovaTextRequest{
-		InputText: "Describe the purpose of a hello world program in one line.",
-		// TextGenerationConfig: TextGenerationConfig{
-		// 	MaxTokenCount: 512,
-		// 	Temperature:   0.5,
-		// },
-	})
 	if err != nil {
 		logger.Error("failed to marshal bytes", "error", err)
 		http.Error(w, "Failed to marshal bytes", http.StatusBadRequest)
 		return
 	}
 
-	brrClient := bedrockruntime.NewFromConfig(brrCfg)
-	invokeOut, err := brrClient.InvokeModel(ctx, &bedrockruntime.InvokeModelInput{
-		ModelId:     ModelAmazonNovaLite,
-		Body:        reqBytes,
-		ContentType: "application/json",
+	brClient := bedrockruntime.NewFromConfig(brCfg)
+	brOut, err := brClient.Converse(ctx, &bedrockruntime.ConverseInput{
+		ModelId: ModelAmazonNovaLite,
+		InferenceConfig: &brtypes.InferenceConfiguration{
+			MaxTokens:   300,
+			Temperature: 0.3,
+			TopP:        0.1,
+		},
+		Messages: []brtypes.Message{
+			{
+				Content: []brtypes.ContentBlockMemberText{
+					{
+						Value: "Write a short story about dragons",
+					},
+				},
+				Role: brtypes.ConversationRoleUser,
+			},
+		},
+		System: []brtypes.SystemContentBlockMemberText{
+			{
+				Value: "You are a helpful assistant",
+			},
+		},
 	})
 	if err != nil {
 		logger.Error("failed to invoke model from bedrock", "error", err)
@@ -205,9 +205,7 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		return
 	}
 
-	outBody := invokeOut.Body
-
-	successResponse(w, outBody)
+	successResponse(w, brOut)
 }
 
 type ChatRequest struct {

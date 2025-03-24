@@ -50,12 +50,15 @@ type ConverseInput struct {
 
 	// A prompt that provides instructions or context to the model about the task it
 	// should perform, or the persona it should adopt during the conversation.
-	System []types.SystemContentBlock `json:"system,omitempty"`
+	System []types.SystemContentBlockMemberText `json:"system,omitempty"`
 }
 
 // Minimal representation of https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/bedrockruntime#ConverseOutput
 type ConverseOutput struct {
-	Output types.ConverseOutputMemberMessage
+	Metrics    *types.ConverseMetrics            `json:"metrics"`
+	Output     types.ConverseOutputMemberMessage `json:"output"`
+	StopReason types.StopReason                  `json:"stopReason"`
+	Usage      *types.TokenUsage                 `json:"usage"`
 }
 
 // Minimal representation of https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/bedrockruntime#InvokeModelInput
