@@ -1,4 +1,4 @@
-//go:generate go run go.bytecodealliance.org/cmd/wit-bindgen-go generate --world api-gateway --out gen ../wit
+//go:generate go tool wit-bindgen-go generate --world api-gateway --out gen ../wit
 package main
 
 import (

@@ -1,8 +1,8 @@
-//go:generate go run go.bytecodealliance.org/cmd/wit-bindgen-go generate --world validator --out gen ../wit
+//go:generate go tool wit-bindgen-go generate --world validator --out gen ../wit
 package main
 
 import (
-	validation "icamer-validator/gen/wasmpay/platform/validation"
+	validation "github.com/cosmonic-labs/wasmpay/icamer-validator/gen/wasmpay/platform/validation"
 )
 
 func init() {
@@ -20,50 +20,50 @@ func Validate(t validation.Transaction) bool {
 
 	// Define European countries that use the Euro
 	euroCountries := map[string]bool{
-		"Austria":      true,
-		"AT":           true,
-		"Belgium":      true,
-		"BE":           true,
-		"Cyprus":       true,
-		"CY":           true,
-		"Estonia":      true,
-		"EE":           true,
-		"Finland":      true,
-		"FI":           true,
-		"France":       true,
-		"FR":           true,
-		"Germany":      true,
-		"DE":           true,
-		"Greece":       true,
-		"GR":           true,
-		"Ireland":      true,
-		"IE":           true,
-		"Italy":        true,
-		"IT":           true,
-		"Latvia":       true,
-		"LV":           true,
-		"Lithuania":    true,
-		"LT":           true,
-		"Luxembourg":   true,
-		"LU":           true,
-		"Malta":        true,
-		"MT":           true,
-		"Netherlands":  true,
-		"NL":           true,
-		"Portugal":     true,
-		"PT":           true,
-		"Slovakia":     true,
-		"SK":           true,
-		"Slovenia":     true,
-		"SI":           true,
-		"Spain":        true,
-		"ES":           true,
+		"Austria":     true,
+		"AT":          true,
+		"Belgium":     true,
+		"BE":          true,
+		"Cyprus":      true,
+		"CY":          true,
+		"Estonia":     true,
+		"EE":          true,
+		"Finland":     true,
+		"FI":          true,
+		"France":      true,
+		"FR":          true,
+		"Germany":     true,
+		"DE":          true,
+		"Greece":      true,
+		"GR":          true,
+		"Ireland":     true,
+		"IE":          true,
+		"Italy":       true,
+		"IT":          true,
+		"Latvia":      true,
+		"LV":          true,
+		"Lithuania":   true,
+		"LT":          true,
+		"Luxembourg":  true,
+		"LU":          true,
+		"Malta":       true,
+		"MT":          true,
+		"Netherlands": true,
+		"NL":          true,
+		"Portugal":    true,
+		"PT":          true,
+		"Slovakia":    true,
+		"SK":          true,
+		"Slovenia":    true,
+		"SI":          true,
+		"Spain":       true,
+		"ES":          true,
 	}
 
 	// Case 1: Transaction from a European country using Euro
 	isEuroCountry := euroCountries[t.Origin.Country]
 	isEuroCurrency := t.Amount.Symbol == "EUR" || t.Amount.Name == "EUR"
-	
+
 	// Case 2: Transaction from UK using Pounds
 	isUK := t.Origin.Country == "UK" || t.Origin.Country == "United Kingdom" || t.Origin.Country == "GB"
 	isPound := t.Amount.Symbol == "GBP" || t.Amount.Name == "Pound" || t.Amount.Name == "Pounds"

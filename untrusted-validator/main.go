@@ -1,8 +1,8 @@
-//go:generate go run go.bytecodealliance.org/cmd/wit-bindgen-go generate --world validator --out gen ../wit
+//go:generate go tool wit-bindgen-go generate --world validator --out gen ../wit
 package main
 
 import (
-	validation "untrusted-validator/gen/wasmpay/platform/validation"
+	validation "github.com/cosmonic-labs/wasmpay/untrusted-validator/gen/wasmpay/platform/validation"
 )
 
 func init() {

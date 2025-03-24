@@ -1,0 +1,20 @@
+go 1.24.0
+
+use (
+	.
+	./api-gateway
+	./aws
+	./aws/config
+	./aws/services/bedrockruntime
+	./aws/services/sts
+	./icamer-validator
+	./untrusted-validator
+)
+
+replace (
+	github.com/cosmonic-labs/wasmpay/aws v0.0.0 => ./aws
+	github.com/cosmonic-labs/wasmpay/aws/config v0.0.0 => ./aws/config
+	github.com/cosmonic-labs/wasmpay/aws/credentials v0.0.0 => ./aws/credentials
+	github.com/cosmonic-labs/wasmpay/aws/services/bedrockruntime v0.0.0 => ./aws/services/bedrockruntime
+	github.com/cosmonic-labs/wasmpay/aws/services/sts v0.0.0 => ./aws/services/sts
+)
