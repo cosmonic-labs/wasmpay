@@ -37,8 +37,13 @@ jobs:
           npm ci
           npm run build --workspaces --if-present
       
-      - name: Build and Push API Gateway
+      - name: Build API Gateway
         uses: ./.github/actions/wash-build
+        with:
+          working-directory: api-gateway
+
+      - name: Push API Gateway
+        uses: ./.github/actions/wash-push
         with:
           working-directory: api-gateway
           registry-username: ${{ github.actor }}
