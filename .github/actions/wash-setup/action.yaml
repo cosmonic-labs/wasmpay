@@ -4,14 +4,13 @@ inputs:
   go-version-file:
     description: "Path to go.work or go.mod file"
     required: false
+  go-cache-dependency-path:
+    description: "Path to go.sum file for dependency caching"
+    required: false
   tinygo-version:
     description: "Tinygo version"
     required: false
     default: "0.36.0"
-  tinygo-arch:
-    description: "Tinygo architecture"
-    required: false
-    default: "amd64"
   wasm-tools-version:
     description: "Wasm-tools version"
     required: false
@@ -42,17 +41,17 @@ runs:
         uses: actions/setup-go@v2
         with:
           go-version-file: ${{ inputs.go-version-file }}
+          cache-dependency-path: ${{ inputs.go-cache-dependency-path }}
       - name: Install tinygo
-        shell: "bash"
-        run: |
-          wget https://github.com/tinygo-org/tinygo/releases/download/v${{ inputs.tinygo-version }}/tinygo_${{ inputs.tinygo-version }}_${{ inputs.tinygo-arch }}.deb
-          sudo dpkg -i tinygo_${{ inputs.tinygo-version }}_${{ inputs.tinygo-arch }}.deb
+        uses: acifani/setup-tinygo@v2.0.0
+        with:
+          tinygo-version: ${{ inputs.tinygo-version }}
       # Node/Typescript Setup
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node-version }}
       # WASM Setup
-      - name: Install wac and wasm-tools
+      - name: Install wac-cli, wasm-tools, and wash
         uses: taiki-e/install-action@v2
         with:
           tool: wac-cli,wasm-tools@${{ inputs.wasm-tools-version }},wash@${{ inputs.wash-version }}
