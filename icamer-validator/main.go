@@ -3,6 +3,7 @@ package main
 
 import (
 	validation "github.com/cosmonic-labs/wasmpay/icamer-validator/gen/wasmpay/platform/validation"
+	"go.bytecodealliance.org/cm"
 )
 
 func init() {
@@ -10,20 +11,29 @@ func init() {
 	validation.Exports.Validate = Validate
 }
 
-func Validate(t validation.Transaction) bool {
+func Validate(t validation.Transaction) validation.ValidateResponse {
 	// Check for nonzero amount
 	if t.Amount.Amount <= 0 {
-		return false
+		return validation.ValidateResponse{
+			Approved: false,
+			Reason:   cm.Some("Amount must be greater than zero"),
+		}
 	}
 
 	if (t.Origin.Country == "USA" && t.Destination.Country == "UK") ||
 		(t.Origin.Country == "UK" && t.Destination.Country == "USA") ||
 		(t.Origin.Country == "UK" && t.Destination.Country == "UK") ||
 		(t.Origin.Country == "USA" && t.Destination.Country == "USA") {
-		return true
+		return validation.ValidateResponse{
+			Approved: true,
+			Reason:   cm.None[string](),
+		}
 	}
 
-	return false
+	return validation.ValidateResponse{
+		Approved: false,
+		Reason:   cm.Some("Transaction did not occur in the USA or UK"),
+	}
 }
 
 func main() {}

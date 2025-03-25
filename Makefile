@@ -9,13 +9,13 @@ help:
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  %-10s - %sn", $$1, $$2}' $(MAKEFILE_LIST)
 
 build: ## Build all components in the project
-	@wash build -p api-gateway --skip-fetch
-	@wash build -p wasmpay-messaging --skip-fetch
-	@wash build -p icamer-validator --skip-fetch
-	@wash build -p nordhaven-validator --skip-fetch
-	@wash build -p transaction-manager --skip-fetch
-	@wash build -p untrusted-validator --skip-fetch
-	@wash build -p wasmpay-validator --skip-fetch
+	@wash build -p api-gateway
+	@wash build -p wasmpay-messaging
+	@wash build -p icamer-validator
+	@wash build -p nordhaven-validator
+	@wash build -p transaction-manager
+	@wash build -p untrusted-validator
+	@wash build -p wasmpay-validator
 
 proto: ## Generate protobuf definitions for the Ledger service
 	go tool buf generate

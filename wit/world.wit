@@ -20,12 +20,17 @@ interface types {
       amount: currency,
       status: string,
    }
+   record validate-response {
+      approved: bool,
+      reason: option<string>,
+   }
 }
 
 // Function to validate a transaction
 interface validation {
-   use types.{transaction};
-   validate: func(transaction: transaction) -> bool;
+   use types.{transaction, validate-response};
+
+   validate: func(validate-request: transaction) -> validate-response;
 }
 
 // API gateway component to handle incoming requests

@@ -13,7 +13,11 @@ export interface UserInformation {
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-  const [user, setUser] = React.useState<UserInformation | null>(null);
+  const [user, setUser] = React.useState<UserInformation | null>(
+    JSON.parse(
+      '{"login": "", "avatar_url": "https://avatars.githubusercontent.com/u/80437882?s=200&v=4", "name": "Cosmonic"}',
+    ) as UserInformation,
+  );
 
   React.useEffect(() => {
     if (window.location.pathname === '/' && user === null) {

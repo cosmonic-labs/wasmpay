@@ -28,10 +28,15 @@ impl MessagingHandler for Component {
             debug!("received request to validate transaction");
             let response = if let Ok(transaction) = serde_json::from_slice(&msg.body) {
                 info!("Validating transaction: {transaction:?}");
-                let res: bool = wasmpay::platform::validation::validate(&transaction);
+                let res = wasmpay::platform::validation::validate(&transaction);
                 BrokerMessage {
                     subject,
-                    body: format!("Transaction should be approved {res}").into_bytes(),
+                    body: format!(
+                        "Transaction approved: {}. Reason: {}",
+                        res.approved,
+                        res.reason.unwrap_or_else(|| "None".to_string())
+                    )
+                    .into_bytes(),
                     reply_to: None,
                 }
             } else {
@@ -51,7 +56,9 @@ impl MessagingHandler for Component {
 
 /// Component passthrough to call the composed component's validation function
 impl ValidationHandler for Component {
-    fn validate(transaction: wasmpay::platform::types::Transaction) -> bool {
+    fn validate(
+        transaction: wasmpay::platform::types::Transaction,
+    ) -> wasmpay::platform::types::ValidateResponse {
         // Additional validation logic can be added here
         debug!("Validating transaction in platform harness {transaction:?}");
         wasmpay::platform::validation::validate(&transaction)

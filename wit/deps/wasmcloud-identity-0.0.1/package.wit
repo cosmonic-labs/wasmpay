@@ -25,3 +25,4 @@ interface store {
   /// `Ok(none)` is returned. If an error occurs, an `Err(error)` is returned.
   get: func(audience: string) -> result<option<string>, error>;
 }
+

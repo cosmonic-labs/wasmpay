@@ -1,9 +1,17 @@
 import * as React from 'react';
-import {ArrowLeftRightIcon, CreditCardIcon, RotateCwIcon, SignatureIcon} from 'lucide-react';
+import {
+  ArrowDownToLineIcon,
+  ArrowLeftRightIcon,
+  ArrowUpFromLineIcon,
+  CreditCardIcon,
+  PlusIcon,
+  SignatureIcon,
+} from 'lucide-react';
 import {useTransactions, Transaction} from '@repo/common/services/user/useTransactions';
 import {DashboardCard} from './DashboardCard';
 import {UserInformation} from '@/App';
 import {Button} from '@repo/ui/Button';
+import {TransactionCard} from './TransactionCard';
 
 interface TransactionsCardProps {
   user: UserInformation;
@@ -11,19 +19,25 @@ interface TransactionsCardProps {
 
 export function TransactionsCard({user}: TransactionsCardProps): React.ReactElement {
   const {transactions, setIsLoading} = useTransactions(user.login);
+  const [showTransactionPopUp, setShowTransactionPopUp] = React.useState(false);
   const reload = () => {
     setIsLoading(true);
   };
 
   return (
     <DashboardCard cols={12}>
+      {showTransactionPopUp ? <TransactionCard /> : null}
       <div className="p-2">
         <div className="sm:flex items-center justify-between">
           <h4 className="font-heading font-semibold text-sm uppercase">Recent Transactions</h4>
           <a className="inline-flex items-center gap-3 text-primary hover:text-primary-400 transition-colors duration-300">
-            <Button onClick={() => reload()}>
-              <RotateCwIcon className="w-4 h-4" />
-              Refresh
+            <Button onClick={() => setShowTransactionPopUp(true)}>
+              <ArrowUpFromLineIcon className="w-4 h-4" />
+              Send Money
+            </Button>
+            <Button onClick={() => setShowTransactionPopUp(true)}>
+              <ArrowDownToLineIcon className="w-4 h-4" />
+              Request Money
             </Button>
           </a>
         </div>

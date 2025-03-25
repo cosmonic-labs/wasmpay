@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {MoneyCard} from './MoneyCard';
 import {GraphCard} from './GraphCard';
 import {TransactionsCard} from './TransactionsCard';
 import {AccountStatusCard} from './AccountStatusCard';
@@ -16,8 +15,6 @@ function Dashboard({user}: DashboardCardProps): React.ReactElement {
       {user ? (
         <>
           <GraphCard userInfo={user} />
-          <MoneyCard direction="in" user={user} />
-          <MoneyCard direction="out" user={user} />
           <TransactionsCard user={user} />
         </>
       ) : null}

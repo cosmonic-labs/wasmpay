@@ -1,3 +1,4 @@
+//go:generate go tool wit-bindgen-go generate --world api-gateway --out gen ../wit
 package main
 
 import (
