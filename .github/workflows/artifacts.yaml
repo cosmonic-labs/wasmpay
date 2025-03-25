@@ -36,26 +36,26 @@ jobs:
         with:
           working-directory: wasmpay-messaging
 
-      # # API Gateway
-      # - name: Build Banking UI
-      #   working-directory: api-gateway/wasmcloud.banking
-      #   run: |
-      #     npm ci
-      #     npm run build --workspaces --if-present
+      # API Gateway
+      - name: Build Banking UI
+        working-directory: api-gateway/wasmcloud.banking
+        run: |
+          npm ci
+          npm run build --workspaces --if-present
       
-      # - name: Build API Gateway
-      #   uses: ./.github/actions/wash-build
-      #   with:
-      #     working-directory: api-gateway
+      - name: Build API Gateway
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: api-gateway
 
-      # - name: Push API Gateway
-      #   uses: ./.github/actions/wash-push
-      #   with:
-      #     working-directory: api-gateway
-      #     registry-username: ${{ github.actor }}
-      #     registry-password: ${{ secrets.GITHUB_TOKEN }}
-      #     artifact: build/api-gateway_s.wasm
-      #     image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:latest
+      - name: Push API Gateway
+        uses: ./.github/actions/wash-push
+        with:
+          working-directory: api-gateway
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          artifact: build/api-gateway_s.wasm
+          image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:latest
     
 
       # Transaction Manager
