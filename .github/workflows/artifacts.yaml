@@ -30,13 +30,13 @@ jobs:
           # Build cache
           go-cache-dependency-path: '*/go.sum'
       
-      # Donut Component Build
+      # wasmpay-messaging ( Donut )
       - name: Build Donut Component
         uses: ./.github/actions/wash-build
         with:
           working-directory: wasmpay-messaging
 
-      # API Gateway Build
+      # API Gateway
       - name: Build Banking UI
         working-directory: api-gateway/wasmcloud.banking
         run: |
@@ -58,8 +58,23 @@ jobs:
           image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:latest
     
 
-      # Transaction Manager Build
+      # Transaction Manager
       - name: Build Transaction Manager
         uses: ./.github/actions/wash-build
         with:
           working-directory: transaction-manager
+
+      # icamer-validator
+      - name: Build icamer-validator
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: icamer-validator
+      
+      - name: Push icamer-validator
+        uses: ./.github/actions/wash-push
+        with:
+          working-directory: icamer-validator
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          artifact: build/icamer_validator.composed_s.wasm
+          image: ghcr.io/cosmonic-labs/wasmpay/icamer-validator:latest
