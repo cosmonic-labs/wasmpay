@@ -3,22 +3,22 @@ package wasmpay:platform@0.1.0;
 // Types involved in the wasmpay platform
 interface types {
    record bank {
-      id: string,
-      name: string,
+      code: string,
       country: string,
       currency: string,
-   }
-   record currency {
       name: string,
-      symbol: string,
-      amount: s64,
+   }
+   variant status {
+      approved,
+      denied(string),
    }
    record transaction {
-      id: string,
+      id: option<string>,
       origin: bank,
       destination: bank,
-      amount: currency,
-      status: string,
+      amount: s64,
+      currency: string,
+      status: status,
    }
    record validate-response {
       approved: bool,
@@ -58,10 +58,11 @@ world transaction-committer {
 }
 
 // Wrapper component to handle messaging logic for validator components
-world validator-messenger {
+world validator-harness {
    import validation;
    export validation;
    export wasmcloud:messaging/handler@0.2.0;
+   // export wasi:http/incoming-handler@0.2.0;
 }
 
 // Implemented by banks to validate transactions using their own rules

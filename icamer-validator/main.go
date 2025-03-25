@@ -13,7 +13,7 @@ func init() {
 
 func Validate(t validation.Transaction) validation.ValidateResponse {
 	// Check for nonzero amount
-	if t.Amount.Amount <= 0 {
+	if t.Amount <= 0 {
 		return validation.ValidateResponse{
 			Approved: false,
 			Reason:   cm.Some("Amount must be greater than zero"),

@@ -40,6 +40,6 @@ tinygo build \
     -o ./build/untrusted_validator.wasm
 
 # Compose component
-wac plug ../wasmpay-platform-harness/build/wasmpay_messaging.wasm \
+wac plug ../wasmpay-platform-harness/build/wasmpay_platform_harness_s.wasm \
     --plug ./build/untrusted_validator.wasm \
     -o ./build/untrusted_validator.composed.wasm
