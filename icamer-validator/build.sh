@@ -40,6 +40,6 @@ tinygo build \
     -o ./build/icamer_validator.wasm
 
 # Compose component
-wac plug ../wasmpay-messaging/build/wasmpay_messaging.wasm \
+wac plug ../wasmpay-platform-harness/build/wasmpay_messaging.wasm \
     --plug ./build/icamer_validator.wasm \
     -o ./build/icamer-validator.composed.wasm

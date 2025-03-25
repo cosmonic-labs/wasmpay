@@ -2,25 +2,55 @@ mod generated {
     use super::Component;
 
     wit_bindgen::generate!({
-        world: "validator-messenger",
+        world: "validator-harness",
         path: "../wit",
         generate_all,
-        additional_derives: [serde::Serialize, serde::Deserialize, Default],
+        additional_derives: [serde::Serialize, serde::Deserialize],
     });
 
     export!(Component);
+    wasmcloud_component::http::export!(Component);
 }
 
+use generated::exports::wasmcloud::messaging::handler::BrokerMessage as IncomingMessage;
 use generated::exports::wasmcloud::messaging::handler::Guest as MessagingHandler;
 use generated::exports::wasmpay::platform::validation::Guest as ValidationHandler;
-use generated::wasmcloud::messaging::types::BrokerMessage as IncomingMessage;
 use generated::wasmpay;
 
 use wasmcloud_component::wasmcloud::messaging::consumer::{publish, BrokerMessage};
-use wasmcloud_component::{debug, info, warn};
+use wasmcloud_component::{debug, http, info, warn};
 
 struct Component;
 
+/// Implements the `wasi:http` export for the validator
+impl http::Server for Component {
+    fn handle(
+        request: http::IncomingRequest,
+    ) -> http::Result<http::Response<impl http::OutgoingBody>> {
+        let (_parts, body) = request.into_parts();
+        if let Ok(transaction) = serde_json::from_reader(body) {
+            info!("Validating transaction: {transaction:?}");
+            let res = <Component as ValidationHandler>::validate(transaction);
+            Ok(http::Response::builder()
+                .status(200)
+                .header("Content-Type", "application/json")
+                .body(format!(
+                    r#"{{"approved": {}, "reason": "{}"}}"#,
+                    res.approved,
+                    res.reason.unwrap_or_else(|| "None".to_string())
+                ))
+                .unwrap())
+        } else {
+            warn!("Invalid transaction");
+            return Ok(http::Response::builder()
+                .status(400)
+                .body(r#"{{"approved": false, "reason": "Invalid transaction"}}"#.to_string())
+                .unwrap());
+        }
+    }
+}
+
+/// Implements the `wasmcloud:messaging` export for the validator
 impl MessagingHandler for Component {
     fn handle_message(msg: IncomingMessage) -> Result<(), String> {
         // If the message has a reply subject, we'll validate the transaction
@@ -28,7 +58,7 @@ impl MessagingHandler for Component {
             debug!("received request to validate transaction");
             let response = if let Ok(transaction) = serde_json::from_slice(&msg.body) {
                 info!("Validating transaction: {transaction:?}");
-                let res = wasmpay::platform::validation::validate(&transaction);
+                let res = <Component as ValidationHandler>::validate(transaction);
                 BrokerMessage {
                     subject,
                     body: format!(

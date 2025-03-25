@@ -1,4 +1,4 @@
-name = "wasmpay-messaging"
+name = "wasmpay-platform-harness"
 version = "0.1.0"
 language = "rust"
 type = "component"
@@ -6,4 +6,4 @@ wit = "../wit"
 
 [component]
 wasm_target = "wasm32-wasip2"
-wit_world = "validator-messenger"
+wit_world = "validator-harness"

@@ -12,13 +12,13 @@ build_artifact = "build/nordhaven-validator.composed.wasm"
 
 # Requires https://github.com/wasmCloud/wasmCloud/pull/4229
 [composition]
-socket = "../wasmpay-messaging/wasmpay_messaging.wasm"
-components = ["../wasmpay-messaging/wasmpay_messaging.wasm"]
+socket = "../wasmpay-platform-harness/wasmpay_messaging.wasm"
+components = ["../wasmpay-platform-harness/wasmpay_messaging.wasm"]
 # Options?
 [compose]
-socket = "../wasmpay-messaging/wasmpay_messaging.wasm"
+socket = "../wasmpay-platform-harness/wasmpay_messaging.wasm"
 [component.compose]
-socket = "../wasmpay-messaging/wasmpay_messaging.wasm"
+socket = "../wasmpay-platform-harness/wasmpay_messaging.wasm"
 
 [[dev.overrides.imports]] 
 interface_spec = "wasmcloud:messaging@0.2.0"
