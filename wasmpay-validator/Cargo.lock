@@ -450,14 +450,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "nordhaven-validator"
-version = "0.1.0"
-dependencies = [
- "wasmcloud-component",
- "wit-bindgen 0.39.0",
-]
-
-[[package]]
 name = "object"
 version = "0.36.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -803,6 +795,16 @@ dependencies = [
  "hashbrown 0.15.2",
  "indexmap",
  "semver",
+]
+
+[[package]]
+name = "wasmpay-validator"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "wasmcloud-component",
+ "wit-bindgen 0.39.0",
 ]
 
 [[package]]

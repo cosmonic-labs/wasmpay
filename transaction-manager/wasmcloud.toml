@@ -6,6 +6,6 @@ wit = "../wit"
 
 [component]
 wit_world = "transaction-manager"
-build_command = "./build.sh"
-build_artifact = "build/transaction-manager.composed.wasm"
+# build_command = "./build.sh"
+# build_artifact = "build/transaction-manager.composed.wasm"
 wasm_target = "wasm32-wasip2"

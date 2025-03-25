@@ -75,8 +75,8 @@ func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 	proFeature := r.Header.Get("X-Wasmpay-Pro")
 	logger := slog.New(wasilog.DefaultOptions().NewHandler())
 	if proFeature != "" {
-		// TODO: AI detect fraud
 		logger.Info("Validated transaction as non-fraudlent, sending for processing")
+		// TODO: AI detect fraud
 	}
 
 	// TODO: call the transaction manager

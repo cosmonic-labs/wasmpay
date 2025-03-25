@@ -3,7 +3,7 @@ mod wasmpay {
     wit_bindgen::generate!({
         world: "validator",
         path: "../wit",
-        generate_all
+        generate_all,
     });
 
     pub use exports::wasmpay::*;
@@ -17,6 +17,7 @@ struct Component;
 impl Guest for Component {
     fn validate(transaction: Transaction) -> bool {
         wasmcloud_component::info!("Validating transaction {transaction:?}");
+        // TODO: basic validation
         if transaction.amount.name == "USD" {
             true
         } else {

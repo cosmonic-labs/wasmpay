@@ -26,20 +26,14 @@ then
     fi
     cargo binstall wash-cli --force -y
 fi
+# TODO: also pull the wasmpay-messaging component
 
 # Build component
-go generate ./...
-rm bindings.wadge.go
-tinygo build \
-    -no-debug \
-    -gc leaking \
-    -scheduler none \
-    --target=wasip2 \
-    --wit-package ../wit \
-    --wit-world validator \
-    -o ./build/icamer_validator.wasm
+# cargo build --target wasm32-wasip2
 
 # Compose component
+cargo build --release --target wasm32-wasip2
 wac plug ../wasmpay-messaging/wasmpay_messaging.wasm \
-    --plug ./build/icamer_validator.wasm \
-    -o ./build/icamer-validator.composed.wasm
+    --plug ./target/wasm32-wasip2/release/wasmpay_validator.wasm \
+    -o ./build/wasmpay-validator.composed.wasm
+    # --plug ./target/wasm32-wasip2/debug/nordhaven_validator.wasm \
