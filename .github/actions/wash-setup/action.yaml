@@ -23,10 +23,14 @@ inputs:
     description: "Rust toolchain"
     required: false
     default: "stable"
-  rust-target:
-    description: "Rust target"
+  rust-targets:
+    description: "Comma separated list of additional targets"
     required: false
     default: "wasm32-wasip2"
+  rust-components:
+    description: "Comma separated list of additional components"
+    required: false
+    default: "clippy, rustfmt"
   node-version:
     description: "Node version"
     required: false
@@ -37,26 +41,27 @@ runs:
   steps:
     # Rust Setup
     - name: Install Rust
-      uses: actions-rust-lang/setup-rust-toolchain@v1
+      uses: dtolnay/rust-toolchain@56f84321dbccf38fb67ce29ab63e4754056677e0 # master
       with:
         toolchain: ${{ inputs.rust-toolchain }}
-        target: ${{ inputs.rust-target }}
+        targets: ${{ inputs.rust-targets }}
+        components: ${{ inputs.rust-components }}
     # Go Setup
     - name: Install Go
-      uses: actions/setup-go@v5.2.0
+      uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
       with:
         go-version-file: ${{ inputs.go-version-file }}
         cache-dependency-path: ${{ inputs.go-cache-dependency-path }}
     - name: Install tinygo
-      uses: acifani/setup-tinygo@v2.0.0
+      uses: acifani/setup-tinygo@b2ba42b249c7d3efdfe94166ec0f48b3191404f7 # v2.0.0
       with:
         tinygo-version: ${{ inputs.tinygo-version }}
     # Node/Typescript Setup
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
       with:
         node-version: ${{ inputs.node-version }}
     # WASM Setup
     - name: Install wac-cli, wasm-tools, and wash
-      uses: taiki-e/install-action@v2
+      uses: taiki-e/install-action@5651179950649c44da31d346537e20c0534f0f25 # v2.49.35
       with:
         tool: wac-cli,wasm-tools@${{ inputs.wasm-tools-version }},wash@${{ inputs.wash-version }}
