@@ -18,7 +18,7 @@ jobs:
 
       # Environment Setup
       - name: Setup Wash
-        uses: .github/actions/wash-setup
+        uses: ./.github/actions/wash-setup
         with:
           go-version-file: go.work
       
@@ -30,6 +30,6 @@ jobs:
           npm run build --workspaces --if-present
       
       - name: Build and Push Component
-        uses: .github/actions/wash-build
+        uses: ./.github/actions/wash-build
         with:
           working-directory: api-gateway
