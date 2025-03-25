@@ -66,7 +66,49 @@ jobs:
         with:
           working-directory: transaction-manager
 
-      # Component: icamer-validator
+      - name: Push Transaction Manager
+        if: github.ref == 'refs/heads/main'
+        uses: ./.github/actions/wash-push
+        with:
+          working-directory: transaction-manager
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          artifact: build/transaction-manager.composed_s.wasm
+          image: ghcr.io/cosmonic-labs/wasmpay/transaction-manager:latest
+
+      # Component: wasmpay-validator
+      - name: Build wasmpay-validator
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: wasmpay-validator
+      
+      - name: Push wasmpay-validator
+        if: github.ref == 'refs/heads/main'
+        uses: ./.github/actions/wash-push
+        with:
+          working-directory: wasmpay-validator
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          artifact: build/wasmpay-validator.composed_s.wasm
+          image: ghcr.io/cosmonic-labs/wasmpay/wasmpay-validator:latest
+
+      # Component: (Bank) nordhaven-validator
+      - name: Build nordhaven-validator
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: nordhaven-validator
+      
+      - name: Push nordhaven-validator
+        if: github.ref == 'refs/heads/main'
+        uses: ./.github/actions/wash-push
+        with:
+          working-directory: nordhaven-validator
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          artifact: build/nordhaven-validator.composed_s.wasm
+          image: ghcr.io/cosmonic-labs/wasmpay/nordhaven-validator:latest
+
+      # Component: (Bank) icamer-validator
       - name: Build icamer-validator
         uses: ./.github/actions/wash-build
         with:
