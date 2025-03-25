@@ -30,7 +30,7 @@ jobs:
         with:
           tool: wac-cli,wasm-tools@1.223.1,wash@${{ env.WASH_VERSION }}
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5
         with:
           go-version: 1.23
       - name: Install tinygo
