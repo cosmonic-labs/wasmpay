@@ -19,14 +19,15 @@ jobs:
     steps:
       # Checkout repository
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      # Environment Setup
+      # Environment Setup (Rust, Go, Node, WASM Tooling)
       - name: Setup WASM Build Environment
         uses: ./.github/actions/wash-setup
         with:
+          # optional: specify go version file to use.
           go-version-file: go.work
-          # Build cache
+          # optional: specify go cache dependency path to use.
           go-cache-dependency-path: '*/go.sum'
       
       # wasmpay-messaging ( Donut )
@@ -63,6 +64,15 @@ jobs:
         uses: ./.github/actions/wash-build
         with:
           working-directory: transaction-manager
+
+      # Environment Setup (Rust, Go, Node, WASM Tooling)
+      - name: Setup WASM Build Environment
+        uses: ./.github/actions/wash-setup
+        with:
+          # optional: specify go version file to use.
+          go-version-file: go.work
+          # optional: specify go cache dependency path to use.
+          go-cache-dependency-path: '*/go.sum'
 
       # icamer-validator
       - name: Build icamer-validator
