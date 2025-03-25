@@ -66,6 +66,16 @@ jobs:
         with:
           working-directory: transaction-manager
 
+      - name: Push Transaction Manager
+        if: github.ref == 'refs/heads/main'
+        uses: ./.github/actions/wash-push
+        with:
+          working-directory: transaction-manager
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          artifact: build/transaction-manager.composed_s.wasm
+          image: ghcr.io/cosmonic-labs/wasmpay/transaction-manager:latest
+
       # Component: wasmpay-validator
       - name: Build wasmpay-validator
         uses: ./.github/actions/wash-build
