@@ -1,10 +1,22 @@
 -- For SQLite datatypes, see: https://www.sqlite.org/datatype3.html
 
+CREATE TABLE banks (
+  id INTEGER PRIMARY KEY,
+  code text NOT NULL,
+  name text NOT NULL,
+  country_id INTEGER NOT NULL,
+  currency_id INTEGER NOT NULL,
+  UNIQUE(code),
+  FOREIGN KEY(country_id) REFERENCES countries(id),
+  FOREIGN KEY(currency_id) REFERENCES currencies(id)
+);
+
 CREATE TABLE countries (
   id INTEGER PRIMARY KEY,
   -- ISO 3166 Alpha-3 code
   code text NOT NULL,
-  name text NOT NULL
+  name text NOT NULL,
+  UNIQUE(code)
 );
 
 CREATE TABLE currencies (
@@ -13,7 +25,8 @@ CREATE TABLE currencies (
   code text NOT NULL,
   name text NOT NULL,
   -- Number of minor units the currency has
-  minor_unit INTEGER NOT NUll
+  minor_unit INTEGER NOT NUll,
+  UNIQUE(code)
 );
 
 CREATE TABLE transfers (

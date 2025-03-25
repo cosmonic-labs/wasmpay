@@ -46,17 +46,21 @@ func main() {
 func run(bindAddr, dbStore string) error {
 	logger := slog.Default()
 
-	_, err := setupDatabase(dbStore)
+	client, err := setupDatabase(dbStore)
 	if err != nil {
 		return err
 	}
 
 	mux := http.NewServeMux()
 
-	path, handler := onboardv1connect.NewOnboardServiceHandler(&server.OnboardServer{})
+	path, handler := onboardv1connect.NewOnboardServiceHandler(&server.OnboardServer{
+		DB: client,
+	})
 	mux.Handle(path, handler)
 
-	path, handler = transferv1connect.NewTransferServiceHandler(&server.TransferServer{})
+	path, handler = transferv1connect.NewTransferServiceHandler(&server.TransferServer{
+		DB: client,
+	})
 	mux.Handle(path, handler)
 
 	// Catch SIGINT and SIGTERM to attempt graceful shutdown
@@ -83,7 +87,8 @@ func setupDatabase(dbStore string) (*db.Queries, error) {
 	// TODO: pass in
 	ctx := context.Background()
 
-	database, err := sql.Open("sqlite", dbStore)
+	// Enable foreign keys support
+	database, err := sql.Open("sqlite", dbStore+"?_pragma=foreign_keys(1)")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open SQLite database: %w", err)
 	}

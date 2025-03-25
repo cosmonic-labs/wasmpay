@@ -1,3 +1,47 @@
+--
+-- Bank queries
+--
+
+-- name: GetBankByCode :one
+SELECT sqlc.embed(banks), sqlc.embed(countries), sqlc.embed(currencies)
+FROM banks
+JOIN countries on countries.id = banks.country_id
+JOIN currencies on currencies.id = banks.currency_id
+WHERE banks.code = ? LIMIT 1;
+
+-- name: ListBanks :many
+SELECT * FROM banks
+LIMIT 50;
+
+-- name: ListBanksWithCountriesAndCurrencies :many
+SELECT sqlc.embed(banks), sqlc.embed(countries), sqlc.embed(currencies)
+FROM banks
+JOIN countries ON countries.id = banks.country_id
+JOIN currencies ON currencies.id = banks.currency_id;
+
+-- name: CreateBank :one
+INSERT INTO banks (
+  code, name, country_id, currency_id
+) VALUES (
+  ?, ?, ?, ?
+)
+RETURNING *;
+
+-- name: DeleteBankByCode :exec
+DELETE FROM banks WHERE code = ?;
+
+--
+-- Country queries
+--
+
+-- name: GetCountryByCode :one
+SELECT * FROM countries
+WHERE code = ? LIMIT 1;
+
+-- name: GetCountryById :one
+SELECT * FROM countries
+WHERE id = ? LIMIT 1;
+
 -- name: CreateCountry :exec
 INSERT INTO countries (
   code, name
@@ -5,16 +49,24 @@ INSERT INTO countries (
   ?, ?
 );
 
+--
+-- Currency queries
+--
+
+-- name: GetCurrencyByCode :one
+SELECT * FROM currencies
+WHERE code = ? LIMIT 1;
+
+-- name: GetCurrencyById :one
+SELECT * FROM currencies
+WHERE id = ? LIMIT 1;
+
 -- name: CreateCurrency :exec
 INSERT INTO currencies (
   code, name, minor_unit
 ) VALUES (
   ?, ?, ?
 );
-
--- name: GetCurrencyByCode :one
-SELECT * FROM currencies
-WHERE code = ? LIMIT 1;
 
 -- name: CurrencyExists :one
 SELECT
@@ -26,6 +78,11 @@ SELECT
         where
             code = ?
     );
+
+
+--
+-- Transfer queries
+--
 
 -- name: GetTransfer :one
 SELECT * FROM transfers

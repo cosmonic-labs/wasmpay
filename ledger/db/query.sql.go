@@ -9,6 +9,40 @@ import (
 	"context"
 )
 
+const createBank = `-- name: CreateBank :one
+INSERT INTO banks (
+  code, name, country_id, currency_id
+) VALUES (
+  ?, ?, ?, ?
+)
+RETURNING id, code, name, country_id, currency_id
+`
+
+type CreateBankParams struct {
+	Code       string
+	Name       string
+	CountryID  int64
+	CurrencyID int64
+}
+
+func (q *Queries) CreateBank(ctx context.Context, arg CreateBankParams) (Bank, error) {
+	row := q.db.QueryRowContext(ctx, createBank,
+		arg.Code,
+		arg.Name,
+		arg.CountryID,
+		arg.CurrencyID,
+	)
+	var i Bank
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.Name,
+		&i.CountryID,
+		&i.CurrencyID,
+	)
+	return i, err
+}
+
 const createCountry = `-- name: CreateCountry :exec
 INSERT INTO countries (
   code, name
@@ -65,11 +99,84 @@ func (q *Queries) CurrencyExists(ctx context.Context, code string) (int64, error
 	return column_1, err
 }
 
+const deleteBankByCode = `-- name: DeleteBankByCode :exec
+DELETE FROM banks WHERE code = ?
+`
+
+func (q *Queries) DeleteBankByCode(ctx context.Context, code string) error {
+	_, err := q.db.ExecContext(ctx, deleteBankByCode, code)
+	return err
+}
+
+const getBankByCode = `-- name: GetBankByCode :one
+
+SELECT banks.id, banks.code, banks.name, banks.country_id, banks.currency_id, countries.id, countries.code, countries.name, currencies.id, currencies.code, currencies.name, currencies.minor_unit
+FROM banks
+JOIN countries on countries.id = banks.country_id
+JOIN currencies on currencies.id = banks.currency_id
+WHERE banks.code = ? LIMIT 1
+`
+
+type GetBankByCodeRow struct {
+	Bank     Bank
+	Country  Country
+	Currency Currency
+}
+
+// Bank queries
+func (q *Queries) GetBankByCode(ctx context.Context, code string) (GetBankByCodeRow, error) {
+	row := q.db.QueryRowContext(ctx, getBankByCode, code)
+	var i GetBankByCodeRow
+	err := row.Scan(
+		&i.Bank.ID,
+		&i.Bank.Code,
+		&i.Bank.Name,
+		&i.Bank.CountryID,
+		&i.Bank.CurrencyID,
+		&i.Country.ID,
+		&i.Country.Code,
+		&i.Country.Name,
+		&i.Currency.ID,
+		&i.Currency.Code,
+		&i.Currency.Name,
+		&i.Currency.MinorUnit,
+	)
+	return i, err
+}
+
+const getCountryByCode = `-- name: GetCountryByCode :one
+
+SELECT id, code, name FROM countries
+WHERE code = ? LIMIT 1
+`
+
+// Country queries
+func (q *Queries) GetCountryByCode(ctx context.Context, code string) (Country, error) {
+	row := q.db.QueryRowContext(ctx, getCountryByCode, code)
+	var i Country
+	err := row.Scan(&i.ID, &i.Code, &i.Name)
+	return i, err
+}
+
+const getCountryById = `-- name: GetCountryById :one
+SELECT id, code, name FROM countries
+WHERE id = ? LIMIT 1
+`
+
+func (q *Queries) GetCountryById(ctx context.Context, id int64) (Country, error) {
+	row := q.db.QueryRowContext(ctx, getCountryById, id)
+	var i Country
+	err := row.Scan(&i.ID, &i.Code, &i.Name)
+	return i, err
+}
+
 const getCurrencyByCode = `-- name: GetCurrencyByCode :one
+
 SELECT id, code, name, minor_unit FROM currencies
 WHERE code = ? LIMIT 1
 `
 
+// Currency queries
 func (q *Queries) GetCurrencyByCode(ctx context.Context, code string) (Currency, error) {
 	row := q.db.QueryRowContext(ctx, getCurrencyByCode, code)
 	var i Currency
@@ -82,11 +189,30 @@ func (q *Queries) GetCurrencyByCode(ctx context.Context, code string) (Currency,
 	return i, err
 }
 
+const getCurrencyById = `-- name: GetCurrencyById :one
+SELECT id, code, name, minor_unit FROM currencies
+WHERE id = ? LIMIT 1
+`
+
+func (q *Queries) GetCurrencyById(ctx context.Context, id int64) (Currency, error) {
+	row := q.db.QueryRowContext(ctx, getCurrencyById, id)
+	var i Currency
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.Name,
+		&i.MinorUnit,
+	)
+	return i, err
+}
+
 const getTransfer = `-- name: GetTransfer :one
+
 SELECT id, source, target, amount, currency, created_at FROM transfers
 WHERE id = ? LIMIT 1
 `
 
+// Transfer queries
 func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
 	row := q.db.QueryRowContext(ctx, getTransfer, id)
 	var i Transfer
@@ -99,6 +225,89 @@ func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const listBanks = `-- name: ListBanks :many
+SELECT id, code, name, country_id, currency_id FROM banks
+LIMIT 50
+`
+
+func (q *Queries) ListBanks(ctx context.Context) ([]Bank, error) {
+	rows, err := q.db.QueryContext(ctx, listBanks)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Bank
+	for rows.Next() {
+		var i Bank
+		if err := rows.Scan(
+			&i.ID,
+			&i.Code,
+			&i.Name,
+			&i.CountryID,
+			&i.CurrencyID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBanksWithCountriesAndCurrencies = `-- name: ListBanksWithCountriesAndCurrencies :many
+SELECT banks.id, banks.code, banks.name, banks.country_id, banks.currency_id, countries.id, countries.code, countries.name, currencies.id, currencies.code, currencies.name, currencies.minor_unit
+FROM banks
+JOIN countries ON countries.id = banks.country_id
+JOIN currencies ON currencies.id = banks.currency_id
+`
+
+type ListBanksWithCountriesAndCurrenciesRow struct {
+	Bank     Bank
+	Country  Country
+	Currency Currency
+}
+
+func (q *Queries) ListBanksWithCountriesAndCurrencies(ctx context.Context) ([]ListBanksWithCountriesAndCurrenciesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listBanksWithCountriesAndCurrencies)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListBanksWithCountriesAndCurrenciesRow
+	for rows.Next() {
+		var i ListBanksWithCountriesAndCurrenciesRow
+		if err := rows.Scan(
+			&i.Bank.ID,
+			&i.Bank.Code,
+			&i.Bank.Name,
+			&i.Bank.CountryID,
+			&i.Bank.CurrencyID,
+			&i.Country.ID,
+			&i.Country.Code,
+			&i.Country.Name,
+			&i.Currency.ID,
+			&i.Currency.Code,
+			&i.Currency.Name,
+			&i.Currency.MinorUnit,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listTransfers = `-- name: ListTransfers :many

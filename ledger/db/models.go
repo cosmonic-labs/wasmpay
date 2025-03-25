@@ -8,6 +8,14 @@ import (
 	"time"
 )
 
+type Bank struct {
+	ID         int64
+	Code       string
+	Name       string
+	CountryID  int64
+	CurrencyID int64
+}
+
 type Country struct {
 	ID   int64
 	Code string
