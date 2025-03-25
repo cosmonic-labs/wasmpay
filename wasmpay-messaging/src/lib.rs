@@ -53,6 +53,7 @@ impl MessagingHandler for Component {
 impl ValidationHandler for Component {
     fn validate(transaction: wasmpay::platform::types::Transaction) -> bool {
         // Additional validation logic can be added here
+        debug!("Validating transaction in platform harness {transaction:?}");
         wasmpay::platform::validation::validate(&transaction)
     }
 }

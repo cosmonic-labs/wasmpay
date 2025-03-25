@@ -4,7 +4,6 @@ kind: Application
 metadata:
   name: wasmpay
   annotations:
-    version: v0.0.1
     description: '🚀 wasmpay - The cross-border, cross-language payment solution powered by WebAssembly! 🌍💸 Send transactions seamlessly between banks, no matter the currency or language. Secure, fast, and extensible. Built for the future of finance! 🏦⚡'
     wasmcloud.dev/authors: Cosmonic team
     wasmcloud.dev/source-url: https://github.com/cosmonic-labs/wasmpay
@@ -26,6 +25,13 @@ spec:
             namespace: wasi
             package: http
             interfaces: [outgoing-handler]
+        - type: link
+          properties:
+            target:
+              name: transaction-manager
+            namespace: wasmpay
+            package: platform
+            interfaces: [validation]
     - name: transaction-manager
       type: component
       properties:
@@ -34,6 +40,30 @@ spec:
         - type: spreadscaler
           properties:
             instances: 100
+        - type: link
+          properties:
+            name: wasmpay_platform
+            target:
+              name: wasmpay-validator
+            namespace: wasmpay
+            package: platform
+            interfaces: [validation]
+        - type: link
+          properties:
+            name: icamer
+            target:
+              name: icamer-validator
+            namespace: wasmpay
+            package: platform
+            interfaces: [validation]
+        - type: link
+          properties:
+            name: nordhaven
+            target:
+              name: nordhaven-validator
+            namespace: wasmpay
+            package: platform
+            interfaces: [validation]
     - name: wasmpay-validator
       type: component
       properties:
@@ -47,7 +77,7 @@ spec:
     - name: icamer-validator
       type: component
       properties:
-        image: file://./icamer-validator/build/icamer-validator.composed_s.wasm
+        image: file://./icamer-validator/build/icamer_validator.composed_s.wasm
       traits:
         - type: spreadscaler
           properties:

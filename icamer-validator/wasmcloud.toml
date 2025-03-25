@@ -8,7 +8,7 @@ wit = "../wit"
 wasm_target = "wasm32-wasip2"
 wit_world = "validator"
 build_command = "./build.sh"
-build_artifact = "build/icamer_validator.composed.wasm"
+build_artifact = "build/icamer-validator.composed.wasm"
 destination = "build/icamer_validator.composed_s.wasm"
 
 [[dev.overrides.imports]] 

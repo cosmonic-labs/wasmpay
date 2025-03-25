@@ -13,6 +13,7 @@ import (
 
 	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmcloud/identity/store"
 	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmpay/platform/types"
+	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmpay/platform/validation"
 	"github.com/cosmonic-labs/wasmpay/aws/config"
 	"github.com/cosmonic-labs/wasmpay/aws/credentials"
 	"github.com/cosmonic-labs/wasmpay/aws/services/bedrockruntime"
@@ -79,9 +80,7 @@ func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 		// TODO: AI detect fraud
 	}
 
-	// TODO: call the transaction manager
-	// transactionManagerResponse := validation.Validate(request)
-	transactionManagerResponse := true
+	transactionManagerResponse := validation.Validate(request)
 	if transactionManagerResponse {
 		successResponse(w, "Transaction is valid and has been processed successfully.")
 	} else {
