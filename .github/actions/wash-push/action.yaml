@@ -10,6 +10,7 @@ inputs:
   image:
     description: "Image in the format of <registry>/<repository>:<tag>"
     required: true
+  # NOTE(lxf): would be nice to get this straight from wasmcloud.toml or wash. but wash doesn't have a way to get the artifact name.
   artifact:
     description: "Artifact to push"
     required: true
