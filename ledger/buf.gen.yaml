@@ -8,8 +8,8 @@ managed:
       value: github.com/cosmonic-labs/wasmpay/ledger/internal/api/onboardv1
       path: api/onboard/v1
     - file_option: go_package
-      value: github.com/cosmonic-labs/wasmpay/ledger/internal/api/transferv1
-      path: api/transfer/v1
+      value: github.com/cosmonic-labs/wasmpay/ledger/internal/api/transactionv1
+      path: api/transaction/v1
 plugins:
   - local: ["go", "tool", "protoc-gen-go"]
     out: internal/api

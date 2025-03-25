@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package api.transaction.v1;
+
+import "api/transaction/v1/transaction.proto";
+
+service TransactionService {
+  rpc Transaction(TransactionRequest) returns (TransactionResponse) {}
+}

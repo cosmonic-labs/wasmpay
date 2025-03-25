@@ -29,7 +29,7 @@ CREATE TABLE currencies (
   UNIQUE(code)
 );
 
-CREATE TABLE transfers (
+CREATE TABLE transactions (
   id   INTEGER PRIMARY KEY,
   source text    NOT NULL,
   target text    NOT NULL,

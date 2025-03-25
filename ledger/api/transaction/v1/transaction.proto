@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package api.transfer.v1;
+package api.transaction.v1;
 
-message TransferRequest {
+message TransactionRequest {
   // What account is sending money
   string from = 1;
   // What account is money being sent to
@@ -13,6 +13,6 @@ message TransferRequest {
   string currency = 4;
 }
 
-message TransferResponse {
+message TransactionResponse {
   bool success = 1;
 }

@@ -18,7 +18,7 @@ import (
 
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/onboardv1/onboardv1connect"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/transferv1/transferv1connect"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/transactionv1/transactionv1connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/fixtures"
 	"github.com/cosmonic-labs/wasmpay/ledger/server"
 )
@@ -58,7 +58,7 @@ func run(bindAddr, dbStore string) error {
 	})
 	mux.Handle(path, handler)
 
-	path, handler = transferv1connect.NewTransferServiceHandler(&server.TransferServer{
+	path, handler = transactionv1connect.NewTransactionServiceHandler(&server.TransactionServer{
 		DB: client,
 	})
 	mux.Handle(path, handler)

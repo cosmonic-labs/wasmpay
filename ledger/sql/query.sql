@@ -81,13 +81,13 @@ SELECT
 
 
 --
--- Transfer queries
+-- Transaction queries
 --
 
--- name: GetTransfer :one
-SELECT * FROM transfers
+-- name: GetTransaction :one
+SELECT * FROM transactions
 WHERE id = ? LIMIT 1;
 
--- name: ListTransfers :many
-SELECT * FROM transfers
+-- name: ListTransactions :many
+SELECT * FROM transactions
 ORDER BY created_at;
