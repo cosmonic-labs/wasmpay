@@ -81,10 +81,10 @@ func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 	}
 
 	transactionManagerResponse := validation.Validate(request)
-	if transactionManagerResponse {
+	if transactionManagerResponse.Approved {
 		successResponse(w, "Transaction is valid and has been processed successfully.")
 	} else {
-		http.Error(w, "Transaction failed validation.", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Transaction failed validation: %s", *transactionManagerResponse.Reason.Some()), http.StatusBadRequest)
 		return
 	}
 }

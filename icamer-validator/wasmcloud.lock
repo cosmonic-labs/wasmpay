@@ -21,6 +21,15 @@ version = "0.1.0"
 digest = "sha256:de3e9af7dedd0d9e882f68f1bee533c7af9c6a1947eb40cbf1ef6163b7d41784"
 
 [[packages]]
+name = "wasmcloud:identity"
+registry = "wasmcloud.com"
+
+[[packages.versions]]
+requirement = "=0.0.1"
+version = "0.0.1"
+digest = "sha256:94f318b7800816dab1206bee11968f3aeda60188748da0a96cdf937dd5a436a4"
+
+[[packages]]
 name = "wasmcloud:messaging"
 registry = "wasmcloud.com"
 

@@ -15,9 +15,12 @@ use wasmpay::platform::validation::*;
 struct Component;
 
 impl Guest for Component {
-    fn validate(transaction: Transaction) -> bool {
+    fn validate(transaction: Transaction) -> ValidateResponse {
         wasmcloud_component::debug!("Validating transaction {transaction:?}");
         // TODO: basic validation
-        true
+        ValidateResponse {
+            approved: true,
+            reason: None,
+        }
     }
 }

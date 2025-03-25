@@ -30,7 +30,7 @@ fi
 
 # Compose component
 cargo build --release --target wasm32-wasip2
-wac plug ../wasmpay-messaging/wasmpay_messaging.wasm \
-	--plug ./target/wasm32-wasip2/release/nordhaven_validator.wasm \
-	-o ./build/nordhaven-validator.composed.wasm
-# --plug ./target/wasm32-wasip2/debug/nordhaven_validator.wasm \
+wac plug ../wasmpay-messaging/build/wasmpay_messaging.wasm \
+    --plug ./target/wasm32-wasip2/release/nordhaven_validator.wasm \
+    -o ./build/nordhaven-validator.composed.wasm
+    # --plug ./target/wasm32-wasip2/debug/nordhaven_validator.wasm \

@@ -15,13 +15,19 @@ use wasmpay::platform::validation::*;
 struct Component;
 
 impl Guest for Component {
-    fn validate(transaction: Transaction) -> bool {
+    fn validate(transaction: Transaction) -> ValidateResponse {
         wasmcloud_component::info!("Validating transaction {transaction:?}");
         if transaction.amount.name == "USD" {
-            true
+            ValidateResponse {
+                approved: true,
+                reason: None,
+            }
         } else {
             wasmcloud_component::warn!("Unknown currency {}", transaction.amount.name);
-            false
+            ValidateResponse {
+                approved: false,
+                reason: Some("Unknown currency".to_string()),
+            }
         }
     }
 }
