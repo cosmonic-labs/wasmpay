@@ -1,9 +1,4 @@
 # Nordhaven Validator
 
-Only approves USD transactions.
+US based bank that only allows transactions using the USD currency.
 
-'murica
-
-## Devloop
-
-`wash dev`

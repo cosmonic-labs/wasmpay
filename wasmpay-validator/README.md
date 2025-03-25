@@ -1,9 +1,4 @@
-# Nordhaven Validator
+# Wasmpay validator
 
-Only approves USD transactions.
+Allows all transactions, placeholder for future logic that can be swapped at runtime.
 
-'murica
-
-## Devloop
-
-`wash dev`
