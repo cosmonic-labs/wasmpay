@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        (unknown)
-// source: proto/ledger/v1/ledger.proto
+// source: proto/ledger/transfer/v1/transfer.proto
 
-package ledgerv1
+package transferv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -37,7 +37,7 @@ type TransferRequest struct {
 
 func (x *TransferRequest) Reset() {
 	*x = TransferRequest{}
-	mi := &file_proto_ledger_v1_ledger_proto_msgTypes[0]
+	mi := &file_proto_ledger_transfer_v1_transfer_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -49,7 +49,7 @@ func (x *TransferRequest) String() string {
 func (*TransferRequest) ProtoMessage() {}
 
 func (x *TransferRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_v1_ledger_proto_msgTypes[0]
+	mi := &file_proto_ledger_transfer_v1_transfer_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -62,7 +62,7 @@ func (x *TransferRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransferRequest.ProtoReflect.Descriptor instead.
 func (*TransferRequest) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_v1_ledger_proto_rawDescGZIP(), []int{0}
+	return file_proto_ledger_transfer_v1_transfer_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *TransferRequest) GetFrom() string {
@@ -102,7 +102,7 @@ type TransferResponse struct {
 
 func (x *TransferResponse) Reset() {
 	*x = TransferResponse{}
-	mi := &file_proto_ledger_v1_ledger_proto_msgTypes[1]
+	mi := &file_proto_ledger_transfer_v1_transfer_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -114,7 +114,7 @@ func (x *TransferResponse) String() string {
 func (*TransferResponse) ProtoMessage() {}
 
 func (x *TransferResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_v1_ledger_proto_msgTypes[1]
+	mi := &file_proto_ledger_transfer_v1_transfer_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -127,7 +127,7 @@ func (x *TransferResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransferResponse.ProtoReflect.Descriptor instead.
 func (*TransferResponse) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_v1_ledger_proto_rawDescGZIP(), []int{1}
+	return file_proto_ledger_transfer_v1_transfer_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *TransferResponse) GetSuccess() bool {
@@ -137,70 +137,65 @@ func (x *TransferResponse) GetSuccess() bool {
 	return false
 }
 
-var File_proto_ledger_v1_ledger_proto protoreflect.FileDescriptor
+var File_proto_ledger_transfer_v1_transfer_proto protoreflect.FileDescriptor
 
-const file_proto_ledger_v1_ledger_proto_rawDesc = "" +
+const file_proto_ledger_transfer_v1_transfer_proto_rawDesc = "" +
 	"\n" +
-	"\x1cproto/ledger/v1/ledger.proto\x12\tledger.v1\"i\n" +
+	"'proto/ledger/transfer/v1/transfer.proto\x12\x18proto.ledger.transfer.v1\"i\n" +
 	"\x0fTransferRequest\x12\x12\n" +
 	"\x04from\x18\x01 \x01(\tR\x04from\x12\x0e\n" +
 	"\x02to\x18\x02 \x01(\tR\x02to\x12\x16\n" +
 	"\x06amount\x18\x03 \x01(\rR\x06amount\x12\x1a\n" +
 	"\bcurrency\x18\x04 \x01(\tR\bcurrency\",\n" +
 	"\x10TransferResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2V\n" +
-	"\rLedgerService\x12E\n" +
-	"\bTransfer\x12\x1a.ledger.v1.TransferRequest\x1a\x1b.ledger.v1.TransferResponse\"\x00B\xa0\x01\n" +
-	"\rcom.ledger.v1B\vLedgerProtoP\x01Z=github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/ledgerv1\xa2\x02\x03LXX\xaa\x02\tLedger.V1\xca\x02\tLedger\\V1\xe2\x02\x15Ledger\\V1\\GPBMetadata\xea\x02\n" +
-	"Ledger::V1b\x06proto3"
+	"\asuccess\x18\x01 \x01(\bR\asuccessB\xf1\x01\n" +
+	"\x1ccom.proto.ledger.transfer.v1B\rTransferProtoP\x01Z?github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/transferv1\xa2\x02\x03PLT\xaa\x02\x18Proto.Ledger.Transfer.V1\xca\x02\x18Proto\\Ledger\\Transfer\\V1\xe2\x02$Proto\\Ledger\\Transfer\\V1\\GPBMetadata\xea\x02\x1bProto::Ledger::Transfer::V1b\x06proto3"
 
 var (
-	file_proto_ledger_v1_ledger_proto_rawDescOnce sync.Once
-	file_proto_ledger_v1_ledger_proto_rawDescData []byte
+	file_proto_ledger_transfer_v1_transfer_proto_rawDescOnce sync.Once
+	file_proto_ledger_transfer_v1_transfer_proto_rawDescData []byte
 )
 
-func file_proto_ledger_v1_ledger_proto_rawDescGZIP() []byte {
-	file_proto_ledger_v1_ledger_proto_rawDescOnce.Do(func() {
-		file_proto_ledger_v1_ledger_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_ledger_v1_ledger_proto_rawDesc), len(file_proto_ledger_v1_ledger_proto_rawDesc)))
+func file_proto_ledger_transfer_v1_transfer_proto_rawDescGZIP() []byte {
+	file_proto_ledger_transfer_v1_transfer_proto_rawDescOnce.Do(func() {
+		file_proto_ledger_transfer_v1_transfer_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_ledger_transfer_v1_transfer_proto_rawDesc), len(file_proto_ledger_transfer_v1_transfer_proto_rawDesc)))
 	})
-	return file_proto_ledger_v1_ledger_proto_rawDescData
+	return file_proto_ledger_transfer_v1_transfer_proto_rawDescData
 }
 
-var file_proto_ledger_v1_ledger_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_proto_ledger_v1_ledger_proto_goTypes = []any{
-	(*TransferRequest)(nil),  // 0: ledger.v1.TransferRequest
-	(*TransferResponse)(nil), // 1: ledger.v1.TransferResponse
+var file_proto_ledger_transfer_v1_transfer_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_ledger_transfer_v1_transfer_proto_goTypes = []any{
+	(*TransferRequest)(nil),  // 0: proto.ledger.transfer.v1.TransferRequest
+	(*TransferResponse)(nil), // 1: proto.ledger.transfer.v1.TransferResponse
 }
-var file_proto_ledger_v1_ledger_proto_depIdxs = []int32{
-	0, // 0: ledger.v1.LedgerService.Transfer:input_type -> ledger.v1.TransferRequest
-	1, // 1: ledger.v1.LedgerService.Transfer:output_type -> ledger.v1.TransferResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+var file_proto_ledger_transfer_v1_transfer_proto_depIdxs = []int32{
+	0, // [0:0] is the sub-list for method output_type
+	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_proto_ledger_v1_ledger_proto_init() }
-func file_proto_ledger_v1_ledger_proto_init() {
-	if File_proto_ledger_v1_ledger_proto != nil {
+func init() { file_proto_ledger_transfer_v1_transfer_proto_init() }
+func file_proto_ledger_transfer_v1_transfer_proto_init() {
+	if File_proto_ledger_transfer_v1_transfer_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_ledger_v1_ledger_proto_rawDesc), len(file_proto_ledger_v1_ledger_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_ledger_transfer_v1_transfer_proto_rawDesc), len(file_proto_ledger_transfer_v1_transfer_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   0,
 		},
-		GoTypes:           file_proto_ledger_v1_ledger_proto_goTypes,
-		DependencyIndexes: file_proto_ledger_v1_ledger_proto_depIdxs,
-		MessageInfos:      file_proto_ledger_v1_ledger_proto_msgTypes,
+		GoTypes:           file_proto_ledger_transfer_v1_transfer_proto_goTypes,
+		DependencyIndexes: file_proto_ledger_transfer_v1_transfer_proto_depIdxs,
+		MessageInfos:      file_proto_ledger_transfer_v1_transfer_proto_msgTypes,
 	}.Build()
-	File_proto_ledger_v1_ledger_proto = out.File
-	file_proto_ledger_v1_ledger_proto_goTypes = nil
-	file_proto_ledger_v1_ledger_proto_depIdxs = nil
+	File_proto_ledger_transfer_v1_transfer_proto = out.File
+	file_proto_ledger_transfer_v1_transfer_proto_goTypes = nil
+	file_proto_ledger_transfer_v1_transfer_proto_depIdxs = nil
 }

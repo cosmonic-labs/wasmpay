@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto.ledger.onboard.v1;
+
+message GetCustomerRequest {}
+message GetCustomerResponse {}
+
+message ListCustomersRequest {}
+message ListCustomersResponse {}
+
+message CreateCustomerRequest {}
+message CreateCustomerResponse {}
+
+message DeleteCustomerRequest {}
+message DeleteCustomerResponse {}

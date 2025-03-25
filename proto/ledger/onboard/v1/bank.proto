@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto.ledger.onboard.v1;
+
+message GetBankRequest {}
+message GetBankResponse {}
+
+message ListBanksRequest {}
+message ListBanksResponse {}
+
+message CreateBankRequest {}
+message CreateBankResponse {}
+
+message DeleteBankRequest {}
+message DeleteBankResponse {}

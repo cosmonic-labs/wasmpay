@@ -11,7 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/ledgerv1/ledgerv1connect"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/onboardv1/onboardv1connect"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/transferv1/transferv1connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/server"
 )
 
@@ -30,9 +31,12 @@ func main() {
 
 func run(bindAddr string) error {
 	logger := slog.Default()
-	srv := &server.LedgerServer{}
 	mux := http.NewServeMux()
-	path, handler := ledgerv1connect.NewLedgerServiceHandler(srv)
+
+	path, handler := onboardv1connect.NewOnboardServiceHandler(&server.OnboardServer{})
+	mux.Handle(path, handler)
+
+	path, handler = transferv1connect.NewTransferServiceHandler(&server.TransferServer{})
 	mux.Handle(path, handler)
 
 	// Catch SIGINT and SIGTERM to attempt graceful shutdown

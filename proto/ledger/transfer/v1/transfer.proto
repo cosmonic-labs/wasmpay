@@ -1,10 +1,6 @@
 syntax = "proto3";
 
-package ledger.v1;
-
-service LedgerService {
-  rpc Transfer(TransferRequest) returns (TransferResponse) {}
-}
+package proto.ledger.transfer.v1;
 
 message TransferRequest {
   // What account is sending money
