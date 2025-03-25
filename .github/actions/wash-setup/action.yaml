@@ -41,10 +41,7 @@ runs:
   steps:
     # Rust Setup
     - name: Install Rust
-      # NOTE(lxf): from their docs: the default is to match the @rev as described above.
-      # When passing an explicit toolchain as an input instead of @rev,
-      # you'll want to use "dtolnay/rust-toolchain@master" as the revision of the action.
-      uses: dtolnay/rust-toolchain@master
+      uses: dtolnay/rust-toolchain@56f84321dbccf38fb67ce29ab63e4754056677e0 # master
       with:
         toolchain: ${{ inputs.rust-toolchain }}
         targets: ${{ inputs.rust-targets }}
