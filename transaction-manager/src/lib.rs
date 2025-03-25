@@ -42,7 +42,7 @@ impl Guest for TransactionManager {
         if let ValidateResponse {
             approved: false,
             reason,
-        } = validate_with(&transaction, &transaction.origin.id)
+        } = validate_with(&transaction, &transaction.origin.code)
         {
             error!("Validation with origin bank failed for transaction {transaction:?} with reason: {reason:?}");
             return ValidateResponse {
@@ -55,7 +55,7 @@ impl Guest for TransactionManager {
         if let ValidateResponse {
             approved: false,
             reason,
-        } = validate_with(&transaction, &transaction.destination.id)
+        } = validate_with(&transaction, &transaction.destination.code)
         {
             error!("Validation with destination bank failed for transaction {transaction:?} with reason: {reason:?}");
             return ValidateResponse {
