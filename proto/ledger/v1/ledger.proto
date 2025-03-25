@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package ledger.v1;
+
+service LedgerService {
+  rpc Transfer(TransferRequest) returns (TransferResponse) {}
+}
+
+message TransferRequest {
+  // What account is sending money
+  string from = 1;
+  // What account is money being sent to
+  string to = 2;
+  // Currency-appropriate denomination
+  uint32 amount = 3;
+  // Currency
+  string currency = 4;
+}
+
+message TransferResponse {
+  bool success = 1;
+}
