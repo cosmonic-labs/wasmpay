@@ -55,9 +55,11 @@ impl Guest for TransactionManager {
 ///
 /// If there isn't a link present, we assume the bank did not include its own validator
 fn validate_with(transaction: &Transaction, link_name: &str) -> Result<(), String> {
-    // wasmpay:platform/validate
+    // wasmpay:platform/validation
     let validate_interface = vec![lattice::CallTargetInterface::new(
-        "wasmpay", "platform", "validate",
+        "wasmpay",
+        "platform",
+        "validation",
     )];
     if lattice::set_link_name(link_name, validate_interface).is_err() {
         debug!("Failed to set link name to {link_name} for transaction {transaction:?}");

@@ -16,13 +16,8 @@ struct Component;
 
 impl Guest for Component {
     fn validate(transaction: Transaction) -> bool {
-        wasmcloud_component::info!("Validating transaction {transaction:?}");
+        wasmcloud_component::debug!("Validating transaction {transaction:?}");
         // TODO: basic validation
-        if transaction.amount.name == "USD" {
-            true
-        } else {
-            wasmcloud_component::warn!("Unknown currency {}", transaction.amount.name);
-            false
-        }
+        true
     }
 }
