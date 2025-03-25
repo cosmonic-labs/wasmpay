@@ -11,7 +11,7 @@ mod wasmpay {
 }
 
 use wasmcloud_component::wasmcloud::bus::lattice;
-use wasmcloud_component::{debug, error, info};
+use wasmcloud_component::{debug, error};
 use wasmpay::wasmpay::platform::types::Transaction;
 use wasmpay::wasmpay::platform::validation::validate;
 use wasmpay::Guest;

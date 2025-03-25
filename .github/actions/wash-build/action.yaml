@@ -1,19 +1,6 @@
-name: "wash: Build and Push Component"
-description: This action builds and pushes a component to an OCI registry
+name: "wash: Build Component"
+description: This action builds a component using wash
 inputs:
-  registry-username:
-    description: "OCI registry username"
-    required: true
-  registry-password:
-    description: "OCI registry password"
-    required: true
-  image:
-    description: "Image in the format of <registry>/<repository>:<tag>"
-    required: true
-  artifact:
-    description: "Artifact to push"
-    required: true
-  # Optionals
   working-directory:
     description: "Directory with wasmcloud.toml"
     default: "."
@@ -22,10 +9,6 @@ inputs:
     description: "wash build arguments"
     default: "--skip-fetch"
     required: false
-  push-args:
-    description: "wash push arguments"
-    default: ""
-    required: false
 runs:
   using: "composite"
   steps:
@@ -33,11 +16,3 @@ runs:
       shell: "bash"
       working-directory: "${{ inputs.working-directory }}"
       run: wash build ${{ inputs.build-args }}
-
-    - name: Push Component
-      shell: "bash"
-      working-directory: "${{ inputs.working-directory }}"
-      env:
-        WASH_REG_USER: ${{ inputs.registry-username }}
-        WASH_REG_PASSWORD: ${{ inputs.registry-password }}
-      run: wash push ${{ inputs.push-args }} ${{ inputs.image }} ${{ inputs.artifact }}

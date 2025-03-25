@@ -1,0 +1,82 @@
+name: artifacts
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write
+      packages: write
+
+    steps:
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Environment Setup
+      - name: Setup WASM Build Environment
+        uses: ./.github/actions/wash-setup
+        with:
+          go-version-file: go.work
+          # Build cache
+          go-cache-dependency-path: '*/go.sum'
+      
+      # wasmpay-messaging ( Donut )
+      - name: Build Donut Component
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: wasmpay-messaging
+
+      # API Gateway
+      - name: Build Banking UI
+        working-directory: api-gateway/wasmcloud.banking
+        run: |
+          npm ci
+          npm run build --workspaces --if-present
+      
+      - name: Build API Gateway
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: api-gateway
+
+      - name: Push API Gateway
+        if: github.ref == 'refs/heads/main'
+        uses: ./.github/actions/wash-push
+        with:
+          working-directory: api-gateway
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          artifact: build/api-gateway_s.wasm
+          image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:latest
+    
+
+      # Transaction Manager
+      - name: Build Transaction Manager
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: transaction-manager
+
+      # icamer-validator
+      - name: Build icamer-validator
+        uses: ./.github/actions/wash-build
+        with:
+          working-directory: icamer-validator
+      
+      - name: Push icamer-validator
+        if: github.ref == 'refs/heads/main'
+        uses: ./.github/actions/wash-push
+        with:
+          working-directory: icamer-validator
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          artifact: build/icamer_validator.composed_s.wasm
+          image: ghcr.io/cosmonic-labs/wasmpay/icamer-validator:latest
