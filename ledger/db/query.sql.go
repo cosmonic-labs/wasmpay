@@ -9,8 +9,81 @@ import (
 	"context"
 )
 
+const createCountry = `-- name: CreateCountry :exec
+INSERT INTO countries (
+  code, name
+) VALUES (
+  ?, ?
+)
+`
+
+type CreateCountryParams struct {
+	Code string
+	Name string
+}
+
+func (q *Queries) CreateCountry(ctx context.Context, arg CreateCountryParams) error {
+	_, err := q.db.ExecContext(ctx, createCountry, arg.Code, arg.Name)
+	return err
+}
+
+const createCurrency = `-- name: CreateCurrency :exec
+INSERT INTO currencies (
+  code, name, minor_unit
+) VALUES (
+  ?, ?, ?
+)
+`
+
+type CreateCurrencyParams struct {
+	Code      string
+	Name      string
+	MinorUnit int64
+}
+
+func (q *Queries) CreateCurrency(ctx context.Context, arg CreateCurrencyParams) error {
+	_, err := q.db.ExecContext(ctx, createCurrency, arg.Code, arg.Name, arg.MinorUnit)
+	return err
+}
+
+const currencyExists = `-- name: CurrencyExists :one
+SELECT
+    EXISTS (
+        SELECT
+            1
+        FROM
+            currencies
+        where
+            code = ?
+    )
+`
+
+func (q *Queries) CurrencyExists(ctx context.Context, code string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, currencyExists, code)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
+const getCurrencyByCode = `-- name: GetCurrencyByCode :one
+SELECT id, code, name, minor_unit FROM currencies
+WHERE code = ? LIMIT 1
+`
+
+func (q *Queries) GetCurrencyByCode(ctx context.Context, code string) (Currency, error) {
+	row := q.db.QueryRowContext(ctx, getCurrencyByCode, code)
+	var i Currency
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.Name,
+		&i.MinorUnit,
+	)
+	return i, err
+}
+
 const getTransfer = `-- name: GetTransfer :one
-SELECT id, "from", "to", amount, currency, created_at FROM transfers
+SELECT id, source, target, amount, currency, created_at FROM transfers
 WHERE id = ? LIMIT 1
 `
 
@@ -19,8 +92,8 @@ func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
 	var i Transfer
 	err := row.Scan(
 		&i.ID,
-		&i.From,
-		&i.To,
+		&i.Source,
+		&i.Target,
 		&i.Amount,
 		&i.Currency,
 		&i.CreatedAt,
@@ -29,7 +102,7 @@ func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
 }
 
 const listTransfers = `-- name: ListTransfers :many
-SELECT id, "from", "to", amount, currency, created_at FROM transfers
+SELECT id, source, target, amount, currency, created_at FROM transfers
 ORDER BY created_at
 `
 
@@ -44,8 +117,8 @@ func (q *Queries) ListTransfers(ctx context.Context) ([]Transfer, error) {
 		var i Transfer
 		if err := rows.Scan(
 			&i.ID,
-			&i.From,
-			&i.To,
+			&i.Source,
+			&i.Target,
 			&i.Amount,
 			&i.Currency,
 			&i.CreatedAt,

@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	_ "embed"
 	"flag"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -11,26 +14,43 @@ import (
 	"syscall"
 	"time"
 
+	_ "modernc.org/sqlite"
+
+	"github.com/cosmonic-labs/wasmpay/ledger/db"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/fixtures"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/onboardv1/onboardv1connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/transferv1/transferv1connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/server"
 )
 
-var bindAddr string
+//go:embed sql/schema.sql
+var ddl string
+
+var (
+	bindAddr string
+	dbStore  string
+)
 
 func main() {
 	flag.StringVar(&bindAddr, "bind-addr", "localhost:8080", "Address to bind to.")
+	flag.StringVar(&dbStore, "db-store", ":memory:", "Either :memory: for in-memory or path to file for storing the database.")
 	flag.Parse()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	if err := run(bindAddr); err != nil {
+	if err := run(bindAddr, dbStore); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(bindAddr string) error {
+func run(bindAddr, dbStore string) error {
 	logger := slog.Default()
+
+	_, err := setupDatabase(dbStore)
+	if err != nil {
+		return err
+	}
+
 	mux := http.NewServeMux()
 
 	path, handler := onboardv1connect.NewOnboardServiceHandler(&server.OnboardServer{})
@@ -57,4 +77,28 @@ func run(bindAddr string) error {
 
 	logger.Info("HTTP Server started", slog.String("addr", bindAddr))
 	return server.ListenAndServe()
+}
+
+func setupDatabase(dbStore string) (*db.Queries, error) {
+	// TODO: pass in
+	ctx := context.Background()
+
+	database, err := sql.Open("sqlite", dbStore)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open SQLite database: %w", err)
+	}
+
+	// create tables
+	if _, err := database.ExecContext(ctx, ddl); err != nil {
+		return nil, fmt.Errorf("failed to create tables: %w", err)
+	}
+
+	client := db.New(database)
+
+	// preseed country and currency data
+	if err := fixtures.PreseedFromFixtures(ctx, client); err != nil {
+		return nil, fmt.Errorf("failed to preseed the database: %w", err)
+	}
+
+	return client, nil
 }

@@ -8,10 +8,23 @@ import (
 	"time"
 )
 
+type Country struct {
+	ID   int64
+	Code string
+	Name string
+}
+
+type Currency struct {
+	ID        int64
+	Code      string
+	Name      string
+	MinorUnit int64
+}
+
 type Transfer struct {
 	ID        int64
-	From      string
-	To        string
+	Source    string
+	Target    string
 	Amount    int64
 	Currency  string
 	CreatedAt time.Time
