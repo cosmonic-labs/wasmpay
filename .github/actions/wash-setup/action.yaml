@@ -23,10 +23,14 @@ inputs:
     description: "Rust toolchain"
     required: false
     default: "stable"
-  rust-target:
-    description: "Rust target"
+  rust-targets:
+    description: "Comma separated list of additional targets"
     required: false
     default: "wasm32-wasip2"
+  rust-components:
+    description: "Comma separated list of additional components"
+    required: false
+    default: "clippy, rustfmt"
   node-version:
     description: "Node version"
     required: false
@@ -37,10 +41,11 @@ runs:
   steps:
     # Rust Setup
     - name: Install Rust
-      uses: actions-rust-lang/setup-rust-toolchain@v1
+      uses: dtolnay/rust-toolchain@stable
       with:
         toolchain: ${{ inputs.rust-toolchain }}
-        target: ${{ inputs.rust-target }}
+        targets: ${{ inputs.rust-targets }}
+        components: ${{ inputs.rust-components }}
     # Go Setup
     - name: Install Go
       uses: actions/setup-go@v5.2.0
