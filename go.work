@@ -8,6 +8,7 @@ use (
 	./aws/services/bedrockruntime
 	./aws/services/sts
 	./icamer-validator
+	./ledger
 	./untrusted-validator
 )
 

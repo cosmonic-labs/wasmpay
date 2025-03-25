@@ -1,6 +1,6 @@
 # Makefile with auto-updating help
 
-.PHONY: help build
+.PHONY: help build proto
 
 WASMCLOUD_EXPERIMENTAL_FEATURES = builtin-messaging-nats,builtin-http-server 
 
@@ -16,6 +16,9 @@ build: ## Build all components in the project
 	@wash build -p transaction-manager --skip-fetch
 	@wash build -p untrusted-validator --skip-fetch
 	@wash build -p wasmpay-validator --skip-fetch
+
+proto: ## Generate protobuf definitions for the Ledger service
+	go tool buf generate
 
 test-e2e: build ## Build all components and deploy the local wadm
 	@WASMCLOUD_EXPERIMENTAL_FEATURES=${WASMCLOUD_EXPERIMENTAL_FEATURES} \

@@ -1,0 +1,22 @@
+# Refer to https://buf.build/docs/configuration/v2/buf-gen-yaml/ for docs
+version: v2
+clean: true
+managed:
+  enabled: true
+  override:
+    - file_option: go_package
+      value: github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/onboardv1
+      path: proto/ledger/onboard/v1
+    - file_option: go_package
+      value: github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/transferv1
+      path: proto/ledger/transfer/v1
+plugins:
+  - local: ["go", "tool", "protoc-gen-go"]
+    out: ledger/internal/rpc
+    opt:
+      - module=github.com/cosmonic-labs/wasmpay/ledger/internal/rpc
+
+  - local: ["go", "tool", "protoc-gen-connect-go"]
+    out: ledger/internal/rpc
+    opt:
+      - module=github.com/cosmonic-labs/wasmpay/ledger/internal/rpc
