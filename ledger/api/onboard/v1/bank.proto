@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package proto.ledger.onboard.v1;
+package api.onboard.v1;
 
 message Bank {
   string code = 1;

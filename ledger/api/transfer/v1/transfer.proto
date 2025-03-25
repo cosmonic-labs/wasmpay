@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package proto.ledger.transfer.v1;
+package api.transfer.v1;
 
 message TransferRequest {
   // What account is sending money

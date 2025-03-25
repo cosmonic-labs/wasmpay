@@ -5,8 +5,8 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/transferv1"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/transferv1/transferv1connect"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/transferv1"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/transferv1/transferv1connect"
 )
 
 type TransferServer struct {

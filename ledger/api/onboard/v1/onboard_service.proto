@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package proto.ledger.onboard.v1;
+package api.onboard.v1;
 
-import "proto/ledger/onboard/v1/bank.proto";
-import "proto/ledger/onboard/v1/customer.proto";
+import "api/onboard/v1/bank.proto";
+import "api/onboard/v1/customer.proto";
 
 // Onboarding Bank and Customer entities
 service OnboardService {

@@ -5,8 +5,8 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/onboardv1"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/onboardv1/onboardv1connect"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/onboardv1"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/onboardv1/onboardv1connect"
 )
 
 type OnboardServer struct {
