@@ -45,9 +45,17 @@ world transaction-manager {
    export validation;
 }
 
+// The transaction committer is responsible for processing
+// transactions, including validation with bank validator components
+world transaction-committer {
+   import validation;
+   export validation;
+}
+
 // Wrapper component to handle messaging logic for validator components
 world validator-messenger {
    import validation;
+   export validation;
    export wasmcloud:messaging/handler@0.2.0;
 }
 

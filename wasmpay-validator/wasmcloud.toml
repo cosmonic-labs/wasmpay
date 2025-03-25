@@ -1,0 +1,26 @@
+name = "wasmpay-validator"
+version = "0.1.0"
+language = "rust"
+type = "component"
+wit = "../wit"
+
+[component]
+wasm_target = "wasm32-wasip2"
+wit_world = "validator"
+build_command = "./build.sh"
+build_artifact = "build/wasmpay-validator.composed.wasm"
+
+# Requires https://github.com/wasmCloud/wasmCloud/pull/4229
+[composition]
+socket = "../wasmpay-messaging/wasmpay_messaging.wasm"
+components = ["../wasmpay-messaging/wasmpay_messaging.wasm"]
+# Options?
+[compose]
+socket = "../wasmpay-messaging/wasmpay_messaging.wasm"
+[component.compose]
+socket = "../wasmpay-messaging/wasmpay_messaging.wasm"
+
+[[dev.overrides.imports]] 
+interface_spec = "wasmcloud:messaging@0.2.0"
+image_ref = "wasmcloud+builtin://messaging-nats"
+config = { values = { subscription = "wasmcloud.dev" } }

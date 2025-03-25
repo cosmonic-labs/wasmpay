@@ -52,13 +52,16 @@ impl Guest for TransactionManager {
 /// Validates a transaction with the given link name. This component will be linked
 /// to multiple validators, and the link name will be used to determine which validator
 /// to use.
+///
+/// If there isn't a link present, we assume the bank did not include its own validator
 fn validate_with(transaction: &Transaction, link_name: &str) -> Result<(), String> {
     // wasmpay:platform/validate
     let validate_interface = vec![lattice::CallTargetInterface::new(
         "wasmpay", "platform", "validate",
     )];
     if lattice::set_link_name(link_name, validate_interface).is_err() {
-        return Err(format!("Failed to set link name to {link_name}"));
+        debug!("Failed to set link name to {link_name} for transaction {transaction:?}");
+        return Ok(());
     };
     if validate(transaction) {
         debug!("Validation succeeded for transaction {transaction:?} to {link_name}");

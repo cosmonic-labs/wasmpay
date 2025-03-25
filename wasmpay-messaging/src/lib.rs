@@ -1,4 +1,6 @@
 mod generated {
+    use super::Component;
+
     wit_bindgen::generate!({
         world: "validator-messenger",
         path: "../wit",
@@ -6,17 +8,18 @@ mod generated {
         additional_derives: [serde::Serialize, serde::Deserialize, Default],
     });
 
-    pub struct Component;
     export!(Component);
 }
 
 use generated::exports::wasmcloud::messaging::handler::Guest as MessagingHandler;
+use generated::exports::wasmpay::platform::validation::Guest as ValidationHandler;
 use generated::wasmcloud::messaging::types::BrokerMessage as IncomingMessage;
 use generated::wasmpay;
-use generated::Component;
 
 use wasmcloud_component::wasmcloud::messaging::consumer::{publish, BrokerMessage};
 use wasmcloud_component::{debug, info, warn};
+
+struct Component;
 
 impl MessagingHandler for Component {
     fn handle_message(msg: IncomingMessage) -> Result<(), String> {
@@ -43,5 +46,13 @@ impl MessagingHandler for Component {
             warn!("Message received without a reply subject, noop");
             Err("No reply subject, not validating transaction".to_string())
         }
+    }
+}
+
+/// Component passthrough to call the composed component's validation function
+impl ValidationHandler for Component {
+    fn validate(transaction: wasmpay::platform::types::Transaction) -> bool {
+        // Additional validation logic can be added here
+        wasmpay::platform::validation::validate(&transaction)
     }
 }
