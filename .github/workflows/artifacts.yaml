@@ -30,13 +30,15 @@ jobs:
           # optional: specify go cache dependency path to use.
           go-cache-dependency-path: '*/go.sum'
       
-      # wasmpay-messaging ( Donut )
-      - name: Build Donut Component
+      # WAC/Donut: wasmpay-messaging
+      # will be used by other components as dependency.
+      - name: Build wasmpay-messaging
         uses: ./.github/actions/wash-build
         with:
           working-directory: wasmpay-messaging
 
-      # API Gateway
+      # Component: API Gateway
+      # build static UI so it can be embedded in the wasm binary.
       - name: Build Banking UI
         working-directory: api-gateway/wasmcloud.banking
         run: |
@@ -58,23 +60,13 @@ jobs:
           artifact: build/api-gateway_s.wasm
           image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:latest
     
-
-      # Transaction Manager
+      # Component: Transaction Manager
       - name: Build Transaction Manager
         uses: ./.github/actions/wash-build
         with:
           working-directory: transaction-manager
 
-      # Environment Setup (Rust, Go, Node, WASM Tooling)
-      - name: Setup WASM Build Environment
-        uses: ./.github/actions/wash-setup
-        with:
-          # optional: specify go version file to use.
-          go-version-file: go.work
-          # optional: specify go cache dependency path to use.
-          go-cache-dependency-path: '*/go.sum'
-
-      # icamer-validator
+      # Component: icamer-validator
       - name: Build icamer-validator
         uses: ./.github/actions/wash-build
         with:
