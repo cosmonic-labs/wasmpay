@@ -28,7 +28,8 @@ impl http::Server for Component {
         request: http::IncomingRequest,
     ) -> http::Result<http::Response<impl http::OutgoingBody>> {
         let (_parts, body) = request.into_parts();
-        if let Ok(transaction) = serde_json::from_reader(body) {
+        let res = serde_json::from_reader(body);
+        if let Ok(transaction) = res {
             info!("Validating transaction: {transaction:?}");
             let res = <Component as ValidationHandler>::validate(transaction);
             Ok(http::Response::builder()
@@ -41,10 +42,10 @@ impl http::Server for Component {
                 ))
                 .unwrap())
         } else {
-            warn!("Invalid transaction");
+            warn!("Invalid transaction: {res:?}");
             return Ok(http::Response::builder()
                 .status(400)
-                .body(r#"{{"approved": false, "reason": "Invalid transaction"}}"#.to_string())
+                .body(r#"{"approved": false, "reason": "Invalid transaction"}"#.to_string())
                 .unwrap());
         }
     }

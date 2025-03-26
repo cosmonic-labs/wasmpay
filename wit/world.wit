@@ -3,6 +3,7 @@ package wasmpay:platform@0.1.0;
 // Types involved in the wasmpay platform
 interface types {
    record bank {
+      id: string,
       code: string,
       country: string,
       currency: string,
@@ -13,7 +14,6 @@ interface types {
       denied(string),
    }
    record transaction {
-      id: option<string>,
       origin: bank,
       destination: bank,
       amount: s64,
@@ -62,6 +62,7 @@ world validator-harness {
    import validation;
    export validation;
    export wasmcloud:messaging/handler@0.2.0;
+   // Exported implicitly by wasmcloud_component crate
    // export wasi:http/incoming-handler@0.2.0;
 }
 
