@@ -9,9 +9,10 @@ function loadApi() {
   console.log('Using API:', api);
 
   const promise = Promise.resolve(
-    api === 'v2'
-      ? import('#services/backend/mocks/index.ts')
-      : import('#services/backend/api/index.ts'),
+    // api === 'v2'
+    //   ? import('#services/backend/mocks/index.ts')
+    //   :
+    import('#services/backend/api/index.ts'),
   ).then((res) => (response = res.default));
 
   return {
@@ -31,8 +32,11 @@ function useApi() {
   const api = apiLoader.load();
 
   return {
+    listBanks: api.listBanks(config),
+    getBanksById: api.getBankById(config),
+    getBanksByCode: api.getBankByCode(config),
     transactions: api.transactions(config),
-    createUser: api.createUser(config),
+    // createUser: api.createUser(config),
   };
 }
 

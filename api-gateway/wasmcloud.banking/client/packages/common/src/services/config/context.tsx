@@ -5,16 +5,20 @@ export type ConfigResponse = {
   appName: string;
   apiPaths: {
     transactions: string;
-    createUser: string;
+    listBanks: string;
+    getBankByCode: string;
+    getBankById: string;
   };
 };
 
 const DEFAULT_CONFIG: ConfigResponse = {
   baseUrl: '/',
-  appName: 'wasmCloud Banking',
+  appName: 'wasmpay',
   apiPaths: {
-    transactions: '/accounts/:id/transactions',
-    createUser: '/accounts/:id',
+    transactions: '/api/v1/transactions',
+    listBanks: '/api/v1/banks',
+    getBankByCode: '/api/v1/banks?code=:code',
+    getBankById: '/api/v1/banks?id=:id',
   },
 };
 
