@@ -20,14 +20,14 @@ build: ## Build all components in the project
 	wash build -p untrusted-validator
 	wash build -p wasmpay-validator
 
-test-e2e: build ## Build all components and deploy the local wadm
+test-e2e: #build ## Build all components and deploy the local wadm
 	@WASMCLOUD_EXPERIMENTAL_FEATURES=${WASMCLOUD_EXPERIMENTAL_FEATURES} \
 		wash up -d
 	@sleep 1
 	@wash app deploy ./app.wadm.yaml
 	@until wash app get | grep wasmpay | tee /dev/stderr | grep Deployed; do sleep 1; done
 	@make test-validate
-	@wash down --all
+# @wash down --all
 
 test-validate: ## curl the API gateway with a test validation that should work after deploy
 	curl localhost:8000/api/v1/transaction -d '{"origin": {"id": "bank1", "code": "BNK1", "country": "US", "currency": "USD", "name": "Bank One"}, "destination": {"id": "bank2", "code": "BNK2", "country": "UK", "currency": "GBP", "name": "Bank Two"}, "amount": 1000, "currency": "USD", "status": "Approved"}'
