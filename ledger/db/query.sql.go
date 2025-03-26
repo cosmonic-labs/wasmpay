@@ -157,25 +157,31 @@ func (q *Queries) DeleteBankByCode(ctx context.Context, code string) error {
 	return err
 }
 
-const getBankByCode = `-- name: GetBankByCode :one
+const getBank = `-- name: GetBank :one
 
 SELECT banks.id, banks.bid, banks.code, banks.name, banks.country_id, banks.currency_id, countries.id, countries.code, countries.name, currencies.id, currencies.code, currencies.name, currencies.minor_unit
 FROM banks
 JOIN countries on countries.id = banks.country_id
 JOIN currencies on currencies.id = banks.currency_id
-WHERE banks.code = ? LIMIT 1
+WHERE banks.bid = ? OR banks.code = ?
+LIMIT 1
 `
 
-type GetBankByCodeRow struct {
+type GetBankParams struct {
+	Bid  string
+	Code string
+}
+
+type GetBankRow struct {
 	Bank     Bank
 	Country  Country
 	Currency Currency
 }
 
 // Bank queries
-func (q *Queries) GetBankByCode(ctx context.Context, code string) (GetBankByCodeRow, error) {
-	row := q.db.QueryRowContext(ctx, getBankByCode, code)
-	var i GetBankByCodeRow
+func (q *Queries) GetBank(ctx context.Context, arg GetBankParams) (GetBankRow, error) {
+	row := q.db.QueryRowContext(ctx, getBank, arg.Bid, arg.Code)
+	var i GetBankRow
 	err := row.Scan(
 		&i.Bank.ID,
 		&i.Bank.Bid,

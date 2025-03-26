@@ -18,8 +18,12 @@ service BankService {
 }
 
 message GetBankRequest {
-  string code = 1;
+  oneof value {
+    string id = 1;
+    string code = 2;
+  }
 }
+
 message GetBankResponse {
   Bank bank = 1;
 }

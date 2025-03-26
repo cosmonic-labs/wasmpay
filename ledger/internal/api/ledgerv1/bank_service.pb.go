@@ -22,8 +22,12 @@ const (
 )
 
 type GetBankRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Value:
+	//
+	//	*GetBankRequest_Id
+	//	*GetBankRequest_Code
+	Value         isGetBankRequest_Value `protobuf_oneof:"value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -58,12 +62,46 @@ func (*GetBankRequest) Descriptor() ([]byte, []int) {
 	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetBankRequest) GetCode() string {
+func (x *GetBankRequest) GetValue() isGetBankRequest_Value {
 	if x != nil {
-		return x.Code
+		return x.Value
+	}
+	return nil
+}
+
+func (x *GetBankRequest) GetId() string {
+	if x != nil {
+		if x, ok := x.Value.(*GetBankRequest_Id); ok {
+			return x.Id
+		}
 	}
 	return ""
 }
+
+func (x *GetBankRequest) GetCode() string {
+	if x != nil {
+		if x, ok := x.Value.(*GetBankRequest_Code); ok {
+			return x.Code
+		}
+	}
+	return ""
+}
+
+type isGetBankRequest_Value interface {
+	isGetBankRequest_Value()
+}
+
+type GetBankRequest_Id struct {
+	Id string `protobuf:"bytes,1,opt,name=id,proto3,oneof"`
+}
+
+type GetBankRequest_Code struct {
+	Code string `protobuf:"bytes,2,opt,name=code,proto3,oneof"`
+}
+
+func (*GetBankRequest_Id) isGetBankRequest_Value() {}
+
+func (*GetBankRequest_Code) isGetBankRequest_Value() {}
 
 type GetBankResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -385,9 +423,11 @@ var File_api_ledger_v1_bank_service_proto protoreflect.FileDescriptor
 
 const file_api_ledger_v1_bank_service_proto_rawDesc = "" +
 	"\n" +
-	" api/ledger/v1/bank_service.proto\x12\rapi.ledger.v1\x1a\x18api/ledger/v1/bank.proto\"$\n" +
-	"\x0eGetBankRequest\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\tR\x04code\":\n" +
+	" api/ledger/v1/bank_service.proto\x12\rapi.ledger.v1\x1a\x18api/ledger/v1/bank.proto\"A\n" +
+	"\x0eGetBankRequest\x12\x10\n" +
+	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x12\x14\n" +
+	"\x04code\x18\x02 \x01(\tH\x00R\x04codeB\a\n" +
+	"\x05value\":\n" +
 	"\x0fGetBankResponse\x12'\n" +
 	"\x04bank\x18\x01 \x01(\v2\x13.api.ledger.v1.BankR\x04bank\"\x12\n" +
 	"\x10ListBanksRequest\">\n" +
@@ -460,6 +500,10 @@ func file_api_ledger_v1_bank_service_proto_init() {
 		return
 	}
 	file_api_ledger_v1_bank_proto_init()
+	file_api_ledger_v1_bank_service_proto_msgTypes[0].OneofWrappers = []any{
+		(*GetBankRequest_Id)(nil),
+		(*GetBankRequest_Code)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

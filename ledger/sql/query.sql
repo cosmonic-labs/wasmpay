@@ -2,12 +2,13 @@
 -- Bank queries
 --
 
--- name: GetBankByCode :one
+-- name: GetBank :one
 SELECT sqlc.embed(banks), sqlc.embed(countries), sqlc.embed(currencies)
 FROM banks
 JOIN countries on countries.id = banks.country_id
 JOIN currencies on currencies.id = banks.currency_id
-WHERE banks.code = ? LIMIT 1;
+WHERE banks.bid = ? OR banks.code = ?
+LIMIT 1;
 
 -- name: ListBanks :many
 SELECT * FROM banks

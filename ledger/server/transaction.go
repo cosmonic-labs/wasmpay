@@ -30,12 +30,16 @@ var _ ledgerv1connect.TransactionServiceHandler = (*TransactionServer)(nil)
 func (srv *TransactionServer) StoreTransaction(ctx context.Context, req *connect.Request[ledgerv1.StoreTransactionRequest]) (*connect.Response[ledgerv1.StoreTransactionResponse], error) {
 	logger := srv.Logger.With(slog.String("method", "StoreTransaction"))
 	// Ensure origin and destination are banks we know about
-	origin, err := srv.DB.GetBankByCode(ctx, req.Msg.GetOrigin())
+	origin, err := srv.DB.GetBank(ctx, db.GetBankParams{
+		Code: req.Msg.GetOrigin(),
+	})
 	if err != nil {
 		logger.Error("could not find origin bank", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, errMissingOrigin)
 	}
-	destination, err := srv.DB.GetBankByCode(ctx, req.Msg.GetDestination())
+	destination, err := srv.DB.GetBank(ctx, db.GetBankParams{
+		Code: req.Msg.GetDestination(),
+	})
 	if err != nil {
 		logger.Error("could not find destination bank", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, errMissingDestination)

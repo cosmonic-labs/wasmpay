@@ -16,7 +16,7 @@ var (
 	errFailedToCreateBank = errors.New("unable to create bank")
 	errFailedToListBanks  = errors.New("unable to list banks")
 	errFailedToDeleteBank = errors.New("unable to delete bank")
-	errMissingBank        = errors.New("unable to locate bank by code")
+	errMissingBank        = errors.New("unable to locate bank")
 	errMissingCountry     = errors.New("unsupported country")
 )
 
@@ -30,7 +30,10 @@ var _ ledgerv1connect.BankServiceHandler = (*BankServer)(nil)
 func (srv *BankServer) GetBank(ctx context.Context, req *connect.Request[ledgerv1.GetBankRequest]) (*connect.Response[ledgerv1.GetBankResponse], error) {
 	logger := srv.Logger.With("method", "get-bank")
 
-	result, err := srv.DB.GetBankByCode(ctx, req.Msg.GetCode())
+	result, err := srv.DB.GetBank(ctx, db.GetBankParams{
+		Bid:  req.Msg.GetId(),
+		Code: req.Msg.GetCode(),
+	})
 	if err != nil {
 		logger.Error("could not get bank by code", "error", err)
 		return nil, connect.NewError(connect.CodeInvalidArgument, errMissingBank)
