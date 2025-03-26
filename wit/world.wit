@@ -9,16 +9,12 @@ interface types {
       currency: string,
       name: string,
    }
-   variant status {
-      approved,
-      denied(string),
-   }
    record transaction {
       origin: bank,
       destination: bank,
       amount: s64,
       currency: string,
-      status: status,
+      status: string,
    }
    record validate-response {
       approved: bool,
