@@ -80,6 +80,52 @@ func (q *Queries) CreateCurrency(ctx context.Context, arg CreateCurrencyParams) 
 	return err
 }
 
+const createTransaction = `-- name: CreateTransaction :one
+
+INSERT INTO transactions (
+  tid, origin_id, destination_id, currency_id, amount, status, reason
+) VALUES (
+  ?, ?, ?, ?, ?, ?, ?
+)
+RETURNING id, tid, origin_id, destination_id, currency_id, amount, status, reason, created_at
+`
+
+type CreateTransactionParams struct {
+	Tid           string
+	OriginID      int64
+	DestinationID int64
+	CurrencyID    int64
+	Amount        int64
+	Status        string
+	Reason        string
+}
+
+// Transaction queries
+func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
+	row := q.db.QueryRowContext(ctx, createTransaction,
+		arg.Tid,
+		arg.OriginID,
+		arg.DestinationID,
+		arg.CurrencyID,
+		arg.Amount,
+		arg.Status,
+		arg.Reason,
+	)
+	var i Transaction
+	err := row.Scan(
+		&i.ID,
+		&i.Tid,
+		&i.OriginID,
+		&i.DestinationID,
+		&i.CurrencyID,
+		&i.Amount,
+		&i.Status,
+		&i.Reason,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const currencyExists = `-- name: CurrencyExists :one
 SELECT
     EXISTS (
@@ -206,27 +252,6 @@ func (q *Queries) GetCurrencyById(ctx context.Context, id int64) (Currency, erro
 	return i, err
 }
 
-const getTransfer = `-- name: GetTransfer :one
-
-SELECT id, source, target, amount, currency, created_at FROM transfers
-WHERE id = ? LIMIT 1
-`
-
-// Transfer queries
-func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
-	row := q.db.QueryRowContext(ctx, getTransfer, id)
-	var i Transfer
-	err := row.Scan(
-		&i.ID,
-		&i.Source,
-		&i.Target,
-		&i.Amount,
-		&i.Currency,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
 const listBanks = `-- name: ListBanks :many
 SELECT id, code, name, country_id, currency_id FROM banks
 LIMIT 50
@@ -310,27 +335,61 @@ func (q *Queries) ListBanksWithCountriesAndCurrencies(ctx context.Context) ([]Li
 	return items, nil
 }
 
-const listTransfers = `-- name: ListTransfers :many
-SELECT id, source, target, amount, currency, created_at FROM transfers
-ORDER BY created_at
+const listTransactions = `-- name: ListTransactions :many
+SELECT
+  transactions.id, transactions.tid, transactions.origin_id, transactions.destination_id, transactions.currency_id, transactions.amount, transactions.status, transactions.reason, transactions.created_at,
+  origin.id, origin.code, origin.name, origin.country_id, origin.currency_id,
+  destination.id, destination.code, destination.name, destination.country_id, destination.currency_id,
+  currencies.id, currencies.code, currencies.name, currencies.minor_unit
+FROM
+  transactions
+  JOIN banks AS origin ON origin.id = transactions.destination_id
+  JOIN banks AS destination ON destination.id = transactions.origin_id
+  JOIN currencies ON currencies.id = transactions.currency_id
+ORDER BY
+  created_at
 `
 
-func (q *Queries) ListTransfers(ctx context.Context) ([]Transfer, error) {
-	rows, err := q.db.QueryContext(ctx, listTransfers)
+type ListTransactionsRow struct {
+	Transaction Transaction
+	Bank        Bank
+	Bank_2      Bank
+	Currency    Currency
+}
+
+func (q *Queries) ListTransactions(ctx context.Context) ([]ListTransactionsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listTransactions)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Transfer
+	var items []ListTransactionsRow
 	for rows.Next() {
-		var i Transfer
+		var i ListTransactionsRow
 		if err := rows.Scan(
-			&i.ID,
-			&i.Source,
-			&i.Target,
-			&i.Amount,
-			&i.Currency,
-			&i.CreatedAt,
+			&i.Transaction.ID,
+			&i.Transaction.Tid,
+			&i.Transaction.OriginID,
+			&i.Transaction.DestinationID,
+			&i.Transaction.CurrencyID,
+			&i.Transaction.Amount,
+			&i.Transaction.Status,
+			&i.Transaction.Reason,
+			&i.Transaction.CreatedAt,
+			&i.Bank.ID,
+			&i.Bank.Code,
+			&i.Bank.Name,
+			&i.Bank.CountryID,
+			&i.Bank.CurrencyID,
+			&i.Bank_2.ID,
+			&i.Bank_2.Code,
+			&i.Bank_2.Name,
+			&i.Bank_2.CountryID,
+			&i.Bank_2.CurrencyID,
+			&i.Currency.ID,
+			&i.Currency.Code,
+			&i.Currency.Name,
+			&i.Currency.MinorUnit,
 		); err != nil {
 			return nil, err
 		}

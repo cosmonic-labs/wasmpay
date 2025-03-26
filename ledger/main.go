@@ -54,12 +54,14 @@ func run(bindAddr, dbStore string) error {
 	mux := http.NewServeMux()
 
 	path, handler := onboardv1connect.NewOnboardServiceHandler(&server.OnboardServer{
-		DB: client,
+		DB:     client,
+		Logger: logger.With(slog.String("service", "onboard-svc")),
 	})
 	mux.Handle(path, handler)
 
 	path, handler = transactionv1connect.NewTransactionServiceHandler(&server.TransactionServer{
-		DB: client,
+		DB:     client,
+		Logger: logger.With(slog.String("service", "transaction-svc")),
 	})
 	mux.Handle(path, handler)
 

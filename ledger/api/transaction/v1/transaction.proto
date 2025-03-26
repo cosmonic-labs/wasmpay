@@ -2,17 +2,33 @@ syntax = "proto3";
 
 package api.transaction.v1;
 
-message TransactionRequest {
-  // What account is sending money
-  string from = 1;
-  // What account is money being sent to
-  string to = 2;
-  // Currency-appropriate denomination
-  uint32 amount = 3;
-  // Currency
-  string currency = 4;
+message Transaction {
+  string id = 1;
+  string origin = 2;
+  string destination = 3;
+  uint64 amount = 4;
+  string currency = 5;
+  TransactionStatus status = 6;
 }
 
-message TransactionResponse {
-  bool success = 1;
+message TransactionStatus {
+  string status = 1;
+  string reason = 2;
+}
+
+message StoreTransactionRequest {
+  string origin = 1;
+  string destination = 2;
+  uint64 amount = 3;
+  string currency = 4;
+  TransactionStatus status = 5;
+}
+
+message StoreTransactionResponse {
+  string id = 1;
+}
+
+message ListTransactionsRequest {}
+message ListTransactionsResponse {
+  repeated Transaction transactions = 1;
 }

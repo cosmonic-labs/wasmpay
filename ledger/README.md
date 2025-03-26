@@ -6,19 +6,15 @@ Ledger Service is a standalone Go binary intended to be run inside of container,
 
 The service can be run with a simple `go run main.go` for local development
 
-## Invoking the service
+## Bank operations:
 
-Once the ledger is running, it can be invoked over HTTP (for example, using curl) like so:
-
-### Bank operations:
-
-### Creating banks:
+### Create a Bank
 
 ```shell
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{"code":"nordhaven", "name": "First National Bank", "currency": "USD", "country": "USA"}' \
-  localhost:8080/proto.ledger.onboard.v1.OnboardService/CreateBank
+  localhost:8080/api.onboard.v1.OnboardService/CreateBank
 ```
 
 Returns:
@@ -39,7 +35,7 @@ Content-Length: 10
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{"code": "nordhaven"}' \
-  localhost:8080/proto.ledger.onboard.v1.OnboardService/GetBank
+  localhost:8080/api.onboard.v1.OnboardService/GetBank
 ```
 
 Returns:
@@ -59,7 +55,7 @@ Content-Length: 91
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{}' \
-  localhost:8080/proto.ledger.onboard.v1.OnboardService/ListBanks
+  localhost:8080/api.onboard.v1.OnboardService/ListBanks
 ```
 
 Returns:
@@ -80,7 +76,7 @@ Content-Length: 97
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{"code": "nordhaven"}' \
-  localhost:8080/proto.ledger.onboard.v1.OnboardService/DeleteBank
+  localhost:8080/api.onboard.v1.OnboardService/DeleteBank
 ```
 
 Returns:
@@ -95,23 +91,46 @@ Content-Length: 2
 {}
 ```
 
-### TODO:
+## Transaction operations:
+
+### Store a Transaction
 
 ```shell
-curl -i \
+curl -i -X POST \
   --header "Content-Type: application/json" \
-  --data '{"from": "foo", "to": "bar", "amount": 12345, "currency": "USD"}' \
-  http://localhost:8080/ledger.v1.LedgerService/Transfer
+  -d '{"origin":"nordhaven", "destination": "icamer", "amount": 10000, "currency": "USD", "status": {"status": "approved", "reason": ""}}' \
+  localhost:8080/api.transaction.v1.TransactionService/StoreTransaction
 ```
 
-Assuming everything is working, you should get back somethign like:
+Returns:
 
 ```shell
 HTTP/1.1 200 OK
 Accept-Encoding: gzip
 Content-Type: application/json
-Date: Tue, 25 Mar 2025 04:17:57 GMT
-Content-Length: 16
+Date: Wed, 26 Mar 2025 02:17:04 GMT
+Content-Length: 20
 
-{"success":true}
+{"id":"txn_OnJqOSK"}
+```
+
+### List Transactions
+
+```shell
+curl -i -X POST \
+  --header "Content-Type: application/json" \
+  -d '{}' \
+  localhost:8080/api.transaction.v1.TransactionService/ListTransactions
+```
+
+Returns:
+
+```shell
+HTTP/1.1 200 OK
+Accept-Encoding: gzip
+Content-Type: application/json
+Date: Wed, 26 Mar 2025 02:23:06 GMT
+Content-Length: 148
+
+{"transactions":[{"id":"txn_hfH2bn9","origin":"icamer","destination":"nordhaven","amount":"10000","currency":"USD","status":{"status":"approved"}}]}
 ```

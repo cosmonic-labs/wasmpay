@@ -24,20 +24,25 @@ var File_api_transaction_v1_transaction_service_proto protoreflect.FileDescripto
 
 const file_api_transaction_v1_transaction_service_proto_rawDesc = "" +
 	"\n" +
-	",api/transaction/v1/transaction_service.proto\x12\x12api.transaction.v1\x1a$api/transaction/v1/transaction.proto2v\n" +
-	"\x12TransactionService\x12`\n" +
-	"\vTransaction\x12&.api.transaction.v1.TransactionRequest\x1a'.api.transaction.v1.TransactionResponse\"\x00B\xdf\x01\n" +
+	",api/transaction/v1/transaction_service.proto\x12\x12api.transaction.v1\x1a$api/transaction/v1/transaction.proto2\xf6\x01\n" +
+	"\x12TransactionService\x12o\n" +
+	"\x10StoreTransaction\x12+.api.transaction.v1.StoreTransactionRequest\x1a,.api.transaction.v1.StoreTransactionResponse\"\x00\x12o\n" +
+	"\x10ListTransactions\x12+.api.transaction.v1.ListTransactionsRequest\x1a,.api.transaction.v1.ListTransactionsResponse\"\x00B\xdf\x01\n" +
 	"\x16com.api.transaction.v1B\x17TransactionServiceProtoP\x01ZBgithub.com/cosmonic-labs/wasmpay/ledger/internal/api/transactionv1\xa2\x02\x03ATX\xaa\x02\x12Api.Transaction.V1\xca\x02\x12Api\\Transaction\\V1\xe2\x02\x1eApi\\Transaction\\V1\\GPBMetadata\xea\x02\x14Api::Transaction::V1b\x06proto3"
 
 var file_api_transaction_v1_transaction_service_proto_goTypes = []any{
-	(*TransactionRequest)(nil),  // 0: api.transaction.v1.TransactionRequest
-	(*TransactionResponse)(nil), // 1: api.transaction.v1.TransactionResponse
+	(*StoreTransactionRequest)(nil),  // 0: api.transaction.v1.StoreTransactionRequest
+	(*ListTransactionsRequest)(nil),  // 1: api.transaction.v1.ListTransactionsRequest
+	(*StoreTransactionResponse)(nil), // 2: api.transaction.v1.StoreTransactionResponse
+	(*ListTransactionsResponse)(nil), // 3: api.transaction.v1.ListTransactionsResponse
 }
 var file_api_transaction_v1_transaction_service_proto_depIdxs = []int32{
-	0, // 0: api.transaction.v1.TransactionService.Transaction:input_type -> api.transaction.v1.TransactionRequest
-	1, // 1: api.transaction.v1.TransactionService.Transaction:output_type -> api.transaction.v1.TransactionResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 0: api.transaction.v1.TransactionService.StoreTransaction:input_type -> api.transaction.v1.StoreTransactionRequest
+	1, // 1: api.transaction.v1.TransactionService.ListTransactions:input_type -> api.transaction.v1.ListTransactionsRequest
+	2, // 2: api.transaction.v1.TransactionService.StoreTransaction:output_type -> api.transaction.v1.StoreTransactionResponse
+	3, // 3: api.transaction.v1.TransactionService.ListTransactions:output_type -> api.transaction.v1.ListTransactionsResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

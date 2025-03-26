@@ -33,14 +33,18 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// TransactionServiceTransactionProcedure is the fully-qualified name of the TransactionService's
-	// Transaction RPC.
-	TransactionServiceTransactionProcedure = "/api.transaction.v1.TransactionService/Transaction"
+	// TransactionServiceStoreTransactionProcedure is the fully-qualified name of the
+	// TransactionService's StoreTransaction RPC.
+	TransactionServiceStoreTransactionProcedure = "/api.transaction.v1.TransactionService/StoreTransaction"
+	// TransactionServiceListTransactionsProcedure is the fully-qualified name of the
+	// TransactionService's ListTransactions RPC.
+	TransactionServiceListTransactionsProcedure = "/api.transaction.v1.TransactionService/ListTransactions"
 )
 
 // TransactionServiceClient is a client for the api.transaction.v1.TransactionService service.
 type TransactionServiceClient interface {
-	Transaction(context.Context, *connect.Request[transactionv1.TransactionRequest]) (*connect.Response[transactionv1.TransactionResponse], error)
+	StoreTransaction(context.Context, *connect.Request[transactionv1.StoreTransactionRequest]) (*connect.Response[transactionv1.StoreTransactionResponse], error)
+	ListTransactions(context.Context, *connect.Request[transactionv1.ListTransactionsRequest]) (*connect.Response[transactionv1.ListTransactionsResponse], error)
 }
 
 // NewTransactionServiceClient constructs a client for the api.transaction.v1.TransactionService
@@ -54,10 +58,16 @@ func NewTransactionServiceClient(httpClient connect.HTTPClient, baseURL string, 
 	baseURL = strings.TrimRight(baseURL, "/")
 	transactionServiceMethods := transactionv1.File_api_transaction_v1_transaction_service_proto.Services().ByName("TransactionService").Methods()
 	return &transactionServiceClient{
-		transaction: connect.NewClient[transactionv1.TransactionRequest, transactionv1.TransactionResponse](
+		storeTransaction: connect.NewClient[transactionv1.StoreTransactionRequest, transactionv1.StoreTransactionResponse](
 			httpClient,
-			baseURL+TransactionServiceTransactionProcedure,
-			connect.WithSchema(transactionServiceMethods.ByName("Transaction")),
+			baseURL+TransactionServiceStoreTransactionProcedure,
+			connect.WithSchema(transactionServiceMethods.ByName("StoreTransaction")),
+			connect.WithClientOptions(opts...),
+		),
+		listTransactions: connect.NewClient[transactionv1.ListTransactionsRequest, transactionv1.ListTransactionsResponse](
+			httpClient,
+			baseURL+TransactionServiceListTransactionsProcedure,
+			connect.WithSchema(transactionServiceMethods.ByName("ListTransactions")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -65,18 +75,25 @@ func NewTransactionServiceClient(httpClient connect.HTTPClient, baseURL string, 
 
 // transactionServiceClient implements TransactionServiceClient.
 type transactionServiceClient struct {
-	transaction *connect.Client[transactionv1.TransactionRequest, transactionv1.TransactionResponse]
+	storeTransaction *connect.Client[transactionv1.StoreTransactionRequest, transactionv1.StoreTransactionResponse]
+	listTransactions *connect.Client[transactionv1.ListTransactionsRequest, transactionv1.ListTransactionsResponse]
 }
 
-// Transaction calls api.transaction.v1.TransactionService.Transaction.
-func (c *transactionServiceClient) Transaction(ctx context.Context, req *connect.Request[transactionv1.TransactionRequest]) (*connect.Response[transactionv1.TransactionResponse], error) {
-	return c.transaction.CallUnary(ctx, req)
+// StoreTransaction calls api.transaction.v1.TransactionService.StoreTransaction.
+func (c *transactionServiceClient) StoreTransaction(ctx context.Context, req *connect.Request[transactionv1.StoreTransactionRequest]) (*connect.Response[transactionv1.StoreTransactionResponse], error) {
+	return c.storeTransaction.CallUnary(ctx, req)
+}
+
+// ListTransactions calls api.transaction.v1.TransactionService.ListTransactions.
+func (c *transactionServiceClient) ListTransactions(ctx context.Context, req *connect.Request[transactionv1.ListTransactionsRequest]) (*connect.Response[transactionv1.ListTransactionsResponse], error) {
+	return c.listTransactions.CallUnary(ctx, req)
 }
 
 // TransactionServiceHandler is an implementation of the api.transaction.v1.TransactionService
 // service.
 type TransactionServiceHandler interface {
-	Transaction(context.Context, *connect.Request[transactionv1.TransactionRequest]) (*connect.Response[transactionv1.TransactionResponse], error)
+	StoreTransaction(context.Context, *connect.Request[transactionv1.StoreTransactionRequest]) (*connect.Response[transactionv1.StoreTransactionResponse], error)
+	ListTransactions(context.Context, *connect.Request[transactionv1.ListTransactionsRequest]) (*connect.Response[transactionv1.ListTransactionsResponse], error)
 }
 
 // NewTransactionServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -86,16 +103,24 @@ type TransactionServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewTransactionServiceHandler(svc TransactionServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	transactionServiceMethods := transactionv1.File_api_transaction_v1_transaction_service_proto.Services().ByName("TransactionService").Methods()
-	transactionServiceTransactionHandler := connect.NewUnaryHandler(
-		TransactionServiceTransactionProcedure,
-		svc.Transaction,
-		connect.WithSchema(transactionServiceMethods.ByName("Transaction")),
+	transactionServiceStoreTransactionHandler := connect.NewUnaryHandler(
+		TransactionServiceStoreTransactionProcedure,
+		svc.StoreTransaction,
+		connect.WithSchema(transactionServiceMethods.ByName("StoreTransaction")),
+		connect.WithHandlerOptions(opts...),
+	)
+	transactionServiceListTransactionsHandler := connect.NewUnaryHandler(
+		TransactionServiceListTransactionsProcedure,
+		svc.ListTransactions,
+		connect.WithSchema(transactionServiceMethods.ByName("ListTransactions")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/api.transaction.v1.TransactionService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case TransactionServiceTransactionProcedure:
-			transactionServiceTransactionHandler.ServeHTTP(w, r)
+		case TransactionServiceStoreTransactionProcedure:
+			transactionServiceStoreTransactionHandler.ServeHTTP(w, r)
+		case TransactionServiceListTransactionsProcedure:
+			transactionServiceListTransactionsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -105,6 +130,10 @@ func NewTransactionServiceHandler(svc TransactionServiceHandler, opts ...connect
 // UnimplementedTransactionServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTransactionServiceHandler struct{}
 
-func (UnimplementedTransactionServiceHandler) Transaction(context.Context, *connect.Request[transactionv1.TransactionRequest]) (*connect.Response[transactionv1.TransactionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.transaction.v1.TransactionService.Transaction is not implemented"))
+func (UnimplementedTransactionServiceHandler) StoreTransaction(context.Context, *connect.Request[transactionv1.StoreTransactionRequest]) (*connect.Response[transactionv1.StoreTransactionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.transaction.v1.TransactionService.StoreTransaction is not implemented"))
+}
+
+func (UnimplementedTransactionServiceHandler) ListTransactions(context.Context, *connect.Request[transactionv1.ListTransactionsRequest]) (*connect.Response[transactionv1.ListTransactionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.transaction.v1.TransactionService.ListTransactions is not implemented"))
 }

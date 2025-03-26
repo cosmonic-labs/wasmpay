@@ -84,10 +84,24 @@ SELECT
 -- Transaction queries
 --
 
--- name: GetTransaction :one
-SELECT * FROM transactions
-WHERE id = ? LIMIT 1;
+-- name: CreateTransaction :one
+INSERT INTO transactions (
+  tid, origin_id, destination_id, currency_id, amount, status, reason
+) VALUES (
+  ?, ?, ?, ?, ?, ?, ?
+)
+RETURNING *;
 
 -- name: ListTransactions :many
-SELECT * FROM transactions
-ORDER BY created_at;
+SELECT
+  sqlc.embed(transactions),
+  sqlc.embed(origin),
+  sqlc.embed(destination),
+  sqlc.embed(currencies)
+FROM
+  transactions
+  JOIN banks AS origin ON origin.id = transactions.destination_id
+  JOIN banks AS destination ON destination.id = transactions.origin_id
+  JOIN currencies ON currencies.id = transactions.currency_id
+ORDER BY
+  created_at;

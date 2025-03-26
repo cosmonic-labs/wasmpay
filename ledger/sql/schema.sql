@@ -30,10 +30,18 @@ CREATE TABLE currencies (
 );
 
 CREATE TABLE transactions (
-  id   INTEGER PRIMARY KEY,
-  source text    NOT NULL,
-  target text    NOT NULL,
-  amount INTEGER    NOT NULL,
-  currency text NOT NULL,
-  created_at DATETIME NOT NULL
+  id INTEGER PRIMARY KEY,
+  -- public transaction id
+  tid text NOT NULL,
+  origin_id INTEGER NOT NULL,
+  destination_id INTEGER NOT NULL,
+  currency_id INTEGER NOT NULL,
+  amount INTEGER NOT NULL,
+  status TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(tid),
+  FOREIGN KEY(origin_id) REFERENCES banks(id),
+  FOREIGN KEY(destination_id) REFERENCES banks(id),
+  FOREIGN KEY(currency_id) REFERENCES currencies(id)
 );
