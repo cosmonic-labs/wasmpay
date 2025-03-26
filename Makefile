@@ -9,10 +9,9 @@ help:
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  %-10s - %sn", $$1, $$2}' $(MAKEFILE_LIST)
 
 build: ## Build all components in the project
-	pushd api-gateway/wasmcloud.banking/client/apps/banking/
-	npm i
-	npm run build --workspaces --if-present
-	popd
+	cd api-gateway/wasmcloud.banking/client/apps/banking && \
+		npm i && \
+		npm run build --workspaces --if-present
 	wash build -p api-gateway
 	wash build -p wasmpay-platform-harness
 	wash build -p icamer-validator
