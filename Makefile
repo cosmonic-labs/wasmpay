@@ -9,6 +9,10 @@ help:
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  %-10s - %sn", $$1, $$2}' $(MAKEFILE_LIST)
 
 build: ## Build all components in the project
+	pushd api-gateway/wasmcloud.banking/client/apps/banking/
+	npm i
+	npm run build --workspaces --if-present
+	popd
 	wash build -p api-gateway
 	wash build -p wasmpay-platform-harness
 	wash build -p icamer-validator
@@ -27,4 +31,12 @@ test-e2e: build ## Build all components and deploy the local wadm
 	@wash down --all
 
 test-validate: ## curl the API gateway with a test validation that should work after deploy
-	curl 127.0.0.1:8000/api/v1/transaction -d '{"id":"txn_123456","origin":{"id":"nordhaven","name":"First National Bank","country":"USA","currency":"USD"},"destination":{"id":"icamer","name":"Global Trust","country":"UK","currency":"GBP"},"amount":{"name":"USD","symbol":"$$","amount":10000},"status":"completed"}'
+	curl localhost:8000/api/v1/transaction -d '{"origin": {"id": "bank1", "code": "BNK1", "country": "US", "currency": "USD", "name": "Bank One"}, "destination": {"id": "bank2", "code": "BNK2", "country": "UK", "currency": "GBP", "name": "Bank Two"}, "amount": 1000, "currency": "USD", "status": "Approved"}'
+
+test-scale: ## Run a single validator 10000 times, then invoke them all
+	nats-server -js -c ./hack/scale.conf &
+	wash up -d --nats-connect-only
+	sleep 10
+	wash config put httphost routing_mode=host default_address=0.0.0.0:8000
+	wash start provider ghcr.io/wasmcloud/http-server:0.27.0 http --config httphost
+	./hack/scale.sh
