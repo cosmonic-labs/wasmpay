@@ -77,7 +77,7 @@ func run(bindAddr, dbStore string) error {
 		<-ctx.Done()
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		server.Shutdown(ctx)
+		_ = server.Shutdown(ctx)
 	}()
 
 	logger.Info("HTTP Server started", slog.String("addr", bindAddr))
