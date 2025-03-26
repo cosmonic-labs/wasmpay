@@ -52,7 +52,7 @@ func (srv *TransactionServer) StoreTransaction(ctx context.Context, req *connect
 		return nil, connect.NewError(connect.CodeInternal, errFailedToStoreTxn)
 	}
 
-	_, err = srv.DB.CreateTransaction(ctx, db.CreateTransactionParams{
+	txn, err := srv.DB.CreateTransaction(ctx, db.CreateTransactionParams{
 		Tid:           txnid,
 		OriginID:      origin.Bank.ID,
 		DestinationID: destination.Bank.ID,
@@ -68,7 +68,7 @@ func (srv *TransactionServer) StoreTransaction(ctx context.Context, req *connect
 
 	return &connect.Response[ledgerv1.StoreTransactionResponse]{
 		Msg: &ledgerv1.StoreTransactionResponse{
-			Id: txnid,
+			Id: txn.Tid,
 		},
 	}, nil
 }

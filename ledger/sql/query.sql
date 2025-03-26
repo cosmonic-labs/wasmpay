@@ -21,9 +21,9 @@ JOIN currencies ON currencies.id = banks.currency_id;
 
 -- name: CreateBank :one
 INSERT INTO banks (
-  code, name, country_id, currency_id
+  bid, code, name, country_id, currency_id
 ) VALUES (
-  ?, ?, ?, ?
+  ?, ?, ?, ?, ?
 )
 RETURNING *;
 

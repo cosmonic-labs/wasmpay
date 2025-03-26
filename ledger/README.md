@@ -26,7 +26,7 @@ Content-Type: application/json
 Date: Tue, 25 Mar 2025 20:30:48 GMT
 Content-Length: 10
 
-{"id":"1"}
+{"id":"bk_GO2KCqj"}
 ```
 
 ### Getting an individual Bank

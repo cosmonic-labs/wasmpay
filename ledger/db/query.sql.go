@@ -11,14 +11,15 @@ import (
 
 const createBank = `-- name: CreateBank :one
 INSERT INTO banks (
-  code, name, country_id, currency_id
+  bid, code, name, country_id, currency_id
 ) VALUES (
-  ?, ?, ?, ?
+  ?, ?, ?, ?, ?
 )
-RETURNING id, code, name, country_id, currency_id
+RETURNING id, bid, code, name, country_id, currency_id
 `
 
 type CreateBankParams struct {
+	Bid        string
 	Code       string
 	Name       string
 	CountryID  int64
@@ -27,6 +28,7 @@ type CreateBankParams struct {
 
 func (q *Queries) CreateBank(ctx context.Context, arg CreateBankParams) (Bank, error) {
 	row := q.db.QueryRowContext(ctx, createBank,
+		arg.Bid,
 		arg.Code,
 		arg.Name,
 		arg.CountryID,
@@ -35,6 +37,7 @@ func (q *Queries) CreateBank(ctx context.Context, arg CreateBankParams) (Bank, e
 	var i Bank
 	err := row.Scan(
 		&i.ID,
+		&i.Bid,
 		&i.Code,
 		&i.Name,
 		&i.CountryID,
@@ -156,7 +159,7 @@ func (q *Queries) DeleteBankByCode(ctx context.Context, code string) error {
 
 const getBankByCode = `-- name: GetBankByCode :one
 
-SELECT banks.id, banks.code, banks.name, banks.country_id, banks.currency_id, countries.id, countries.code, countries.name, currencies.id, currencies.code, currencies.name, currencies.minor_unit
+SELECT banks.id, banks.bid, banks.code, banks.name, banks.country_id, banks.currency_id, countries.id, countries.code, countries.name, currencies.id, currencies.code, currencies.name, currencies.minor_unit
 FROM banks
 JOIN countries on countries.id = banks.country_id
 JOIN currencies on currencies.id = banks.currency_id
@@ -175,6 +178,7 @@ func (q *Queries) GetBankByCode(ctx context.Context, code string) (GetBankByCode
 	var i GetBankByCodeRow
 	err := row.Scan(
 		&i.Bank.ID,
+		&i.Bank.Bid,
 		&i.Bank.Code,
 		&i.Bank.Name,
 		&i.Bank.CountryID,
@@ -253,7 +257,7 @@ func (q *Queries) GetCurrencyById(ctx context.Context, id int64) (Currency, erro
 }
 
 const listBanks = `-- name: ListBanks :many
-SELECT id, code, name, country_id, currency_id FROM banks
+SELECT id, bid, code, name, country_id, currency_id FROM banks
 LIMIT 50
 `
 
@@ -268,6 +272,7 @@ func (q *Queries) ListBanks(ctx context.Context) ([]Bank, error) {
 		var i Bank
 		if err := rows.Scan(
 			&i.ID,
+			&i.Bid,
 			&i.Code,
 			&i.Name,
 			&i.CountryID,
@@ -287,7 +292,7 @@ func (q *Queries) ListBanks(ctx context.Context) ([]Bank, error) {
 }
 
 const listBanksWithCountriesAndCurrencies = `-- name: ListBanksWithCountriesAndCurrencies :many
-SELECT banks.id, banks.code, banks.name, banks.country_id, banks.currency_id, countries.id, countries.code, countries.name, currencies.id, currencies.code, currencies.name, currencies.minor_unit
+SELECT banks.id, banks.bid, banks.code, banks.name, banks.country_id, banks.currency_id, countries.id, countries.code, countries.name, currencies.id, currencies.code, currencies.name, currencies.minor_unit
 FROM banks
 JOIN countries ON countries.id = banks.country_id
 JOIN currencies ON currencies.id = banks.currency_id
@@ -310,6 +315,7 @@ func (q *Queries) ListBanksWithCountriesAndCurrencies(ctx context.Context) ([]Li
 		var i ListBanksWithCountriesAndCurrenciesRow
 		if err := rows.Scan(
 			&i.Bank.ID,
+			&i.Bank.Bid,
 			&i.Bank.Code,
 			&i.Bank.Name,
 			&i.Bank.CountryID,
@@ -338,8 +344,8 @@ func (q *Queries) ListBanksWithCountriesAndCurrencies(ctx context.Context) ([]Li
 const listTransactions = `-- name: ListTransactions :many
 SELECT
   transactions.id, transactions.tid, transactions.origin_id, transactions.destination_id, transactions.currency_id, transactions.amount, transactions.status, transactions.reason, transactions.created_at,
-  origin.id, origin.code, origin.name, origin.country_id, origin.currency_id,
-  destination.id, destination.code, destination.name, destination.country_id, destination.currency_id,
+  origin.id, origin.bid, origin.code, origin.name, origin.country_id, origin.currency_id,
+  destination.id, destination.bid, destination.code, destination.name, destination.country_id, destination.currency_id,
   currencies.id, currencies.code, currencies.name, currencies.minor_unit
 FROM
   transactions
@@ -377,11 +383,13 @@ func (q *Queries) ListTransactions(ctx context.Context) ([]ListTransactionsRow, 
 			&i.Transaction.Reason,
 			&i.Transaction.CreatedAt,
 			&i.Bank.ID,
+			&i.Bank.Bid,
 			&i.Bank.Code,
 			&i.Bank.Name,
 			&i.Bank.CountryID,
 			&i.Bank.CurrencyID,
 			&i.Bank_2.ID,
+			&i.Bank_2.Bid,
 			&i.Bank_2.Code,
 			&i.Bank_2.Name,
 			&i.Bank_2.CountryID,

@@ -10,6 +10,7 @@ import (
 
 type Bank struct {
 	ID         int64
+	Bid        string
 	Code       string
 	Name       string
 	CountryID  int64

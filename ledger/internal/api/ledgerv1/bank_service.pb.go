@@ -259,7 +259,7 @@ func (x *CreateBankRequest) GetCurrency() string {
 
 type CreateBankResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -294,11 +294,11 @@ func (*CreateBankResponse) Descriptor() ([]byte, []int) {
 	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *CreateBankResponse) GetId() uint64 {
+func (x *CreateBankResponse) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
 type DeleteBankRequest struct {
@@ -399,7 +399,7 @@ const file_api_ledger_v1_bank_service_proto_rawDesc = "" +
 	"\acountry\x18\x03 \x01(\tR\acountry\x12\x1a\n" +
 	"\bcurrency\x18\x04 \x01(\tR\bcurrency\"$\n" +
 	"\x12CreateBankResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x04R\x02id\"'\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"'\n" +
 	"\x11DeleteBankRequest\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\"\x14\n" +
 	"\x12DeleteBankResponse2\xd5\x02\n" +

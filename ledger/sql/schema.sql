@@ -2,6 +2,8 @@
 
 CREATE TABLE banks (
   id INTEGER PRIMARY KEY,
+  -- public bank id, something like `bk_1a2B3c4`
+  bid text NOT NULL,
   code text NOT NULL,
   name text NOT NULL,
   country_id INTEGER NOT NULL,
@@ -31,7 +33,7 @@ CREATE TABLE currencies (
 
 CREATE TABLE transactions (
   id INTEGER PRIMARY KEY,
-  -- public transaction id
+  -- public transaction id, something like `txn_9J8i7H6`
   tid text NOT NULL,
   origin_id INTEGER NOT NULL,
   destination_id INTEGER NOT NULL,

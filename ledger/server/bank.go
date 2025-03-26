@@ -9,6 +9,7 @@ import (
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1/ledgerv1connect"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/id"
 )
 
 var (
@@ -38,6 +39,7 @@ func (srv *BankServer) GetBank(ctx context.Context, req *connect.Request[ledgerv
 	return &connect.Response[ledgerv1.GetBankResponse]{
 		Msg: &ledgerv1.GetBankResponse{
 			Bank: &ledgerv1.Bank{
+				Id:       result.Bank.Bid,
 				Code:     result.Bank.Code,
 				Name:     result.Bank.Name,
 				Country:  result.Country.Code,
@@ -59,6 +61,7 @@ func (srv *BankServer) ListBanks(ctx context.Context, req *connect.Request[ledge
 	var banks []*ledgerv1.Bank
 	for _, result := range results {
 		banks = append(banks, &ledgerv1.Bank{
+			Id:       result.Bank.Bid,
 			Code:     result.Bank.Code,
 			Name:     result.Bank.Name,
 			Country:  result.Country.Code,
@@ -88,7 +91,14 @@ func (srv *BankServer) CreateBank(ctx context.Context, req *connect.Request[ledg
 		return nil, connect.NewError(connect.CodeInvalidArgument, errMissingCurrency)
 	}
 
+	bankId, err := id.NewBankId()
+	if err != nil {
+		logger.Error("could not generate bank id", "error", err)
+		return nil, connect.NewError(connect.CodeInternal, errFailedToCreateBank)
+	}
+
 	bank, err := srv.DB.CreateBank(ctx, db.CreateBankParams{
+		Bid:        bankId,
 		Code:       req.Msg.GetCode(),
 		Name:       req.Msg.GetName(),
 		CountryID:  country.ID,
@@ -101,7 +111,7 @@ func (srv *BankServer) CreateBank(ctx context.Context, req *connect.Request[ledg
 
 	return &connect.Response[ledgerv1.CreateBankResponse]{
 		Msg: &ledgerv1.CreateBankResponse{
-			Id: uint64(bank.ID),
+			Id: bank.Bid,
 		},
 	}, nil
 }

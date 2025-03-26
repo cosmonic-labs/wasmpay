@@ -23,10 +23,11 @@ const (
 
 type Bank struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Country       string                 `protobuf:"bytes,3,opt,name=country,proto3" json:"country,omitempty"`
-	Currency      string                 `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Country       string                 `protobuf:"bytes,4,opt,name=country,proto3" json:"country,omitempty"`
+	Currency      string                 `protobuf:"bytes,5,opt,name=currency,proto3" json:"currency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -61,6 +62,13 @@ func (*Bank) Descriptor() ([]byte, []int) {
 	return file_api_ledger_v1_bank_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *Bank) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 func (x *Bank) GetCode() string {
 	if x != nil {
 		return x.Code
@@ -93,12 +101,13 @@ var File_api_ledger_v1_bank_proto protoreflect.FileDescriptor
 
 const file_api_ledger_v1_bank_proto_rawDesc = "" +
 	"\n" +
-	"\x18api/ledger/v1/bank.proto\x12\rapi.ledger.v1\"d\n" +
-	"\x04Bank\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\tR\x04code\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\acountry\x18\x03 \x01(\tR\acountry\x12\x1a\n" +
-	"\bcurrency\x18\x04 \x01(\tR\bcurrencyB\xb3\x01\n" +
+	"\x18api/ledger/v1/bank.proto\x12\rapi.ledger.v1\"t\n" +
+	"\x04Bank\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x18\n" +
+	"\acountry\x18\x04 \x01(\tR\acountry\x12\x1a\n" +
+	"\bcurrency\x18\x05 \x01(\tR\bcurrencyB\xb3\x01\n" +
 	"\x11com.api.ledger.v1B\tBankProtoP\x01Z=github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1\xa2\x02\x03ALX\xaa\x02\rApi.Ledger.V1\xca\x02\rApi\\Ledger\\V1\xe2\x02\x19Api\\Ledger\\V1\\GPBMetadata\xea\x02\x0fApi::Ledger::V1b\x06proto3"
 
 var (
