@@ -7,8 +7,8 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/transactionv1"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/transactionv1/transactionv1connect"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1/ledgerv1connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/id"
 )
 
@@ -25,9 +25,9 @@ type TransactionServer struct {
 	Logger *slog.Logger
 }
 
-var _ transactionv1connect.TransactionServiceHandler = (*TransactionServer)(nil)
+var _ ledgerv1connect.TransactionServiceHandler = (*TransactionServer)(nil)
 
-func (srv *TransactionServer) StoreTransaction(ctx context.Context, req *connect.Request[transactionv1.StoreTransactionRequest]) (*connect.Response[transactionv1.StoreTransactionResponse], error) {
+func (srv *TransactionServer) StoreTransaction(ctx context.Context, req *connect.Request[ledgerv1.StoreTransactionRequest]) (*connect.Response[ledgerv1.StoreTransactionResponse], error) {
 	logger := srv.Logger.With(slog.String("method", "StoreTransaction"))
 	// Ensure origin and destination are banks we know about
 	origin, err := srv.DB.GetBankByCode(ctx, req.Msg.GetOrigin())
@@ -66,14 +66,14 @@ func (srv *TransactionServer) StoreTransaction(ctx context.Context, req *connect
 		return nil, connect.NewError(connect.CodeInternal, errFailedToStoreTxn)
 	}
 
-	return &connect.Response[transactionv1.StoreTransactionResponse]{
-		Msg: &transactionv1.StoreTransactionResponse{
+	return &connect.Response[ledgerv1.StoreTransactionResponse]{
+		Msg: &ledgerv1.StoreTransactionResponse{
 			Id: txnid,
 		},
 	}, nil
 }
 
-func (srv *TransactionServer) ListTransactions(ctx context.Context, req *connect.Request[transactionv1.ListTransactionsRequest]) (*connect.Response[transactionv1.ListTransactionsResponse], error) {
+func (srv *TransactionServer) ListTransactions(ctx context.Context, req *connect.Request[ledgerv1.ListTransactionsRequest]) (*connect.Response[ledgerv1.ListTransactionsResponse], error) {
 	logger := srv.Logger.With(slog.String("method", "ListTransaction"))
 
 	results, err := srv.DB.ListTransactions(ctx)
@@ -82,23 +82,23 @@ func (srv *TransactionServer) ListTransactions(ctx context.Context, req *connect
 		return nil, connect.NewError(connect.CodeInternal, errFailedToListTxn)
 	}
 
-	var txns []*transactionv1.Transaction
+	var txns []*ledgerv1.Transaction
 	for _, result := range results {
-		txns = append(txns, &transactionv1.Transaction{
+		txns = append(txns, &ledgerv1.Transaction{
 			Id:          result.Transaction.Tid,
 			Origin:      result.Bank.Code,
 			Destination: result.Bank_2.Code,
 			Amount:      uint64(result.Transaction.Amount),
 			Currency:    result.Currency.Code,
-			Status: &transactionv1.TransactionStatus{
+			Status: &ledgerv1.TransactionStatus{
 				Status: result.Transaction.Status,
 				Reason: result.Transaction.Reason,
 			},
 		})
 	}
 
-	return &connect.Response[transactionv1.ListTransactionsResponse]{
-		Msg: &transactionv1.ListTransactionsResponse{
+	return &connect.Response[ledgerv1.ListTransactionsResponse]{
+		Msg: &ledgerv1.ListTransactionsResponse{
 			Transactions: txns,
 		},
 	}, nil

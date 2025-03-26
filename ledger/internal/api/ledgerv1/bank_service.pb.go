@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        (unknown)
-// source: proto/ledger/onboard/v1/bank.proto
+// source: api/ledger/v1/bank_service.proto
 
-package onboardv1
+package ledgerv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -21,74 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Bank struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Country       string                 `protobuf:"bytes,3,opt,name=country,proto3" json:"country,omitempty"`
-	Currency      string                 `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Bank) Reset() {
-	*x = Bank{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Bank) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Bank) ProtoMessage() {}
-
-func (x *Bank) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Bank.ProtoReflect.Descriptor instead.
-func (*Bank) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *Bank) GetCode() string {
-	if x != nil {
-		return x.Code
-	}
-	return ""
-}
-
-func (x *Bank) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *Bank) GetCountry() string {
-	if x != nil {
-		return x.Country
-	}
-	return ""
-}
-
-func (x *Bank) GetCurrency() string {
-	if x != nil {
-		return x.Currency
-	}
-	return ""
-}
-
 type GetBankRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
@@ -98,7 +30,7 @@ type GetBankRequest struct {
 
 func (x *GetBankRequest) Reset() {
 	*x = GetBankRequest{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[1]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -110,7 +42,7 @@ func (x *GetBankRequest) String() string {
 func (*GetBankRequest) ProtoMessage() {}
 
 func (x *GetBankRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[1]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -123,7 +55,7 @@ func (x *GetBankRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBankRequest.ProtoReflect.Descriptor instead.
 func (*GetBankRequest) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{1}
+	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetBankRequest) GetCode() string {
@@ -142,7 +74,7 @@ type GetBankResponse struct {
 
 func (x *GetBankResponse) Reset() {
 	*x = GetBankResponse{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[2]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -154,7 +86,7 @@ func (x *GetBankResponse) String() string {
 func (*GetBankResponse) ProtoMessage() {}
 
 func (x *GetBankResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[2]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -167,7 +99,7 @@ func (x *GetBankResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBankResponse.ProtoReflect.Descriptor instead.
 func (*GetBankResponse) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{2}
+	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetBankResponse) GetBank() *Bank {
@@ -185,7 +117,7 @@ type ListBanksRequest struct {
 
 func (x *ListBanksRequest) Reset() {
 	*x = ListBanksRequest{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[3]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -197,7 +129,7 @@ func (x *ListBanksRequest) String() string {
 func (*ListBanksRequest) ProtoMessage() {}
 
 func (x *ListBanksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[3]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -210,7 +142,7 @@ func (x *ListBanksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBanksRequest.ProtoReflect.Descriptor instead.
 func (*ListBanksRequest) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{3}
+	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{2}
 }
 
 type ListBanksResponse struct {
@@ -222,7 +154,7 @@ type ListBanksResponse struct {
 
 func (x *ListBanksResponse) Reset() {
 	*x = ListBanksResponse{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[4]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -234,7 +166,7 @@ func (x *ListBanksResponse) String() string {
 func (*ListBanksResponse) ProtoMessage() {}
 
 func (x *ListBanksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[4]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -247,7 +179,7 @@ func (x *ListBanksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBanksResponse.ProtoReflect.Descriptor instead.
 func (*ListBanksResponse) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{4}
+	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListBanksResponse) GetBanks() []*Bank {
@@ -269,7 +201,7 @@ type CreateBankRequest struct {
 
 func (x *CreateBankRequest) Reset() {
 	*x = CreateBankRequest{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[5]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -281,7 +213,7 @@ func (x *CreateBankRequest) String() string {
 func (*CreateBankRequest) ProtoMessage() {}
 
 func (x *CreateBankRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[5]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -294,7 +226,7 @@ func (x *CreateBankRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateBankRequest.ProtoReflect.Descriptor instead.
 func (*CreateBankRequest) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{5}
+	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CreateBankRequest) GetCode() string {
@@ -334,7 +266,7 @@ type CreateBankResponse struct {
 
 func (x *CreateBankResponse) Reset() {
 	*x = CreateBankResponse{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[6]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -346,7 +278,7 @@ func (x *CreateBankResponse) String() string {
 func (*CreateBankResponse) ProtoMessage() {}
 
 func (x *CreateBankResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[6]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -359,7 +291,7 @@ func (x *CreateBankResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateBankResponse.ProtoReflect.Descriptor instead.
 func (*CreateBankResponse) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{6}
+	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateBankResponse) GetId() uint64 {
@@ -378,7 +310,7 @@ type DeleteBankRequest struct {
 
 func (x *DeleteBankRequest) Reset() {
 	*x = DeleteBankRequest{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[7]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -390,7 +322,7 @@ func (x *DeleteBankRequest) String() string {
 func (*DeleteBankRequest) ProtoMessage() {}
 
 func (x *DeleteBankRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[7]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -403,7 +335,7 @@ func (x *DeleteBankRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteBankRequest.ProtoReflect.Descriptor instead.
 func (*DeleteBankRequest) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{7}
+	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteBankRequest) GetCode() string {
@@ -421,7 +353,7 @@ type DeleteBankResponse struct {
 
 func (x *DeleteBankResponse) Reset() {
 	*x = DeleteBankResponse{}
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[8]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -433,7 +365,7 @@ func (x *DeleteBankResponse) String() string {
 func (*DeleteBankResponse) ProtoMessage() {}
 
 func (x *DeleteBankResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_ledger_onboard_v1_bank_proto_msgTypes[8]
+	mi := &file_api_ledger_v1_bank_service_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -446,26 +378,21 @@ func (x *DeleteBankResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteBankResponse.ProtoReflect.Descriptor instead.
 func (*DeleteBankResponse) Descriptor() ([]byte, []int) {
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP(), []int{8}
+	return file_api_ledger_v1_bank_service_proto_rawDescGZIP(), []int{7}
 }
 
-var File_proto_ledger_onboard_v1_bank_proto protoreflect.FileDescriptor
+var File_api_ledger_v1_bank_service_proto protoreflect.FileDescriptor
 
-const file_proto_ledger_onboard_v1_bank_proto_rawDesc = "" +
+const file_api_ledger_v1_bank_service_proto_rawDesc = "" +
 	"\n" +
-	"\"proto/ledger/onboard/v1/bank.proto\x12\x17proto.ledger.onboard.v1\"d\n" +
-	"\x04Bank\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\tR\x04code\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
-	"\acountry\x18\x03 \x01(\tR\acountry\x12\x1a\n" +
-	"\bcurrency\x18\x04 \x01(\tR\bcurrency\"$\n" +
+	" api/ledger/v1/bank_service.proto\x12\rapi.ledger.v1\x1a\x18api/ledger/v1/bank.proto\"$\n" +
 	"\x0eGetBankRequest\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\tR\x04code\"D\n" +
-	"\x0fGetBankResponse\x121\n" +
-	"\x04bank\x18\x01 \x01(\v2\x1d.proto.ledger.onboard.v1.BankR\x04bank\"\x12\n" +
-	"\x10ListBanksRequest\"H\n" +
-	"\x11ListBanksResponse\x123\n" +
-	"\x05banks\x18\x01 \x03(\v2\x1d.proto.ledger.onboard.v1.BankR\x05banks\"q\n" +
+	"\x04code\x18\x01 \x01(\tR\x04code\":\n" +
+	"\x0fGetBankResponse\x12'\n" +
+	"\x04bank\x18\x01 \x01(\v2\x13.api.ledger.v1.BankR\x04bank\"\x12\n" +
+	"\x10ListBanksRequest\">\n" +
+	"\x11ListBanksResponse\x12)\n" +
+	"\x05banks\x18\x01 \x03(\v2\x13.api.ledger.v1.BankR\x05banks\"q\n" +
 	"\x11CreateBankRequest\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
@@ -475,63 +402,79 @@ const file_proto_ledger_onboard_v1_bank_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"'\n" +
 	"\x11DeleteBankRequest\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\"\x14\n" +
-	"\x12DeleteBankResponseB\xe7\x01\n" +
-	"\x1bcom.proto.ledger.onboard.v1B\tBankProtoP\x01Z>github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/onboardv1\xa2\x02\x03PLO\xaa\x02\x17Proto.Ledger.Onboard.V1\xca\x02\x17Proto\\Ledger\\Onboard\\V1\xe2\x02#Proto\\Ledger\\Onboard\\V1\\GPBMetadata\xea\x02\x1aProto::Ledger::Onboard::V1b\x06proto3"
+	"\x12DeleteBankResponse2\xd5\x02\n" +
+	"\vBankService\x12J\n" +
+	"\aGetBank\x12\x1d.api.ledger.v1.GetBankRequest\x1a\x1e.api.ledger.v1.GetBankResponse\"\x00\x12P\n" +
+	"\tListBanks\x12\x1f.api.ledger.v1.ListBanksRequest\x1a .api.ledger.v1.ListBanksResponse\"\x00\x12S\n" +
+	"\n" +
+	"CreateBank\x12 .api.ledger.v1.CreateBankRequest\x1a!.api.ledger.v1.CreateBankResponse\"\x00\x12S\n" +
+	"\n" +
+	"DeleteBank\x12 .api.ledger.v1.DeleteBankRequest\x1a!.api.ledger.v1.DeleteBankResponse\"\x00B\xba\x01\n" +
+	"\x11com.api.ledger.v1B\x10BankServiceProtoP\x01Z=github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1\xa2\x02\x03ALX\xaa\x02\rApi.Ledger.V1\xca\x02\rApi\\Ledger\\V1\xe2\x02\x19Api\\Ledger\\V1\\GPBMetadata\xea\x02\x0fApi::Ledger::V1b\x06proto3"
 
 var (
-	file_proto_ledger_onboard_v1_bank_proto_rawDescOnce sync.Once
-	file_proto_ledger_onboard_v1_bank_proto_rawDescData []byte
+	file_api_ledger_v1_bank_service_proto_rawDescOnce sync.Once
+	file_api_ledger_v1_bank_service_proto_rawDescData []byte
 )
 
-func file_proto_ledger_onboard_v1_bank_proto_rawDescGZIP() []byte {
-	file_proto_ledger_onboard_v1_bank_proto_rawDescOnce.Do(func() {
-		file_proto_ledger_onboard_v1_bank_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_ledger_onboard_v1_bank_proto_rawDesc), len(file_proto_ledger_onboard_v1_bank_proto_rawDesc)))
+func file_api_ledger_v1_bank_service_proto_rawDescGZIP() []byte {
+	file_api_ledger_v1_bank_service_proto_rawDescOnce.Do(func() {
+		file_api_ledger_v1_bank_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_api_ledger_v1_bank_service_proto_rawDesc), len(file_api_ledger_v1_bank_service_proto_rawDesc)))
 	})
-	return file_proto_ledger_onboard_v1_bank_proto_rawDescData
+	return file_api_ledger_v1_bank_service_proto_rawDescData
 }
 
-var file_proto_ledger_onboard_v1_bank_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_proto_ledger_onboard_v1_bank_proto_goTypes = []any{
-	(*Bank)(nil),               // 0: proto.ledger.onboard.v1.Bank
-	(*GetBankRequest)(nil),     // 1: proto.ledger.onboard.v1.GetBankRequest
-	(*GetBankResponse)(nil),    // 2: proto.ledger.onboard.v1.GetBankResponse
-	(*ListBanksRequest)(nil),   // 3: proto.ledger.onboard.v1.ListBanksRequest
-	(*ListBanksResponse)(nil),  // 4: proto.ledger.onboard.v1.ListBanksResponse
-	(*CreateBankRequest)(nil),  // 5: proto.ledger.onboard.v1.CreateBankRequest
-	(*CreateBankResponse)(nil), // 6: proto.ledger.onboard.v1.CreateBankResponse
-	(*DeleteBankRequest)(nil),  // 7: proto.ledger.onboard.v1.DeleteBankRequest
-	(*DeleteBankResponse)(nil), // 8: proto.ledger.onboard.v1.DeleteBankResponse
+var file_api_ledger_v1_bank_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_api_ledger_v1_bank_service_proto_goTypes = []any{
+	(*GetBankRequest)(nil),     // 0: api.ledger.v1.GetBankRequest
+	(*GetBankResponse)(nil),    // 1: api.ledger.v1.GetBankResponse
+	(*ListBanksRequest)(nil),   // 2: api.ledger.v1.ListBanksRequest
+	(*ListBanksResponse)(nil),  // 3: api.ledger.v1.ListBanksResponse
+	(*CreateBankRequest)(nil),  // 4: api.ledger.v1.CreateBankRequest
+	(*CreateBankResponse)(nil), // 5: api.ledger.v1.CreateBankResponse
+	(*DeleteBankRequest)(nil),  // 6: api.ledger.v1.DeleteBankRequest
+	(*DeleteBankResponse)(nil), // 7: api.ledger.v1.DeleteBankResponse
+	(*Bank)(nil),               // 8: api.ledger.v1.Bank
 }
-var file_proto_ledger_onboard_v1_bank_proto_depIdxs = []int32{
-	0, // 0: proto.ledger.onboard.v1.GetBankResponse.bank:type_name -> proto.ledger.onboard.v1.Bank
-	0, // 1: proto.ledger.onboard.v1.ListBanksResponse.banks:type_name -> proto.ledger.onboard.v1.Bank
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
+var file_api_ledger_v1_bank_service_proto_depIdxs = []int32{
+	8, // 0: api.ledger.v1.GetBankResponse.bank:type_name -> api.ledger.v1.Bank
+	8, // 1: api.ledger.v1.ListBanksResponse.banks:type_name -> api.ledger.v1.Bank
+	0, // 2: api.ledger.v1.BankService.GetBank:input_type -> api.ledger.v1.GetBankRequest
+	2, // 3: api.ledger.v1.BankService.ListBanks:input_type -> api.ledger.v1.ListBanksRequest
+	4, // 4: api.ledger.v1.BankService.CreateBank:input_type -> api.ledger.v1.CreateBankRequest
+	6, // 5: api.ledger.v1.BankService.DeleteBank:input_type -> api.ledger.v1.DeleteBankRequest
+	1, // 6: api.ledger.v1.BankService.GetBank:output_type -> api.ledger.v1.GetBankResponse
+	3, // 7: api.ledger.v1.BankService.ListBanks:output_type -> api.ledger.v1.ListBanksResponse
+	5, // 8: api.ledger.v1.BankService.CreateBank:output_type -> api.ledger.v1.CreateBankResponse
+	7, // 9: api.ledger.v1.BankService.DeleteBank:output_type -> api.ledger.v1.DeleteBankResponse
+	6, // [6:10] is the sub-list for method output_type
+	2, // [2:6] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_proto_ledger_onboard_v1_bank_proto_init() }
-func file_proto_ledger_onboard_v1_bank_proto_init() {
-	if File_proto_ledger_onboard_v1_bank_proto != nil {
+func init() { file_api_ledger_v1_bank_service_proto_init() }
+func file_api_ledger_v1_bank_service_proto_init() {
+	if File_api_ledger_v1_bank_service_proto != nil {
 		return
 	}
+	file_api_ledger_v1_bank_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_ledger_onboard_v1_bank_proto_rawDesc), len(file_proto_ledger_onboard_v1_bank_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_ledger_v1_bank_service_proto_rawDesc), len(file_api_ledger_v1_bank_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   8,
 			NumExtensions: 0,
-			NumServices:   0,
+			NumServices:   1,
 		},
-		GoTypes:           file_proto_ledger_onboard_v1_bank_proto_goTypes,
-		DependencyIndexes: file_proto_ledger_onboard_v1_bank_proto_depIdxs,
-		MessageInfos:      file_proto_ledger_onboard_v1_bank_proto_msgTypes,
+		GoTypes:           file_api_ledger_v1_bank_service_proto_goTypes,
+		DependencyIndexes: file_api_ledger_v1_bank_service_proto_depIdxs,
+		MessageInfos:      file_api_ledger_v1_bank_service_proto_msgTypes,
 	}.Build()
-	File_proto_ledger_onboard_v1_bank_proto = out.File
-	file_proto_ledger_onboard_v1_bank_proto_goTypes = nil
-	file_proto_ledger_onboard_v1_bank_proto_depIdxs = nil
+	File_api_ledger_v1_bank_service_proto = out.File
+	file_api_ledger_v1_bank_service_proto_goTypes = nil
+	file_api_ledger_v1_bank_service_proto_depIdxs = nil
 }

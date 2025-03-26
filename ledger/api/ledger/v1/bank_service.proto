@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package api.ledger.v1;
+
+import "api/ledger/v1/bank.proto";
+
+service BankService {
+  // Bank entity operations
+  //
+  // Get Bank by id
+  rpc GetBank(GetBankRequest) returns (GetBankResponse) {}
+  // List Banks
+  rpc ListBanks(ListBanksRequest) returns (ListBanksResponse) {}
+  // Create new Banks
+  rpc CreateBank(CreateBankRequest) returns (CreateBankResponse) {}
+  // Deleting existing Banks
+  rpc DeleteBank(DeleteBankRequest) returns (DeleteBankResponse) {}
+}
+
+message GetBankRequest {
+  string code = 1;
+}
+message GetBankResponse {
+  Bank bank = 1;
+}
+
+message ListBanksRequest {}
+message ListBanksResponse {
+  repeated Bank banks = 1;
+}
+
+message CreateBankRequest {
+  string code = 1;
+  string name = 2;
+  string country = 3;
+  string currency = 4;
+}
+message CreateBankResponse {
+  uint64 id = 1;
+}
+
+message DeleteBankRequest {
+  string code = 1;
+}
+message DeleteBankResponse {}

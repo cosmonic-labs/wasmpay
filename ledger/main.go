@@ -17,8 +17,7 @@ import (
 	_ "modernc.org/sqlite"
 
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/onboardv1/onboardv1connect"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/transactionv1/transactionv1connect"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1/ledgerv1connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/fixtures"
 	"github.com/cosmonic-labs/wasmpay/ledger/server"
 )
@@ -53,13 +52,13 @@ func run(bindAddr, dbStore string) error {
 
 	mux := http.NewServeMux()
 
-	path, handler := onboardv1connect.NewOnboardServiceHandler(&server.OnboardServer{
+	path, handler := ledgerv1connect.NewBankServiceHandler(&server.BankServer{
 		DB:     client,
-		Logger: logger.With(slog.String("service", "onboard-svc")),
+		Logger: logger.With(slog.String("service", "bank-svc")),
 	})
 	mux.Handle(path, handler)
 
-	path, handler = transactionv1connect.NewTransactionServiceHandler(&server.TransactionServer{
+	path, handler = ledgerv1connect.NewTransactionServiceHandler(&server.TransactionServer{
 		DB:     client,
 		Logger: logger.With(slog.String("service", "transaction-svc")),
 	})

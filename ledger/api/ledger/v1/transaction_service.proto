@@ -1,19 +1,12 @@
 syntax = "proto3";
 
-package api.transaction.v1;
+package api.ledger.v1;
 
-message Transaction {
-  string id = 1;
-  string origin = 2;
-  string destination = 3;
-  uint64 amount = 4;
-  string currency = 5;
-  TransactionStatus status = 6;
-}
+import "api/ledger/v1/transaction.proto";
 
-message TransactionStatus {
-  string status = 1;
-  string reason = 2;
+service TransactionService {
+  rpc StoreTransaction(StoreTransactionRequest) returns (StoreTransactionResponse) {}
+  rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse) {}
 }
 
 message StoreTransactionRequest {

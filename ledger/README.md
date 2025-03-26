@@ -14,7 +14,7 @@ The service can be run with a simple `go run main.go` for local development
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{"code":"nordhaven", "name": "First National Bank", "currency": "USD", "country": "USA"}' \
-  localhost:8080/api.onboard.v1.OnboardService/CreateBank
+  localhost:8080/api.ledger.v1.BankService/CreateBank
 ```
 
 Returns:
@@ -35,7 +35,7 @@ Content-Length: 10
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{"code": "nordhaven"}' \
-  localhost:8080/api.onboard.v1.OnboardService/GetBank
+  localhost:8080/api.ledger.v1.BankService/GetBank
 ```
 
 Returns:
@@ -55,7 +55,7 @@ Content-Length: 91
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{}' \
-  localhost:8080/api.onboard.v1.OnboardService/ListBanks
+  localhost:8080/api.ledger.v1.BankService/ListBanks
 ```
 
 Returns:
@@ -76,7 +76,7 @@ Content-Length: 97
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{"code": "nordhaven"}' \
-  localhost:8080/api.onboard.v1.OnboardService/DeleteBank
+  localhost:8080/api.ledger.v1.BankService/DeleteBank
 ```
 
 Returns:
@@ -99,7 +99,7 @@ Content-Length: 2
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{"origin":"nordhaven", "destination": "icamer", "amount": 10000, "currency": "USD", "status": {"status": "approved", "reason": ""}}' \
-  localhost:8080/api.transaction.v1.TransactionService/StoreTransaction
+  localhost:8080/api.ledger.v1.TransactionService/StoreTransaction
 ```
 
 Returns:
@@ -120,7 +120,7 @@ Content-Length: 20
 curl -i -X POST \
   --header "Content-Type: application/json" \
   -d '{}' \
-  localhost:8080/api.transaction.v1.TransactionService/ListTransactions
+  localhost:8080/api.ledger.v1.TransactionService/ListTransactions
 ```
 
 Returns:
