@@ -23,10 +23,10 @@ impl Guest for Component {
                 reason: None,
             }
         } else {
-            wasmcloud_component::warn!("Unknown currency {}", transaction.currency);
+            wasmcloud_component::warn!("Unsupported currency: {}", transaction.currency);
             ValidateResponse {
                 approved: false,
-                reason: Some("Unknown currency".to_string()),
+                reason: Some(format!("Unsupported currency: {}", transaction.currency)),
             }
         }
     }
