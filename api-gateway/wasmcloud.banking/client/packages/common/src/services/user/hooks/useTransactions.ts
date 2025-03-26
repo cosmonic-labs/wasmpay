@@ -107,13 +107,13 @@ export function useTransactions(
       if (isLoading) {
         let transactionsResponse = await api.transactions(userId);
         console.dir(transactionsResponse);
-        if (transactionsResponse.error || transactionsResponse.data === null) {
-          await api.createUser(userId);
-          transactionsResponse = await api.transactions(userId);
-        }
-        const sorted = transactionsResponse.data.sort((a, b) => b.date - a.date);
-        const selectedTransactions = selector?.(sorted) ?? sorted;
-        setTransactions(selectedTransactions);
+        // if (transactionsResponse.error || transactionsResponse.data === null) {
+        //   await api.createUser(userId);
+        //   transactionsResponse = await api.transactions(userId);
+        // }
+        // const sorted = transactionsResponse.data.sort((a, b) => b.date - a.date);
+        // const selectedTransactions = selector?.(sorted) ?? sorted;
+        setTransactions(transactionsResponse.data);
         setIsLoading(false);
       }
     }

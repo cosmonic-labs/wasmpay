@@ -1,16 +1,20 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"embed"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	// Generated interfaces
 
+	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasi/config/runtime"
 	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmcloud/identity/store"
 	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmpay/platform/types"
 	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmpay/platform/validation"
@@ -34,6 +38,8 @@ const (
 	defaultRegion             = "us-east-2"
 	defaultAPIGatewayAudience = "spiffe://aws.amazon.com/wasmpay/api-gateway"
 	defaultRoleArn            = "arn:aws:iam::471112507838:role/wasmpay-api-gateway"
+	bankBackendConfigKey      = "bank_backend_url"
+	defaultBankBackendURL     = "http://127.0.0.1:8080"
 )
 
 // Router creates a [http.Handler] and registers the application-specific
@@ -51,16 +57,66 @@ func Router() http.Handler {
 	router.POST("/api/v1/transaction", transactionHandler)
 	// Send request to identity store to fetch a JWT-SVID
 	router.POST("/api/v1/token", tokenHandler)
-	// router.POST("/accounts/:id", newAccountHandler)
-	// router.GET("/accounts/:id/info", accountInfoHandler)
-	// router.GET("/accounts/:id/transactions", getTransactionsHandler)
-	// router.POST("/accounts/:id/transactions", postTransactionHandler)
+
+	// Send request to the backend to get a bank
+	router.GET("/api/v1/banks", getBankHandler)
 
 	// Handling assets
 	router.GET("/", assetHandler)
 	router.GET("/assets/*asset", assetHandler)
 	router.GET("/images/*image", assetHandler)
 	return router
+}
+
+func getBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var url string
+	var body []byte
+
+	// Determine if we should query by code, id, or list all banks
+	code := r.FormValue("code")
+	if code != "" {
+		url = backend("BankService", "GetBank")
+		body = fmt.Appendf(body, `{"code": "%s"}`, code)
+	}
+	id := r.FormValue("id")
+	if id != "" {
+		url = backend("BankService", "GetBank")
+		body = fmt.Appendf(body, `{"id": "%s"}`, id)
+	}
+	if url == "" {
+		url = backend("BankService", "ListBanks")
+		body = []byte("{}")
+	}
+
+	resp, err := httpClient.Post(url, "application/json", bytes.NewReader(body))
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to fetch banks: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		http.Error(w, string(body), resp.StatusCode)
+		return
+	}
+
+	// List requests return an array
+	// Get requests return a single object
+	type BankResponse struct {
+		Banks []types.Bank `json:"banks"`
+		Bank  types.Bank   `json:"bank"`
+	}
+	var bankResponse BankResponse
+	if err := json.NewDecoder(resp.Body).Decode(&bankResponse); err != nil {
+		http.Error(w, "Failed to decode banks response", http.StatusInternalServerError)
+		return
+	}
+	if strings.Contains(url, "ListBanks") {
+		successResponse(w, bankResponse.Banks)
+	} else {
+		successResponse(w, bankResponse.Bank)
+	}
 }
 
 func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -309,10 +365,10 @@ func assetHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 type SuccessResponse struct {
-	Data interface{} `json:"data"`
+	Data any `json:"data"`
 }
 
-func successResponse(w http.ResponseWriter, data interface{}) {
+func successResponse(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(SuccessResponse{Data: data})
@@ -350,4 +406,14 @@ func exchangeWorkloadIdentityForCredentials(ctx context.Context, token string) (
 		SecretAccessKey: out.Credentials.SecretAccessKey,
 		SessionToken:    out.Credentials.SessionToken,
 	}, nil
+}
+
+// Helper function to get the backend URL from the runtime config
+// or fallback to local
+func backend(service string, path string) string {
+	url, _, err := runtime.Get(bankBackendConfigKey).Result()
+	if err || url.None() {
+		return fmt.Sprintf("%s/api.ledger.v1.%s/%s", defaultBankBackendURL, service, path)
+	}
+	return fmt.Sprintf("%s/api.ledger.v1.%s/%s", url.Value(), service, path)
 }
