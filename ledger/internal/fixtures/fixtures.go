@@ -6,14 +6,28 @@ import (
 	_ "embed"
 	"encoding/csv"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/id"
 )
 
 //go:embed country-codes.csv
 var countryCodes []byte
+
+// Struct for keeping tracking of the column indexes in the bank fixtures
+type bankColumnIndex struct {
+	// Required: The code used for fetching the bank via the API (i.e. nordhaven)
+	Code int
+	// Required: Full name of the bank
+	Name int
+	// Required: ISO3166 Alpha-3 code for the country (i.e. USA)
+	Country int
+	// Required: ISO4217 currency name (i.e. USD)
+	Currency int
+}
 
 // Struct for keeping tracking of the column indexes we care about
 type columnIndex struct {
@@ -29,7 +43,21 @@ type columnIndex struct {
 	CurrencyMinorUnit int
 }
 
-func PreseedFromFixtures(ctx context.Context, query *db.Queries) error {
+func PreseedFromFixtures(ctx context.Context, query *db.Queries, bankFixturesPath string) error {
+	err := preseedCountriesAndCurrencies(ctx, query)
+	if err != nil {
+		return err
+	}
+
+	err = preseedBanks(ctx, query, bankFixturesPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func preseedCountriesAndCurrencies(ctx context.Context, query *db.Queries) error {
 	r := bytes.NewReader(countryCodes)
 
 	reader := csv.NewReader(r)
@@ -38,7 +66,7 @@ func PreseedFromFixtures(ctx context.Context, query *db.Queries) error {
 		return fmt.Errorf("failed to read headers from fixtures: %w", err)
 	}
 
-	index := parseColumnIndexFromHeaders(headers)
+	ci := newColumnIndexFromHeaders(headers)
 
 	fixtures, err := reader.ReadAll()
 	if err != nil {
@@ -77,8 +105,8 @@ func PreseedFromFixtures(ctx context.Context, query *db.Queries) error {
 	}
 
 	for _, fixture := range fixtures {
-		country_code := fixture[index.CountryCode]
-		country_name := fixture[index.CountryName]
+		country_code := fixture[ci.CountryCode]
+		country_name := fixture[ci.CountryName]
 
 		if err := query.CreateCountry(ctx, db.CreateCountryParams{
 			Code: country_code,
@@ -87,9 +115,9 @@ func PreseedFromFixtures(ctx context.Context, query *db.Queries) error {
 			return err
 		}
 
-		currency_code := fixture[index.CurrencyCode]
-		currency_name := fixture[index.CurrencyName]
-		currency_minor_unit := fixture[index.CurrencyMinorUnit]
+		currency_code := fixture[ci.CurrencyCode]
+		currency_name := fixture[ci.CurrencyName]
+		currency_minor_unit := fixture[ci.CurrencyMinorUnit]
 
 		// Some countries have more than one currency
 		if strings.Contains(currency_code, ",") {
@@ -114,7 +142,66 @@ func PreseedFromFixtures(ctx context.Context, query *db.Queries) error {
 	return nil
 }
 
-func parseColumnIndexFromHeaders(headers []string) columnIndex {
+func preseedBanks(ctx context.Context, query *db.Queries, fixturesPath string) error {
+	// No fixtures were provided, move along.
+	if fixturesPath == "" {
+		return nil
+	}
+
+	f, err := os.Open(fixturesPath)
+	if err != nil {
+		return err
+	}
+
+	reader := csv.NewReader(f)
+	headers, err := reader.Read()
+	if err != nil {
+		return fmt.Errorf("failed to read headers from provided fixture (%s): %w", fixturesPath, err)
+	}
+
+	bci := newBankColumnIndexFromHeaders(headers)
+
+	entities, err := reader.ReadAll()
+	if err != nil {
+		return fmt.Errorf("failed to read records for bank entity fixtures: %w", err)
+	}
+
+	for _, entity := range entities {
+		code := entity[bci.Code]
+		name := entity[bci.Name]
+		countryCode := entity[bci.Country]
+		currencyCode := entity[bci.Currency]
+		bid, err := id.NewBankId()
+		if err != nil {
+			return fmt.Errorf("failed to generate entity ID for fixture (%q): %w", name, err)
+		}
+
+		country, err := query.GetCountryByCode(ctx, countryCode)
+		if err != nil {
+			return fmt.Errorf("could not find country (%q) for fixture (%q): %w", countryCode, name, err)
+		}
+
+		currency, err := query.GetCurrencyByCode(ctx, currencyCode)
+		if err != nil {
+			return fmt.Errorf("could not find currency (%q) for fixture (%q): %w", currencyCode, name, err)
+		}
+
+		_, err = query.CreateBank(ctx, db.CreateBankParams{
+			Bid:        bid,
+			Code:       code,
+			Name:       name,
+			CountryID:  country.ID,
+			CurrencyID: currency.ID,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create bank entity from fixture: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func newColumnIndexFromHeaders(headers []string) columnIndex {
 	ci := columnIndex{}
 	for idx, column := range headers {
 		switch column {
@@ -132,4 +219,22 @@ func parseColumnIndexFromHeaders(headers []string) columnIndex {
 	}
 
 	return ci
+}
+
+func newBankColumnIndexFromHeaders(headers []string) bankColumnIndex {
+	bci := bankColumnIndex{}
+	for idx, column := range headers {
+		switch strings.ToLower(column) {
+		case "code":
+			bci.Code = idx
+		case "name":
+			bci.Name = idx
+		case "country":
+			bci.Country = idx
+		case "currency":
+			bci.Currency = idx
+		}
+	}
+
+	return bci
 }

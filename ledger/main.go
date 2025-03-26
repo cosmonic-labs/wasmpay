@@ -26,26 +26,28 @@ import (
 var ddl string
 
 var (
-	bindAddr string
-	dbStore  string
+	bankFixturesPath string
+	bindAddr         string
+	dbStore          string
 )
 
 func main() {
+	flag.StringVar(&bankFixturesPath, "bank-fixtures-path", "", "Path to a CSV that contains fixtures data for Bank entities.")
 	flag.StringVar(&bindAddr, "bind-addr", "localhost:8080", "Address to bind to.")
 	flag.StringVar(&dbStore, "db-store", ":memory:", "Either :memory: for in-memory or path to file for storing the database.")
 	flag.Parse()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	if err := run(bindAddr, dbStore); err != nil {
+	if err := run(bindAddr, dbStore, bankFixturesPath); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(bindAddr, dbStore string) error {
+func run(bindAddr, dbStore, bankFixturesPath string) error {
 	logger := slog.Default()
 
-	client, err := setupDatabase(dbStore)
+	client, err := setupDatabase(dbStore, bankFixturesPath)
 	if err != nil {
 		return err
 	}
@@ -84,7 +86,7 @@ func run(bindAddr, dbStore string) error {
 	return server.ListenAndServe()
 }
 
-func setupDatabase(dbStore string) (*db.Queries, error) {
+func setupDatabase(dbStore, bankFixturesPath string) (*db.Queries, error) {
 	// TODO: pass in
 	ctx := context.Background()
 
@@ -102,7 +104,7 @@ func setupDatabase(dbStore string) (*db.Queries, error) {
 	client := db.New(database)
 
 	// preseed country and currency data
-	if err := fixtures.PreseedFromFixtures(ctx, client); err != nil {
+	if err := fixtures.PreseedFromFixtures(ctx, client, bankFixturesPath); err != nil {
 		return nil, fmt.Errorf("failed to preseed the database: %w", err)
 	}
 
