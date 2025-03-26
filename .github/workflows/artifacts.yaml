@@ -28,8 +28,8 @@ jobs:
           # optional: specify go version file to use.
           go-version-file: go.work
           # optional: specify go cache dependency path to use.
-          go-cache-dependency-path: '*/go.sum'
-      
+          go-cache-dependency-path: "*/go.sum"
+
       # WAC/Donut: wasmpay-messaging
       # will be used by other components as dependency.
       - name: Build wasmpay-messaging
@@ -44,7 +44,7 @@ jobs:
         run: |
           npm ci
           npm run build --workspaces --if-present
-      
+
       - name: Build API Gateway
         uses: ./.github/actions/wash-build
         with:
@@ -59,7 +59,7 @@ jobs:
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           artifact: build/api-gateway_s.wasm
           image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:latest
-    
+
       # Component: Transaction Manager
       - name: Build Transaction Manager
         uses: ./.github/actions/wash-build
@@ -73,7 +73,7 @@ jobs:
           working-directory: transaction-manager
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
-          artifact: build/transaction-manager.composed_s.wasm
+          artifact: build/transaction_manager_s.wasm
           image: ghcr.io/cosmonic-labs/wasmpay/transaction-manager:latest
 
       # Component: wasmpay-validator
@@ -81,7 +81,7 @@ jobs:
         uses: ./.github/actions/wash-build
         with:
           working-directory: wasmpay-validator
-      
+
       - name: Push wasmpay-validator
         if: github.ref == 'refs/heads/main'
         uses: ./.github/actions/wash-push
@@ -97,7 +97,7 @@ jobs:
         uses: ./.github/actions/wash-build
         with:
           working-directory: nordhaven-validator
-      
+
       - name: Push nordhaven-validator
         if: github.ref == 'refs/heads/main'
         uses: ./.github/actions/wash-push
@@ -113,7 +113,7 @@ jobs:
         uses: ./.github/actions/wash-build
         with:
           working-directory: icamer-validator
-      
+
       - name: Push icamer-validator
         if: github.ref == 'refs/heads/main'
         uses: ./.github/actions/wash-push
