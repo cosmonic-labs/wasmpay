@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package api.ledger.v1;
+
+import "api/ledger/v1/transaction.proto";
+
+service TransactionService {
+  rpc StoreTransaction(StoreTransactionRequest) returns (StoreTransactionResponse) {}
+  rpc ListTransactions(ListTransactionsRequest) returns (ListTransactionsResponse) {}
+}
+
+message StoreTransactionRequest {
+  string origin = 1;
+  string destination = 2;
+  uint64 amount = 3;
+  string currency = 4;
+  TransactionStatus status = 5;
+}
+
+message StoreTransactionResponse {
+  string id = 1;
+}
+
+message ListTransactionsRequest {}
+message ListTransactionsResponse {
+  repeated Transaction transactions = 1;
+}

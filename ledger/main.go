@@ -17,9 +17,8 @@ import (
 	_ "modernc.org/sqlite"
 
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
+	"github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1/ledgerv1connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/fixtures"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/onboardv1/onboardv1connect"
-	"github.com/cosmonic-labs/wasmpay/ledger/internal/rpc/transferv1/transferv1connect"
 	"github.com/cosmonic-labs/wasmpay/ledger/server"
 )
 
@@ -53,13 +52,15 @@ func run(bindAddr, dbStore string) error {
 
 	mux := http.NewServeMux()
 
-	path, handler := onboardv1connect.NewOnboardServiceHandler(&server.OnboardServer{
-		DB: client,
+	path, handler := ledgerv1connect.NewBankServiceHandler(&server.BankServer{
+		DB:     client,
+		Logger: logger.With(slog.String("service", "bank-svc")),
 	})
 	mux.Handle(path, handler)
 
-	path, handler = transferv1connect.NewTransferServiceHandler(&server.TransferServer{
-		DB: client,
+	path, handler = ledgerv1connect.NewTransactionServiceHandler(&server.TransactionServer{
+		DB:     client,
+		Logger: logger.With(slog.String("service", "transaction-svc")),
 	})
 	mux.Handle(path, handler)
 
@@ -76,7 +77,7 @@ func run(bindAddr, dbStore string) error {
 		<-ctx.Done()
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		server.Shutdown(ctx)
+		_ = server.Shutdown(ctx)
 	}()
 
 	logger.Info("HTTP Server started", slog.String("addr", bindAddr))

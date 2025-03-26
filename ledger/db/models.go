@@ -10,6 +10,7 @@ import (
 
 type Bank struct {
 	ID         int64
+	Bid        string
 	Code       string
 	Name       string
 	CountryID  int64
@@ -29,11 +30,14 @@ type Currency struct {
 	MinorUnit int64
 }
 
-type Transfer struct {
-	ID        int64
-	Source    string
-	Target    string
-	Amount    int64
-	Currency  string
-	CreatedAt time.Time
+type Transaction struct {
+	ID            int64
+	Tid           string
+	OriginID      int64
+	DestinationID int64
+	CurrencyID    int64
+	Amount        int64
+	Status        string
+	Reason        string
+	CreatedAt     time.Time
 }

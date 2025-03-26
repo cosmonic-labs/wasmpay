@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package api.ledger.v1;
+
+message Transaction {
+  string id = 1;
+  string origin = 2;
+  string destination = 3;
+  uint64 amount = 4;
+  string currency = 5;
+  TransactionStatus status = 6;
+}
+
+message TransactionStatus {
+  string status = 1;
+  string reason = 2;
+}

@@ -2,12 +2,13 @@
 -- Bank queries
 --
 
--- name: GetBankByCode :one
+-- name: GetBank :one
 SELECT sqlc.embed(banks), sqlc.embed(countries), sqlc.embed(currencies)
 FROM banks
 JOIN countries on countries.id = banks.country_id
 JOIN currencies on currencies.id = banks.currency_id
-WHERE banks.code = ? LIMIT 1;
+WHERE banks.bid = ? OR banks.code = ?
+LIMIT 1;
 
 -- name: ListBanks :many
 SELECT * FROM banks
@@ -21,9 +22,9 @@ JOIN currencies ON currencies.id = banks.currency_id;
 
 -- name: CreateBank :one
 INSERT INTO banks (
-  code, name, country_id, currency_id
+  bid, code, name, country_id, currency_id
 ) VALUES (
-  ?, ?, ?, ?
+  ?, ?, ?, ?, ?
 )
 RETURNING *;
 
@@ -81,13 +82,27 @@ SELECT
 
 
 --
--- Transfer queries
+-- Transaction queries
 --
 
--- name: GetTransfer :one
-SELECT * FROM transfers
-WHERE id = ? LIMIT 1;
+-- name: CreateTransaction :one
+INSERT INTO transactions (
+  tid, origin_id, destination_id, currency_id, amount, status, reason
+) VALUES (
+  ?, ?, ?, ?, ?, ?, ?
+)
+RETURNING *;
 
--- name: ListTransfers :many
-SELECT * FROM transfers
-ORDER BY created_at;
+-- name: ListTransactions :many
+SELECT
+  sqlc.embed(transactions),
+  sqlc.embed(origin),
+  sqlc.embed(destination),
+  sqlc.embed(currencies)
+FROM
+  transactions
+  JOIN banks AS origin ON origin.id = transactions.destination_id
+  JOIN banks AS destination ON destination.id = transactions.origin_id
+  JOIN currencies ON currencies.id = transactions.currency_id
+ORDER BY
+  created_at;

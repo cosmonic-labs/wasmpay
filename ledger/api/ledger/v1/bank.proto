@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package api.ledger.v1;
+
+message Bank {
+  string id = 1;
+  string code = 2;
+  string name = 3;
+  string country = 4;
+  string currency = 5;
+}

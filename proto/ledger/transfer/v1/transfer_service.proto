@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package proto.ledger.transfer.v1;
-
-import "proto/ledger/transfer/v1/transfer.proto";
-
-service TransferService {
-  rpc Transfer(TransferRequest) returns (TransferResponse) {}
-}

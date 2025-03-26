@@ -98,10 +98,16 @@ func PreseedFromFixtures(ctx context.Context, query *db.Queries) error {
 			minor_units := strings.Split(currency_minor_unit, ",")
 
 			for idx, code := range codes {
-				createCurrency(code, names[idx], minor_units[idx])
+				err := createCurrency(code, names[idx], minor_units[idx])
+				if err != nil {
+					return err
+				}
 			}
 		} else {
-			createCurrency(currency_code, currency_name, currency_minor_unit)
+			err := createCurrency(currency_code, currency_name, currency_minor_unit)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

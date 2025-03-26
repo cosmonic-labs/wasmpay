@@ -1,0 +1,19 @@
+# Refer to https://buf.build/docs/configuration/v2/buf-gen-yaml/ for docs
+version: v2
+clean: true
+managed:
+  enabled: true
+  override:
+    - file_option: go_package
+      value: github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1
+      path: api/ledger/v1
+plugins:
+  - local: ["go", "tool", "protoc-gen-go"]
+    out: internal/api
+    opt:
+      - module=github.com/cosmonic-labs/wasmpay/ledger/internal/api
+
+  - local: ["go", "tool", "protoc-gen-connect-go"]
+    out: internal/api
+    opt:
+      - module=github.com/cosmonic-labs/wasmpay/ledger/internal/api
