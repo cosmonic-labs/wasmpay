@@ -14,6 +14,7 @@ import (
 	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmcloud/identity/store"
 	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmpay/platform/types"
 	"github.com/cosmonic-labs/wasmpay/api-gateway/gen/wasmpay/platform/validation"
+	"github.com/cosmonic-labs/wasmpay/aws"
 	"github.com/cosmonic-labs/wasmpay/aws/config"
 	"github.com/cosmonic-labs/wasmpay/aws/credentials"
 	"github.com/cosmonic-labs/wasmpay/aws/services/bedrockruntime"
@@ -31,6 +32,8 @@ const (
 	ModelAmazonNovaLite       = "us.amazon.nova-lite-v1:0"
 	ModelAnthropicClaudeHaiku = "us.anthropic.claude-3-5-haiku-20241022-v1:0"
 	defaultRegion             = "us-east-2"
+	defaultAPIGatewayAudience = "spiffe://aws.amazon.com/wasmpay/api-gateway"
+	defaultRoleArn            = "arn:aws:iam::471112507838:role/wasmpay-api-gateway"
 )
 
 // Router creates a [http.Handler] and registers the application-specific
@@ -61,6 +64,7 @@ func Router() http.Handler {
 }
 
 func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := r.Context()
 	var request types.Transaction
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -78,6 +82,64 @@ func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 	if proFeature != "" {
 		logger.Info("Validated transaction as non-fraudlent, sending for processing")
 		// TODO: AI detect fraud
+		workloadIdentityToken, err := fetchWorkloadIdentity()
+		if err != nil {
+			logger.Error("failed to load JWT from identity service", "error", err)
+			http.Error(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-001)", http.StatusBadRequest)
+			return
+		}
+
+		creds, err := exchangeWorkloadIdentityForCredentials(ctx, workloadIdentityToken)
+		if err != nil {
+			logger.Error("failed to load aws config for sts", "error", err)
+			http.Error(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-002)", http.StatusBadRequest)
+			return
+		}
+
+		// <insert-AI-logic-here>
+		cfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(defaultRegion), config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(creds.AccessKeyID, creds.SecretAccessKey, creds.SessionToken)))
+		if err != nil {
+			logger.Error("failed to load AWS config for Bedrock Runtime", "error", err)
+			http.Error(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-003)", http.StatusBadRequest)
+			return
+		}
+
+		client := bedrockruntime.NewFromConfig(cfg)
+		responses, err := client.Converse(ctx, &bedrockruntime.ConverseInput{
+			ModelId: ModelAmazonNovaLite,
+			InferenceConfig: &brtypes.InferenceConfiguration{
+				MaxTokens:   300,
+				Temperature: 0.3,
+				TopP:        0.1,
+			},
+			Messages: []brtypes.Message{
+				{
+					Content: []brtypes.ContentBlockMemberText{
+						{
+							Value: "Write a short story about dragons",
+						},
+					},
+					Role: brtypes.ConversationRoleUser,
+				},
+			},
+			System: []brtypes.SystemContentBlockMemberText{
+				{
+					Value: "You are a helpful assistant",
+				},
+			},
+		})
+		if err != nil {
+			logger.Error("failed to invoke model from bedrock", "error", err)
+			http.Error(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-004)", http.StatusBadRequest)
+			return
+		}
+
+		// Act on the AI response
+		for _, response := range responses.Output.Value.Content {
+			fmt.Printf("The AI said: %s\n", response.Value)
+		}
+
+		// </insert-AI-logic-here>
 	}
 
 	transactionManagerResponse := validation.Validate(request)
@@ -254,4 +316,38 @@ func successResponse(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(SuccessResponse{Data: data})
+}
+
+func fetchWorkloadIdentity() (string, error) {
+	// TODO(joonas): Should this be configurable from the request?
+	result := store.Get(defaultAPIGatewayAudience)
+	token := result.OK()
+	if token == nil {
+		return "", fmt.Errorf("failed to load JWT from identity service: %w", result.Err())
+	}
+	return token.Value(), nil
+}
+
+func exchangeWorkloadIdentityForCredentials(ctx context.Context, token string) (aws.Credentials, error) {
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(defaultRegion))
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	client := sts.NewFromConfig(cfg)
+	out, err := client.AssumeRoleWithWebIdentity(ctx, &sts.AssumeRoleWithWebIdentityInput{
+		RoleArn:          defaultRoleArn,
+		RoleSessionName:  "apigateway-request",
+		DurationSeconds:  900,
+		WebIdentityToken: token,
+	})
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	return aws.Credentials{
+		AccessKeyID:     out.Credentials.AccessKeyID,
+		SecretAccessKey: out.Credentials.SecretAccessKey,
+		SessionToken:    out.Credentials.SessionToken,
+	}, nil
 }
