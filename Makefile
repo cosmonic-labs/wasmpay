@@ -37,8 +37,9 @@ test-validate-invalid: ## curl the API gateway with a test validation that shoul
 
 test-scale: ## Run a single validator 10000 times, then invoke them all
 	nats-server -js -c ./hack/scale.conf &
-	wash up -d --nats-connect-only
+	WASMCLOUD_EXPERIMENTAL_FEATURES=${WASMCLOUD_EXPERIMENTAL_FEATURES} \
+		wash up -d --nats-connect-only
 	sleep 10
-	wash config put httphost routing_mode=host default_address=0.0.0.0:8000
+	wash config put httphost routing_mode=host default_address=0.0.0.0:8001
 	wash start provider ghcr.io/wasmcloud/http-server:0.27.0 http --config httphost
 	./hack/scale.sh
