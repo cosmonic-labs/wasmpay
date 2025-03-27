@@ -51,7 +51,7 @@ jobs:
           working-directory: api-gateway
 
       - name: Push API Gateway
-        #if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         uses: ./.github/actions/wash-push
         with:
           working-directory: api-gateway
