@@ -58,7 +58,7 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           artifact: build/api-gateway_s.wasm
-          image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:{{ github.sha }}
+          image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:${{ github.sha }}
 
       # Component: Transaction Manager
       - name: Build Transaction Manager
@@ -74,7 +74,7 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           artifact: build/transaction_manager_s.wasm
-          image: ghcr.io/cosmonic-labs/wasmpay/transaction-manager:{{ github.sha }}
+          image: ghcr.io/cosmonic-labs/wasmpay/transaction-manager:${{ github.sha }}
 
       # Component: wasmpay-validator
       - name: Build wasmpay-validator
@@ -90,7 +90,7 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           artifact: build/wasmpay-validator.composed_s.wasm
-          image: ghcr.io/cosmonic-labs/wasmpay/wasmpay-validator:{{ github.sha }}
+          image: ghcr.io/cosmonic-labs/wasmpay/wasmpay-validator:${{ github.sha }}
 
       # Component: (Bank) nordhaven-validator
       - name: Build nordhaven-validator
@@ -106,7 +106,7 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           artifact: build/nordhaven-validator.composed_s.wasm
-          image: ghcr.io/cosmonic-labs/wasmpay/nordhaven-validator:{{ github.sha }}
+          image: ghcr.io/cosmonic-labs/wasmpay/nordhaven-validator:${{ github.sha }}
 
       # Component: (Bank) icamer-validator
       - name: Build icamer-validator
@@ -122,4 +122,4 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           artifact: build/icamer_validator.composed_s.wasm
-          image: ghcr.io/cosmonic-labs/wasmpay/icamer-validator:{{ github.sha }}
+          image: ghcr.io/cosmonic-labs/wasmpay/icamer-validator:${{ github.sha }}
