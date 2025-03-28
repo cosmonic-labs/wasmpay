@@ -28,6 +28,14 @@ INSERT INTO banks (
 )
 RETURNING *;
 
+-- Used to preseed
+-- name: CreateBankIfNotExists :exec
+INSERT OR IGNORE INTO banks (
+  bid, code, name, country_id, currency_id
+) VALUES (
+  ?, ?, ?, ?, ?
+);
+
 -- name: DeleteBankByCode :exec
 DELETE FROM banks WHERE code = ?;
 
@@ -44,7 +52,7 @@ SELECT * FROM countries
 WHERE id = ? LIMIT 1;
 
 -- name: CreateCountry :exec
-INSERT INTO countries (
+INSERT OR IGNORE INTO countries (
   code, name
 ) VALUES (
   ?, ?
@@ -63,7 +71,7 @@ SELECT * FROM currencies
 WHERE id = ? LIMIT 1;
 
 -- name: CreateCurrency :exec
-INSERT INTO currencies (
+INSERT OR IGNORE INTO currencies (
   code, name, minor_unit
 ) VALUES (
   ?, ?, ?

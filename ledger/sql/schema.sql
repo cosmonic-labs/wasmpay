@@ -1,6 +1,6 @@
 -- For SQLite datatypes, see: https://www.sqlite.org/datatype3.html
 
-CREATE TABLE banks (
+CREATE TABLE IF NOT EXISTS banks (
   id INTEGER PRIMARY KEY,
   -- public bank id, something like `bk_1a2B3c4`
   bid text NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE banks (
   FOREIGN KEY(currency_id) REFERENCES currencies(id)
 );
 
-CREATE TABLE countries (
+CREATE TABLE IF NOT EXISTS countries (
   id INTEGER PRIMARY KEY,
   -- ISO 3166 Alpha-3 code
   code text NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE countries (
   UNIQUE(code)
 );
 
-CREATE TABLE currencies (
+CREATE TABLE IF NOT EXISTS currencies (
   id INTEGER PRIMARY KEY,
   -- ISO 4217 Alphabetic code
   code text NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE currencies (
   UNIQUE(code)
 );
 
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
   id INTEGER PRIMARY KEY,
   -- public transaction id, something like `txn_9J8i7H6`
   tid text NOT NULL,

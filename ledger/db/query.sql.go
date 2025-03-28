@@ -46,8 +46,36 @@ func (q *Queries) CreateBank(ctx context.Context, arg CreateBankParams) (Bank, e
 	return i, err
 }
 
+const createBankIfNotExists = `-- name: CreateBankIfNotExists :exec
+INSERT OR IGNORE INTO banks (
+  bid, code, name, country_id, currency_id
+) VALUES (
+  ?, ?, ?, ?, ?
+)
+`
+
+type CreateBankIfNotExistsParams struct {
+	Bid        string
+	Code       string
+	Name       string
+	CountryID  int64
+	CurrencyID int64
+}
+
+// Used to preseed
+func (q *Queries) CreateBankIfNotExists(ctx context.Context, arg CreateBankIfNotExistsParams) error {
+	_, err := q.db.ExecContext(ctx, createBankIfNotExists,
+		arg.Bid,
+		arg.Code,
+		arg.Name,
+		arg.CountryID,
+		arg.CurrencyID,
+	)
+	return err
+}
+
 const createCountry = `-- name: CreateCountry :exec
-INSERT INTO countries (
+INSERT OR IGNORE INTO countries (
   code, name
 ) VALUES (
   ?, ?
@@ -65,7 +93,7 @@ func (q *Queries) CreateCountry(ctx context.Context, arg CreateCountryParams) er
 }
 
 const createCurrency = `-- name: CreateCurrency :exec
-INSERT INTO currencies (
+INSERT OR IGNORE INTO currencies (
   code, name, minor_unit
 ) VALUES (
   ?, ?, ?
