@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM cgr.dev/chainguard/go AS builder
+ENV CGO_ENABLED=0
 
 COPY . /app
 
