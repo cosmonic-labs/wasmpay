@@ -6,13 +6,15 @@ import (
 	_ "embed"
 	"encoding/csv"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/cosmonic-labs/wasmpay/ledger/db"
 	"github.com/cosmonic-labs/wasmpay/ledger/internal/id"
 )
+
+//go:embed banks.csv
+var banks []byte
 
 //go:embed country-codes.csv
 var countryCodes []byte
@@ -43,13 +45,13 @@ type columnIndex struct {
 	CurrencyMinorUnit int
 }
 
-func PreseedFromFixtures(ctx context.Context, query *db.Queries, bankFixturesPath string) error {
+func PreseedFromFixtures(ctx context.Context, query *db.Queries) error {
 	err := preseedCountriesAndCurrencies(ctx, query)
 	if err != nil {
 		return err
 	}
 
-	err = preseedBanks(ctx, query, bankFixturesPath)
+	err = preseedBanks(ctx, query)
 	if err != nil {
 		return err
 	}
@@ -142,21 +144,13 @@ func preseedCountriesAndCurrencies(ctx context.Context, query *db.Queries) error
 	return nil
 }
 
-func preseedBanks(ctx context.Context, query *db.Queries, fixturesPath string) error {
-	// No fixtures were provided, move along.
-	if fixturesPath == "" {
-		return nil
-	}
+func preseedBanks(ctx context.Context, query *db.Queries) error {
+	r := bytes.NewReader(banks)
 
-	f, err := os.Open(fixturesPath)
-	if err != nil {
-		return err
-	}
-
-	reader := csv.NewReader(f)
+	reader := csv.NewReader(r)
 	headers, err := reader.Read()
 	if err != nil {
-		return fmt.Errorf("failed to read headers from provided fixture (%s): %w", fixturesPath, err)
+		return fmt.Errorf("failed to read headers from fixtures: %w", err)
 	}
 
 	bci := newBankColumnIndexFromHeaders(headers)
