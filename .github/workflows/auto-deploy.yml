@@ -1,0 +1,26 @@
+name: auto-deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.AUTOMATION_TOKEN }}
+          script: |
+            const result = await github.rest.actions.createWorkflowDispatch({
+              owner: 'cosmonic',
+              repo: 'control-demo',
+              workflow_id: 'wasmpay',
+              ref: 'main',
+              inputs: { "tag": "218444cb78aa1217aed15c4459a69db13996e362" }
+            })
+            console.log(result);
