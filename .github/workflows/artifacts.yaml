@@ -159,5 +159,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' }}
           context: ./ledger
           file: ./ledger/Dockerfile
-          tags: ghcr.io/cosmonic-labs/wasmpay/ledger
+          tags: |
+            ghcr.io/cosmonic-labs/wasmpay/ledger:${{ github.sha }}
+            ghcr.io/cosmonic-labs/wasmpay/ledger:latest
           platforms: linux/arm64,linux/amd64
