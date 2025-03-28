@@ -19,7 +19,7 @@ jobs:
             const result = await github.rest.actions.createWorkflowDispatch({
               owner: 'cosmonic',
               repo: 'control-demo',
-              workflow_id: 'wasmpay.yml',
+              workflow_id: 'wasmpay.yaml',
               ref: 'main',
               inputs: { "tag": "218444cb78aa1217aed15c4459a69db13996e362" }
             })
