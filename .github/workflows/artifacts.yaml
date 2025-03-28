@@ -124,6 +124,22 @@ jobs:
           artifact: build/icamer_validator.composed_s.wasm
           image: ghcr.io/cosmonic-labs/wasmpay/icamer-validator:${{ github.sha }}
 
+      - name: Notify Deployment Pipeline
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        with:
+          # janet-not-a-robot
+          github-token: ${{ secrets.AUTOMATION_TOKEN }}
+          script: |
+            const result = await github.rest.actions.createWorkflowDispatch({
+              owner: 'cosmonic',
+              repo: 'control-demo',
+              workflow_id: 'wasmpay.yaml',
+              ref: 'main',
+              inputs: { "tag": "${{ github.sha }}" }
+            })
+            console.log(result);
+
   ledger:
     runs-on: ubuntu-latest
 
