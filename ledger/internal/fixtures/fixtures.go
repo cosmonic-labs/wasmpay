@@ -180,7 +180,7 @@ func preseedBanks(ctx context.Context, query *db.Queries) error {
 			return fmt.Errorf("could not find currency (%q) for fixture (%q): %w", currencyCode, name, err)
 		}
 
-		_, err = query.CreateBank(ctx, db.CreateBankParams{
+		err = query.CreateBankIfNotExists(ctx, db.CreateBankIfNotExistsParams{
 			Bid:        bid,
 			Code:       code,
 			Name:       name,
