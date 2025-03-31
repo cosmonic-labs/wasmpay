@@ -53,13 +53,18 @@ func Router() http.Handler {
 	router.POST("/api/v1/bedrock", bedrockHandler)
 	// Send requests to the LLM for translation
 	router.POST("/api/v1/chat", chatHandler)
-	// Send requests to LLM for fraud detection, then kick off transaction
-	router.POST("/api/v1/transaction", transactionHandler)
 	// Send request to identity store to fetch a JWT-SVID
 	router.POST("/api/v1/token", tokenHandler)
 
-	// Send request to the backend to get a bank
+	// Send request to the backend to manage banks
 	router.GET("/api/v1/banks", getBankHandler)
+	router.DELETE("/api/v1/banks", deleteBankHandler)
+	router.POST("/api/v1/banks", createBankHandler)
+
+	// Send request to the backend to manage transactions
+	router.GET("/api/v1/transactions", getTransactionsHandler)
+	// Send requests to LLM for fraud detection, then kick off transaction
+	router.POST("/api/v1/transactions", createTransactionHandler)
 
 	// Handling assets
 	router.GET("/", assetHandler)
@@ -68,71 +73,22 @@ func Router() http.Handler {
 	return router
 }
 
-func getBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var url string
-	var body []byte
-
-	// Determine if we should query by code, id, or list all banks
-	code := r.FormValue("code")
-	if code != "" {
-		url = backend("BankService", "GetBank")
-		body = fmt.Appendf(body, `{"code": "%s"}`, code)
-	}
-	id := r.FormValue("id")
-	if id != "" {
-		url = backend("BankService", "GetBank")
-		body = fmt.Appendf(body, `{"id": "%s"}`, id)
-	}
-	if url == "" {
-		url = backend("BankService", "ListBanks")
-		body = []byte("{}")
-	}
-
-	resp, err := httpClient.Post(url, "application/json", bytes.NewReader(body))
-
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to fetch banks: %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		http.Error(w, string(body), resp.StatusCode)
-		return
-	}
-
-	// List requests return an array
-	// Get requests return a single object
-	type BankResponse struct {
-		Banks []types.Bank `json:"banks"`
-		Bank  types.Bank   `json:"bank"`
-	}
-	var bankResponse BankResponse
-	if err := json.NewDecoder(resp.Body).Decode(&bankResponse); err != nil {
-		http.Error(w, "Failed to decode banks response", http.StatusInternalServerError)
-		return
-	}
-	if strings.Contains(url, "ListBanks") {
-		successResponse(w, bankResponse.Banks)
-	} else {
-		successResponse(w, bankResponse.Bank)
-	}
-}
-
-func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	ctx := r.Context()
+func createTransactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var request types.Transaction
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		errorResponse(w, "Invalid request body"+err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	// Ensure the request is not a zero value
 	if request == (types.Transaction{}) {
-		http.Error(w, "Request cannot be empty or zero value", http.StatusBadRequest)
+		errorResponse(w, "Request cannot be empty or zero value", http.StatusBadRequest)
 		return
 	}
 
 	// TODO: fraud detection is a wasmpay "pro" feature that's optional
+
+	ctx := r.Context()
 	proFeature := r.Header.Get("X-Wasmpay-Pro")
 	logger := slog.New(wasilog.DefaultOptions().NewHandler())
 	if proFeature != "" {
@@ -141,14 +97,14 @@ func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 		workloadIdentityToken, err := fetchWorkloadIdentity()
 		if err != nil {
 			logger.Error("failed to load JWT from identity service", "error", err)
-			http.Error(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-001)", http.StatusBadRequest)
+			errorResponse(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-001)", http.StatusBadRequest)
 			return
 		}
 
 		creds, err := exchangeWorkloadIdentityForCredentials(ctx, workloadIdentityToken)
 		if err != nil {
 			logger.Error("failed to load aws config for sts", "error", err)
-			http.Error(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-002)", http.StatusBadRequest)
+			errorResponse(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-002)", http.StatusBadRequest)
 			return
 		}
 
@@ -156,7 +112,7 @@ func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 		cfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(defaultRegion), config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(creds.AccessKeyID, creds.SecretAccessKey, creds.SessionToken)))
 		if err != nil {
 			logger.Error("failed to load AWS config for Bedrock Runtime", "error", err)
-			http.Error(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-003)", http.StatusBadRequest)
+			errorResponse(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-003)", http.StatusBadRequest)
 			return
 		}
 
@@ -186,7 +142,7 @@ func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 		})
 		if err != nil {
 			logger.Error("failed to invoke model from bedrock", "error", err)
-			http.Error(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-004)", http.StatusBadRequest)
+			errorResponse(w, "Wasmpay Pro feature is currently unavailable, please try again later. (error-004)", http.StatusBadRequest)
 			return
 		}
 
@@ -200,10 +156,218 @@ func transactionHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 
 	transactionManagerResponse := validation.Validate(request)
 	if transactionManagerResponse.Approved {
-		successResponse(w, "Transaction is valid and has been processed successfully.")
+		// successResponse(w, "Transaction is valid and has been processed successfully.")
 	} else {
-		http.Error(w, fmt.Sprintf("Transaction failed validation: %s", *transactionManagerResponse.Reason.Some()), http.StatusBadRequest)
+		errorResponse(w, fmt.Sprintf("Transaction failed validation: %s", *transactionManagerResponse.Reason.Some()), http.StatusBadRequest)
 		return
+	}
+
+	// Send the request to the backend
+	requestBytes, err := json.Marshal(request)
+	if err != nil {
+		errorResponse(w, "Failed to marshal request to JSON", http.StatusInternalServerError)
+		return
+	}
+	url := backend("TransactionService", "StoreTransaction")
+	resp, err := httpClient.Post(url, "application/json", bytes.NewReader(requestBytes))
+	if err != nil {
+		errorResponse(w, fmt.Sprintf("Failed to create transaction: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		http.Error(w, string(body), resp.StatusCode)
+		return
+	}
+	// Decode the response which should just contain the ID
+
+	type CreateTransactionResponse struct {
+		ID string `json:"id"`
+	}
+	var createTransactionResponse CreateTransactionResponse
+	if err := json.NewDecoder(resp.Body).Decode(&createTransactionResponse); err != nil {
+		errorResponse(w, "Failed to decode create transaction response", http.StatusInternalServerError)
+		return
+	}
+	// Return the response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(createTransactionResponse)
+}
+
+func getTransactionsHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	url := backend("TransactionService", "ListTransactions")
+
+	resp, err := httpClient.Post(url, "application/json", bytes.NewReader([]byte("{}")))
+	if err != nil {
+		errorResponse(w, fmt.Sprintf("Failed to fetch transactions: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		http.Error(w, string(body), resp.StatusCode)
+		return
+	}
+
+	// Backend transaction type
+	type Transaction struct {
+		ID          string `json:"id,omitempty"`
+		Amount      string `json:"amount"`
+		Currency    string `json:"currency"`
+		Origin      string `json:"origin"`
+		Destination string `json:"destination"`
+		Status      string `json:"status"`
+		Reason      string `json:"reason"`
+	}
+	type TransactionResponse struct {
+		Transactions []Transaction `json:"transactions"`
+	}
+	var transactions TransactionResponse
+	if err := json.NewDecoder(resp.Body).Decode(&transactions); err != nil {
+		errorResponse(w, "Failed to decode transactions response", http.StatusInternalServerError)
+		return
+	}
+
+	// Return the transactions
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(transactions)
+}
+
+func deleteBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	code := r.FormValue("code")
+	if code == "" {
+		errorResponse(w, "Missing bank code", http.StatusBadRequest)
+		return
+	}
+
+	url := backend("BankService", "DeleteBank")
+	body := fmt.Sprintf(`{"code": "%s"}`, code)
+
+	resp, err := httpClient.Post(url, "application/json", strings.NewReader(body))
+	if err != nil {
+		errorResponse(w, fmt.Sprintf("Failed to delete bank: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		responseBody, _ := io.ReadAll(resp.Body)
+		http.Error(w, string(responseBody), resp.StatusCode)
+		return
+	}
+
+	successResponse(w, "Bank deleted successfully")
+}
+
+func createBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var request types.Bank
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		errorResponse(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Ensure the request is not a zero value
+	if request == (types.Bank{}) {
+		errorResponse(w, "Request cannot be empty or zero value", http.StatusBadRequest)
+		return
+	}
+
+	// Ensure the request has a code, name, currency, and country
+	if request.Code == "" || request.Name == "" || request.Currency == "" || request.Country == "" {
+		errorResponse(w, "Request must contain code, name, currency, and country", http.StatusBadRequest)
+		return
+	}
+
+	// Send the request to the backend
+	url := backend("BankService", "CreateBank")
+	requestBytes, err := json.Marshal(request)
+	if err != nil {
+		errorResponse(w, "Failed to marshal request to JSON", http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := httpClient.Post(url, "application/json", bytes.NewReader(requestBytes))
+
+	if err != nil {
+		errorResponse(w, fmt.Sprintf("Failed to create bank: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		http.Error(w, string(body), resp.StatusCode)
+		return
+	}
+
+	// Decode the response
+	type CreateBankResponse struct {
+		ID string `json:"id"`
+	}
+
+	var createBankResponse CreateBankResponse
+	if err := json.NewDecoder(resp.Body).Decode(&createBankResponse); err != nil {
+		errorResponse(w, "Failed to decode create bank response", http.StatusInternalServerError)
+		return
+	}
+
+	// Return the response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(createBankResponse)
+}
+
+func getBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var url string
+	var body []byte
+
+	// Determine if we should query by code, id, or list all banks
+	code := r.FormValue("code")
+	if code != "" {
+		url = backend("BankService", "GetBank")
+		body = fmt.Appendf(body, `{"code": "%s"}`, code)
+	}
+	id := r.FormValue("id")
+	if id != "" {
+		url = backend("BankService", "GetBank")
+		body = fmt.Appendf(body, `{"id": "%s"}`, id)
+	}
+	if url == "" {
+		url = backend("BankService", "ListBanks")
+		body = []byte("{}")
+	}
+
+	resp, err := httpClient.Post(url, "application/json", bytes.NewReader(body))
+
+	if err != nil {
+		errorResponse(w, fmt.Sprintf("Failed to fetch banks: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		http.Error(w, string(body), resp.StatusCode)
+		return
+	}
+
+	// List requests return an array
+	// Get requests return a single object
+	type BankResponse struct {
+		Banks []types.Bank `json:"banks"`
+		Bank  types.Bank   `json:"bank"`
+	}
+	var bankResponse BankResponse
+	if err := json.NewDecoder(resp.Body).Decode(&bankResponse); err != nil {
+		errorResponse(w, "Failed to decode banks response", http.StatusInternalServerError)
+		return
+	}
+	if strings.Contains(url, "ListBanks") {
+		successResponse(w, bankResponse.Banks)
+	} else {
+		successResponse(w, bankResponse.Bank)
 	}
 }
 
@@ -218,7 +382,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request, params httprouter.Para
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		logger.Error("failed to decode request", "error", err)
-		http.Error(w, "Failed to decode request.", http.StatusBadRequest)
+		errorResponse(w, "Failed to decode request.", http.StatusBadRequest)
 		return
 	}
 	audience := req.Audience
@@ -227,7 +391,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request, params httprouter.Para
 	resultOk := result.OK()
 	if resultOk == nil {
 		logger.Error("failed to load JWT from identity service", "error", result.Err())
-		http.Error(w, "Failed to load JWT.", http.StatusBadRequest)
+		errorResponse(w, "Failed to load JWT.", http.StatusBadRequest)
 		return
 	}
 	token := resultOk.Value()
@@ -249,7 +413,7 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		logger.Error("failed to decode request", "error", err)
-		http.Error(w, "Failed to decode request.", http.StatusBadRequest)
+		errorResponse(w, "Failed to decode request.", http.StatusBadRequest)
 		return
 	}
 	roleArn := req.RoleArn
@@ -262,7 +426,7 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	stsCfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(region))
 	if err != nil {
 		logger.Error("failed to load aws config for sts", "error", err)
-		http.Error(w, "Failed to load AWS config for STS", http.StatusBadRequest)
+		errorResponse(w, "Failed to load AWS config for STS", http.StatusBadRequest)
 		return
 	}
 
@@ -275,20 +439,14 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	})
 	if err != nil {
 		logger.Error("failed to assume role", "error", err)
-		http.Error(w, "Failed to assume role.", http.StatusBadRequest)
+		errorResponse(w, "Failed to assume role.", http.StatusBadRequest)
 		return
 	}
 
 	brCfg, err := config.LoadDefaultConfig(ctx, config.WithHTTPClient(httpClient), config.WithRegion(region), config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(stsOut.Credentials.AccessKeyID, stsOut.Credentials.SecretAccessKey, stsOut.Credentials.SessionToken)))
 	if err != nil {
 		logger.Error("failed to load AWS config for Bedrock Runtime", "error", err)
-		http.Error(w, "Failed to load AWS config for Bedrock Runtime", http.StatusBadRequest)
-		return
-	}
-
-	if err != nil {
-		logger.Error("failed to marshal bytes", "error", err)
-		http.Error(w, "Failed to marshal bytes", http.StatusBadRequest)
+		errorResponse(w, "Failed to load AWS config for Bedrock Runtime", http.StatusBadRequest)
 		return
 	}
 
@@ -318,7 +476,7 @@ func bedrockHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	})
 	if err != nil {
 		logger.Error("failed to invoke model from bedrock", "error", err)
-		http.Error(w, "Failed to invoke model", http.StatusBadRequest)
+		errorResponse(w, "Failed to invoke model", http.StatusBadRequest)
 		return
 	}
 
@@ -335,7 +493,7 @@ type ChatRequest struct {
 func chatHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var request ChatRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		errorResponse(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
@@ -343,7 +501,7 @@ func chatHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	// TODO: AI EXECUTE
 	logger := slog.New(wasilog.DefaultOptions().NewHandler())
-	logger.Info("Translating text", prompt)
+	logger.Info(fmt.Sprintf("Translating text %s", prompt))
 	response := "Hola, mundo!" // Placeholder for the actual translation response
 	successResponse(w, response)
 }
@@ -357,7 +515,7 @@ func healthzHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 func assetHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	assets, err := fs.Sub(staticAssets, "wasmcloud.banking/client/apps/banking/dist")
 	if err != nil {
-		http.Error(w, "Couldn't find static assets", http.StatusInternalServerError)
+		errorResponse(w, "Couldn't find static assets", http.StatusInternalServerError)
 		return
 	}
 	fs := http.FileServer(http.FS(assets))
@@ -368,10 +526,25 @@ type SuccessResponse struct {
 	Data any `json:"data"`
 }
 
+// Send a successful HTTP response, encoding the data under a nested field
 func successResponse(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(SuccessResponse{Data: data})
+}
+
+type ErrorResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func errorResponse(w http.ResponseWriter, message string, httpCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(httpCode)
+	json.NewEncoder(w).Encode(ErrorResponse{
+		Code:    "gateway_error",
+		Message: message,
+	})
 }
 
 func fetchWorkloadIdentity() (string, error) {

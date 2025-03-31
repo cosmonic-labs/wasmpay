@@ -28,7 +28,8 @@ type Transaction struct {
 	Destination   string                 `protobuf:"bytes,3,opt,name=destination,proto3" json:"destination,omitempty"`
 	Amount        uint64                 `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
 	Currency      string                 `protobuf:"bytes,5,opt,name=currency,proto3" json:"currency,omitempty"`
-	Status        *TransactionStatus     `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	Reason        string                 `protobuf:"bytes,7,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -98,59 +99,14 @@ func (x *Transaction) GetCurrency() string {
 	return ""
 }
 
-func (x *Transaction) GetStatus() *TransactionStatus {
-	if x != nil {
-		return x.Status
-	}
-	return nil
-}
-
-type TransactionStatus struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TransactionStatus) Reset() {
-	*x = TransactionStatus{}
-	mi := &file_api_ledger_v1_transaction_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TransactionStatus) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TransactionStatus) ProtoMessage() {}
-
-func (x *TransactionStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_api_ledger_v1_transaction_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TransactionStatus.ProtoReflect.Descriptor instead.
-func (*TransactionStatus) Descriptor() ([]byte, []int) {
-	return file_api_ledger_v1_transaction_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *TransactionStatus) GetStatus() string {
+func (x *Transaction) GetStatus() string {
 	if x != nil {
 		return x.Status
 	}
 	return ""
 }
 
-func (x *TransactionStatus) GetReason() string {
+func (x *Transaction) GetReason() string {
 	if x != nil {
 		return x.Reason
 	}
@@ -161,17 +117,15 @@ var File_api_ledger_v1_transaction_proto protoreflect.FileDescriptor
 
 const file_api_ledger_v1_transaction_proto_rawDesc = "" +
 	"\n" +
-	"\x1fapi/ledger/v1/transaction.proto\x12\rapi.ledger.v1\"\xc5\x01\n" +
+	"\x1fapi/ledger/v1/transaction.proto\x12\rapi.ledger.v1\"\xbb\x01\n" +
 	"\vTransaction\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06origin\x18\x02 \x01(\tR\x06origin\x12 \n" +
 	"\vdestination\x18\x03 \x01(\tR\vdestination\x12\x16\n" +
 	"\x06amount\x18\x04 \x01(\x04R\x06amount\x12\x1a\n" +
-	"\bcurrency\x18\x05 \x01(\tR\bcurrency\x128\n" +
-	"\x06status\x18\x06 \x01(\v2 .api.ledger.v1.TransactionStatusR\x06status\"C\n" +
-	"\x11TransactionStatus\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reasonB\xba\x01\n" +
+	"\bcurrency\x18\x05 \x01(\tR\bcurrency\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\x12\x16\n" +
+	"\x06reason\x18\a \x01(\tR\x06reasonB\xba\x01\n" +
 	"\x11com.api.ledger.v1B\x10TransactionProtoP\x01Z=github.com/cosmonic-labs/wasmpay/ledger/internal/api/ledgerv1\xa2\x02\x03ALX\xaa\x02\rApi.Ledger.V1\xca\x02\rApi\\Ledger\\V1\xe2\x02\x19Api\\Ledger\\V1\\GPBMetadata\xea\x02\x0fApi::Ledger::V1b\x06proto3"
 
 var (
@@ -186,18 +140,16 @@ func file_api_ledger_v1_transaction_proto_rawDescGZIP() []byte {
 	return file_api_ledger_v1_transaction_proto_rawDescData
 }
 
-var file_api_ledger_v1_transaction_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_api_ledger_v1_transaction_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_api_ledger_v1_transaction_proto_goTypes = []any{
-	(*Transaction)(nil),       // 0: api.ledger.v1.Transaction
-	(*TransactionStatus)(nil), // 1: api.ledger.v1.TransactionStatus
+	(*Transaction)(nil), // 0: api.ledger.v1.Transaction
 }
 var file_api_ledger_v1_transaction_proto_depIdxs = []int32{
-	1, // 0: api.ledger.v1.Transaction.status:type_name -> api.ledger.v1.TransactionStatus
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // [0:0] is the sub-list for method output_type
+	0, // [0:0] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_api_ledger_v1_transaction_proto_init() }
@@ -211,7 +163,7 @@ func file_api_ledger_v1_transaction_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_ledger_v1_transaction_proto_rawDesc), len(file_api_ledger_v1_transaction_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

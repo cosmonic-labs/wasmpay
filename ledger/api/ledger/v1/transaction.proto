@@ -8,10 +8,6 @@ message Transaction {
   string destination = 3;
   uint64 amount = 4;
   string currency = 5;
-  TransactionStatus status = 6;
-}
-
-message TransactionStatus {
-  string status = 1;
-  string reason = 2;
+  string status = 6;
+  string reason = 7;
 }
