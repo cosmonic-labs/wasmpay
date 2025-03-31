@@ -28,7 +28,7 @@ import (
 	"go.wasmcloud.dev/component/log/wasilog"
 )
 
-//go:embed wasmcloud.banking/client/apps/banking/dist/*
+//go:embed static/dist/*
 var staticAssets embed.FS
 
 const (
@@ -540,7 +540,7 @@ func healthzHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 }
 
 func assetHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	assets, err := fs.Sub(staticAssets, "wasmcloud.banking/client/apps/banking/dist")
+	assets, err := fs.Sub(staticAssets, "static/dist")
 	if err != nil {
 		errorResponse(w, "Couldn't find static assets", http.StatusInternalServerError)
 		return
