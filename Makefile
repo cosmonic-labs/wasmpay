@@ -8,10 +8,7 @@ help:
 	@echo "Available targets:"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  %-10s - %sn", $$1, $$2}' $(MAKEFILE_LIST)
 
-build: ## Build all components in the project
-	cd api-gateway/wasmcloud.banking/client/apps/banking && \
-		npm i && \
-		npm run build --workspaces --if-present
+build: build-ui ## Build all components in the project
 	wash build -p api-gateway
 	wash build -p wasmpay-platform-harness
 	wash build -p icamer-validator
@@ -19,6 +16,10 @@ build: ## Build all components in the project
 	wash build -p transaction-manager
 	wash build -p untrusted-validator
 	wash build -p wasmpay-validator
+
+build-ui: ## Build the UI
+	npm i
+	npm run build
 
 test-e2e: build ## Build all components and deploy the local wadm
 	@WASMCLOUD_EXPERIMENTAL_FEATURES=${WASMCLOUD_EXPERIMENTAL_FEATURES} \

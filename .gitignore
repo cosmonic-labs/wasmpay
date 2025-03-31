@@ -1,5 +1,10 @@
 gen/*
 build/*
 
+# ui files
+node_modules
+.turbo
+.vite
+
 # ignore db backups
 *.db
