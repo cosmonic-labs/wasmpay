@@ -20,9 +20,9 @@ func Validate(t validation.Transaction) validation.ValidateResponse {
 		}
 	}
 
-	if (t.Origin.Country == "USA" && t.Destination.Country == "UK") ||
-		(t.Origin.Country == "UK" && t.Destination.Country == "USA") ||
-		(t.Origin.Country == "UK" && t.Destination.Country == "UK") ||
+	if (t.Origin.Country == "USA" && t.Destination.Country == "GBR") ||
+		(t.Origin.Country == "GBR" && t.Destination.Country == "USA") ||
+		(t.Origin.Country == "GBR" && t.Destination.Country == "GBR") ||
 		(t.Origin.Country == "USA" && t.Destination.Country == "USA") {
 		return validation.ValidateResponse{
 			Approved: true,
@@ -32,7 +32,7 @@ func Validate(t validation.Transaction) validation.ValidateResponse {
 
 	return validation.ValidateResponse{
 		Approved: false,
-		Reason:   cm.Some("Transaction did not occur in the USA or UK"),
+		Reason:   cm.Some("Transaction did not occur in the USA or GBR"),
 	}
 }
 

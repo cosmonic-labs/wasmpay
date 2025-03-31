@@ -40,6 +40,8 @@ const (
 	defaultRoleArn            = "arn:aws:iam::471112507838:role/wasmpay-api-gateway"
 	bankBackendConfigKey      = "bank_backend_url"
 	defaultBankBackendURL     = "http://127.0.0.1:8080"
+	wasmPayProFeature         = "X-Wasmpay-Pro"
+	wasmPayStoreOnFail        = "X-WasmPay-Persist-Denied"
 )
 
 // Router creates a [http.Handler] and registers the application-specific
@@ -89,7 +91,7 @@ func createTransactionHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	// TODO: fraud detection is a wasmpay "pro" feature that's optional
 
 	ctx := r.Context()
-	proFeature := r.Header.Get("X-Wasmpay-Pro")
+	proFeature := r.Header.Get(wasmPayProFeature)
 	logger := slog.New(wasilog.DefaultOptions().NewHandler())
 	if proFeature != "" {
 		logger.Info("Validated transaction as non-fraudlent, sending for processing")
@@ -155,15 +157,47 @@ func createTransactionHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	transactionManagerResponse := validation.Validate(request)
+	// Backend transaction type
+	type Transaction struct {
+		ID          string `json:"id,omitempty"`
+		Amount      string `json:"amount"`
+		Currency    string `json:"currency"`
+		Origin      string `json:"origin"`
+		Destination string `json:"destination"`
+		Status      string `json:"status"`
+		Reason      string `json:"reason"`
+	}
+
+	var backendRequest Transaction
 	if transactionManagerResponse.Approved {
-		// successResponse(w, "Transaction is valid and has been processed successfully.")
+		backendRequest = Transaction{
+			Amount:      fmt.Sprintf("%d", request.Amount),
+			Currency:    request.Currency,
+			Origin:      request.Origin.Code,
+			Destination: request.Destination.Code,
+			Status:      "approved",
+			Reason:      "",
+		}
 	} else {
-		errorResponse(w, fmt.Sprintf("Transaction failed validation: %s", *transactionManagerResponse.Reason.Some()), http.StatusBadRequest)
-		return
+		// Allow configuration to store transactions even if they are denied
+		storeOnFail := r.Header.Get(wasmPayStoreOnFail)
+		if storeOnFail == "" {
+			errorResponse(w, fmt.Sprintf("Transaction failed validation: %s", *transactionManagerResponse.Reason.Some()), http.StatusBadRequest)
+			return
+		} else {
+			backendRequest = Transaction{
+				Amount:      fmt.Sprintf("%d", request.Amount),
+				Currency:    request.Currency,
+				Origin:      request.Origin.Code,
+				Destination: request.Destination.Code,
+				Status:      "denied",
+				Reason:      *transactionManagerResponse.Reason.Some(),
+			}
+		}
 	}
 
 	// Send the request to the backend
-	requestBytes, err := json.Marshal(request)
+	requestBytes, err := json.Marshal(backendRequest)
 	if err != nil {
 		errorResponse(w, "Failed to marshal request to JSON", http.StatusInternalServerError)
 		return
@@ -191,9 +225,7 @@ func createTransactionHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 	// Return the response
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(createTransactionResponse)
+	successResponse(w, createTransactionResponse)
 }
 
 func getTransactionsHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
