@@ -70,6 +70,8 @@ func Router() http.Handler {
 
 	// Handling assets
 	router.GET("/", assetHandler)
+	router.GET("/config.json", assetHandler)
+	router.GET("/favicon.ico", assetHandler)
 	router.GET("/assets/*asset", assetHandler)
 	router.GET("/images/*image", assetHandler)
 	return router
@@ -88,14 +90,13 @@ func createTransactionHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
-	// TODO: fraud detection is a wasmpay "pro" feature that's optional
-
-	ctx := r.Context()
-	proFeature := r.Header.Get(wasmPayProFeature)
 	logger := slog.New(wasilog.DefaultOptions().NewHandler())
+
+	proFeature := r.Header.Get("X-Wasmpay-Pro")
 	if proFeature != "" {
-		logger.Info("Validated transaction as non-fraudlent, sending for processing")
+		ctx := r.Context()
 		// TODO: AI detect fraud
+		logger.Info("Validated transaction as non-fraudlent, sending for processing")
 		workloadIdentityToken, err := fetchWorkloadIdentity()
 		if err != nil {
 			logger.Error("failed to load JWT from identity service", "error", err)
@@ -182,7 +183,7 @@ func createTransactionHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		// Allow configuration to store transactions even if they are denied
 		storeOnFail := r.Header.Get(wasmPayStoreOnFail)
 		if storeOnFail == "" {
-			errorResponse(w, fmt.Sprintf("Transaction failed validation: %s", *transactionManagerResponse.Reason.Some()), http.StatusBadRequest)
+			errorResponse(w, fmt.Sprintf("Transaction failed validation: %s", *transactionManagerResponse.Reason.Some()), http.StatusOK)
 			return
 		} else {
 			backendRequest = Transaction{
@@ -264,9 +265,7 @@ func getTransactionsHandler(w http.ResponseWriter, r *http.Request, _ httprouter
 	}
 
 	// Return the transactions
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(transactions)
+	successResponse(w, transactions.Transactions)
 }
 
 func deleteBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -347,9 +346,7 @@ func createBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 
 	// Return the response
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(createBankResponse)
+	successResponse(w, createBankResponse)
 }
 
 func getBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

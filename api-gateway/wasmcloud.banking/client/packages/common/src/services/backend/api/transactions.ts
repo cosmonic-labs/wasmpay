@@ -1,16 +1,26 @@
 import {ApiSuccessResponse} from '#services/backend/types.ts';
 import {apiFetch} from '#services/backend/utils/apiFetch.ts';
 import {getBaseUrl} from '#services/backend/utils/getBaseUrl.ts';
-import {isApiSuccessResponse} from '#services/backend/utils/typeGuards.ts';
+import {hasProperty, isApiSuccessResponse, isObject} from '#services/backend/utils/typeGuards.ts';
 import {ConfigResponse} from '#services/config/context.tsx';
-import {Transaction} from '#services/user/hooks/useTransactions.ts';
+import {
+  CreateTransaction,
+  Transaction,
+  TransactionId,
+} from '#services/user/hooks/useTransactions.ts';
+
+type StandardError = {
+  code: string;
+  message: string;
+};
 
 type TransactionsResponse = ApiSuccessResponse<Transaction[]>;
+type CreateResponse = ApiSuccessResponse<TransactionId>;
 
 function transactions(config: ConfigResponse) {
-  return async (accountId: string) => {
+  return async () => {
     return apiFetch(
-      getBaseUrl(config)(config.apiPaths.transactions.replace(':id', accountId)),
+      getBaseUrl(config)(config.apiPaths.transactions),
       {
         method: 'Get',
       },
@@ -20,7 +30,28 @@ function transactions(config: ConfigResponse) {
 }
 
 function isTransactionsResponse(res: unknown): res is TransactionsResponse {
+  return isApiSuccessResponse(res) || isStandardErrorResponse(res);
+}
+
+function createTransaction(config: ConfigResponse) {
+  return async (transaction: CreateTransaction) => {
+    return apiFetch(
+      getBaseUrl(config)(config.apiPaths.transactions),
+      {
+        method: 'POST',
+        body: JSON.stringify(transaction),
+      },
+      isCreateResponse,
+    );
+  };
+}
+
+function isCreateResponse(res: unknown): res is CreateResponse {
   return isApiSuccessResponse(res);
 }
 
-export {transactions};
+function isStandardErrorResponse(res: unknown): res is StandardError {
+  return isObject(res) && hasProperty(res, 'code') && hasProperty(res, 'message');
+}
+
+export {transactions, createTransaction, isCreateResponse, isStandardErrorResponse};

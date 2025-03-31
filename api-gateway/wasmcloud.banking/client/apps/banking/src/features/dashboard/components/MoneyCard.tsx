@@ -12,7 +12,7 @@ interface CardMoneyProps {
 export function MoneyCard({direction, user}: CardMoneyProps): React.ReactElement {
   const isIn = direction === 'in';
   const {transactions, balance, isLoading} = useTransactions(user.login, (transactions) =>
-    transactions.filter((t) => (isIn ? t.amount >= 0 : t.amount < 0)),
+    transactions.filter((t) => (isIn ? parseFloat(t.amount) >= 0 : parseFloat(t.amount) < 0)),
   );
 
   return (
