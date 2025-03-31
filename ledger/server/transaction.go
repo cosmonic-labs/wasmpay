@@ -62,8 +62,8 @@ func (srv *TransactionServer) StoreTransaction(ctx context.Context, req *connect
 		DestinationID: destination.Bank.ID,
 		CurrencyID:    currency.ID,
 		Amount:        int64(req.Msg.GetAmount()),
-		Status:        req.Msg.Status.GetStatus(),
-		Reason:        req.Msg.Status.GetReason(),
+		Status:        req.Msg.GetStatus(),
+		Reason:        req.Msg.GetReason(),
 	})
 	if err != nil {
 		logger.Error("could not store transaction", "error", err)
@@ -94,10 +94,8 @@ func (srv *TransactionServer) ListTransactions(ctx context.Context, req *connect
 			Destination: result.Bank_2.Code,
 			Amount:      uint64(result.Transaction.Amount),
 			Currency:    result.Currency.Code,
-			Status: &ledgerv1.TransactionStatus{
-				Status: result.Transaction.Status,
-				Reason: result.Transaction.Reason,
-			},
+			Status:      result.Transaction.Status,
+			Reason:      result.Transaction.Reason,
 		})
 	}
 

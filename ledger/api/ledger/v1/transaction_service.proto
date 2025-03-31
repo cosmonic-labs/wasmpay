@@ -14,7 +14,8 @@ message StoreTransactionRequest {
   string destination = 2;
   uint64 amount = 3;
   string currency = 4;
-  TransactionStatus status = 5;
+  string status = 5;
+  string reason = 6;
 }
 
 message StoreTransactionResponse {

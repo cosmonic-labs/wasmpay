@@ -27,7 +27,8 @@ type StoreTransactionRequest struct {
 	Destination   string                 `protobuf:"bytes,2,opt,name=destination,proto3" json:"destination,omitempty"`
 	Amount        uint64                 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	Currency      string                 `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty"`
-	Status        *TransactionStatus     `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	Reason        string                 `protobuf:"bytes,6,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -90,11 +91,18 @@ func (x *StoreTransactionRequest) GetCurrency() string {
 	return ""
 }
 
-func (x *StoreTransactionRequest) GetStatus() *TransactionStatus {
+func (x *StoreTransactionRequest) GetStatus() string {
 	if x != nil {
 		return x.Status
 	}
-	return nil
+	return ""
+}
+
+func (x *StoreTransactionRequest) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
 }
 
 type StoreTransactionResponse struct {
@@ -225,13 +233,14 @@ var File_api_ledger_v1_transaction_service_proto protoreflect.FileDescriptor
 
 const file_api_ledger_v1_transaction_service_proto_rawDesc = "" +
 	"\n" +
-	"'api/ledger/v1/transaction_service.proto\x12\rapi.ledger.v1\x1a\x1fapi/ledger/v1/transaction.proto\"\xc1\x01\n" +
+	"'api/ledger/v1/transaction_service.proto\x12\rapi.ledger.v1\x1a\x1fapi/ledger/v1/transaction.proto\"\xb7\x01\n" +
 	"\x17StoreTransactionRequest\x12\x16\n" +
 	"\x06origin\x18\x01 \x01(\tR\x06origin\x12 \n" +
 	"\vdestination\x18\x02 \x01(\tR\vdestination\x12\x16\n" +
 	"\x06amount\x18\x03 \x01(\x04R\x06amount\x12\x1a\n" +
-	"\bcurrency\x18\x04 \x01(\tR\bcurrency\x128\n" +
-	"\x06status\x18\x05 \x01(\v2 .api.ledger.v1.TransactionStatusR\x06status\"*\n" +
+	"\bcurrency\x18\x04 \x01(\tR\bcurrency\x12\x16\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\x16\n" +
+	"\x06reason\x18\x06 \x01(\tR\x06reason\"*\n" +
 	"\x18StoreTransactionResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x19\n" +
 	"\x17ListTransactionsRequest\"Z\n" +
@@ -260,21 +269,19 @@ var file_api_ledger_v1_transaction_service_proto_goTypes = []any{
 	(*StoreTransactionResponse)(nil), // 1: api.ledger.v1.StoreTransactionResponse
 	(*ListTransactionsRequest)(nil),  // 2: api.ledger.v1.ListTransactionsRequest
 	(*ListTransactionsResponse)(nil), // 3: api.ledger.v1.ListTransactionsResponse
-	(*TransactionStatus)(nil),        // 4: api.ledger.v1.TransactionStatus
-	(*Transaction)(nil),              // 5: api.ledger.v1.Transaction
+	(*Transaction)(nil),              // 4: api.ledger.v1.Transaction
 }
 var file_api_ledger_v1_transaction_service_proto_depIdxs = []int32{
-	4, // 0: api.ledger.v1.StoreTransactionRequest.status:type_name -> api.ledger.v1.TransactionStatus
-	5, // 1: api.ledger.v1.ListTransactionsResponse.transactions:type_name -> api.ledger.v1.Transaction
-	0, // 2: api.ledger.v1.TransactionService.StoreTransaction:input_type -> api.ledger.v1.StoreTransactionRequest
-	2, // 3: api.ledger.v1.TransactionService.ListTransactions:input_type -> api.ledger.v1.ListTransactionsRequest
-	1, // 4: api.ledger.v1.TransactionService.StoreTransaction:output_type -> api.ledger.v1.StoreTransactionResponse
-	3, // 5: api.ledger.v1.TransactionService.ListTransactions:output_type -> api.ledger.v1.ListTransactionsResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	4, // 0: api.ledger.v1.ListTransactionsResponse.transactions:type_name -> api.ledger.v1.Transaction
+	0, // 1: api.ledger.v1.TransactionService.StoreTransaction:input_type -> api.ledger.v1.StoreTransactionRequest
+	2, // 2: api.ledger.v1.TransactionService.ListTransactions:input_type -> api.ledger.v1.ListTransactionsRequest
+	1, // 3: api.ledger.v1.TransactionService.StoreTransaction:output_type -> api.ledger.v1.StoreTransactionResponse
+	3, // 4: api.ledger.v1.TransactionService.ListTransactions:output_type -> api.ledger.v1.ListTransactionsResponse
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_api_ledger_v1_transaction_service_proto_init() }

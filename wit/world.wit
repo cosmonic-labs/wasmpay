@@ -15,6 +15,7 @@ interface types {
       amount: s64,
       currency: string,
       status: string,
+      reason: string,
    }
    record validate-response {
       approved: bool,
