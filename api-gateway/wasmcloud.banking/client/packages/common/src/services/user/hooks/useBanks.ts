@@ -41,13 +41,6 @@ export function useBanks() {
     async function listBanks() {
       if (isLoading) {
         let listBanksResponse = await api.listBanks();
-        console.dir(listBanksResponse);
-        // if (listBanksResponse.error || listBanksResponse.data === null) {
-        //   await api.createUser(userId);
-        //   listBanksResponse = await api.transactions(userId);
-        // }
-        // const sorted = listBanksResponse.data.sort((a, b) => b.date - a.date);
-        // const selectedTransactions = selector?.(sorted) ?? sorted;
         setBanks(listBanksResponse.data);
         setIsLoading(false);
       }
@@ -55,11 +48,6 @@ export function useBanks() {
 
     listBanks();
   }, [isLoading]);
-
-  //   const balance = React.useMemo(
-  //     () => transactions.reduce((total, t) => total + Math.round(t.amount * 100), 0) / 100,
-  //     [transactions],
-  //   );
 
   return {banks, isLoading, setIsLoading};
 }

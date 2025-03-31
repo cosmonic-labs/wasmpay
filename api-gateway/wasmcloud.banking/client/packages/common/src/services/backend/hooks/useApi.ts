@@ -36,7 +36,7 @@ function useApi() {
     getBanksById: api.getBankById(config),
     getBanksByCode: api.getBankByCode(config),
     transactions: api.transactions(config),
-    // createUser: api.createUser(config),
+    createTransaction: api.createTransaction(config),
   };
 }
 

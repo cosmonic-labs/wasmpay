@@ -1,3 +1,5 @@
 gen/*
 build/*
 
+# ignore db backups
+*.db

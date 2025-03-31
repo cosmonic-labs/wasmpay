@@ -1,12 +1,5 @@
 import * as React from 'react';
-import {
-  ArrowDownToLineIcon,
-  ArrowLeftRightIcon,
-  ArrowUpFromLineIcon,
-  CreditCardIcon,
-  PlusIcon,
-  SignatureIcon,
-} from 'lucide-react';
+import {ArrowDownToLineIcon, ArrowUpFromLineIcon} from 'lucide-react';
 import {useTransactions, Transaction} from '@repo/common/services/user/useTransactions';
 import {DashboardCard} from './DashboardCard';
 import {UserInformation} from '@/App';
@@ -18,11 +11,8 @@ interface TransactionsCardProps {
 }
 
 export function TransactionsCard({user}: TransactionsCardProps): React.ReactElement {
-  const {transactions, setIsLoading} = useTransactions(user.login);
+  const {transactions} = useTransactions(user.login);
   const [showTransactionPopUp, setShowTransactionPopUp] = React.useState(false);
-  const reload = () => {
-    setIsLoading(true);
-  };
 
   return (
     <DashboardCard cols={12}>
@@ -43,9 +33,11 @@ export function TransactionsCard({user}: TransactionsCardProps): React.ReactElem
         </div>
         <div className="mt-7 -mb-4 overflow-x-auto text-sm">
           <TransactionsTable>
-            {transactions.map((transaction) => (
-              <TransactionRow key={transaction.id} transaction={transaction} />
-            ))}
+            {transactions
+              ? transactions.map((transaction) => (
+                  <TransactionRow key={transaction.id} transaction={transaction} />
+                ))
+              : null}
           </TransactionsTable>
         </div>
       </div>
@@ -63,7 +55,7 @@ function TransactionsTable({children}: React.PropsWithChildren) {
           <th></th>
           <th></th>
           <th></th>
-          <th></th>
+          {/* <th></th> */}
         </tr>
       </thead>
       <tbody>{children}</tbody>
@@ -72,24 +64,25 @@ function TransactionsTable({children}: React.PropsWithChildren) {
 }
 
 function TransactionRow({transaction}: {transaction: Transaction}) {
-  const formattedDate = new Date(transaction.date * 1000).toLocaleString(undefined, {
+  // TODO: transactin date
+  const formattedDate = new Date().toLocaleString(undefined, {
     dateStyle: 'medium',
   });
   const formattedCurrency = new Intl.NumberFormat(undefined, {
     style: 'currency',
     currency: 'USD',
-  }).format(transaction.amount);
+  }).format(parseFloat(transaction.amount));
   return (
     <tr className="font-medium">
       <td className="py-2">{formattedDate}</td>
-      <td className="py-2">{transaction.description}</td>
+      <td className="py-2">{transaction.origin}</td>
       <td className="py-2 px-4 font-mono">{formattedCurrency}</td>
       <td className="py-2 px-4">
         <TransactionStatus status={transaction.status} />
       </td>
-      <td className="py-2 px-4">
-        <TransactionMethod method={transaction.method} />
-      </td>
+      {/* <td className="py-2 px-4">
+        <TransactionMethod method={transaction.destination} />
+      </td> */}
     </tr>
   );
 }
@@ -108,27 +101,27 @@ function TransactionStatus({status}: {status: Transaction['status']}) {
   );
 }
 
-function TransactionMethod({method}: {method: Transaction['method']}) {
-  const Icon = (() => {
-    switch (method) {
-      case 'Check':
-        return SignatureIcon;
-      case 'Credit':
-        return CreditCardIcon;
-      case 'Transfer':
-        return ArrowLeftRightIcon;
-    }
-  })();
-  const text = {
-    Check: 'Check',
-    Credit: 'Credit Card',
-    Transfer: 'Transfer',
-  }[method];
+// function TransactionMethod({method}: {method: Transaction['method']}) {
+//   const Icon = (() => {
+//     switch (method) {
+//       case 'Check':
+//         return SignatureIcon;
+//       case 'Credit':
+//         return CreditCardIcon;
+//       case 'Transfer':
+//         return ArrowLeftRightIcon;
+//     }
+//   })();
+//   const text = {
+//     Check: 'Check',
+//     Credit: 'Credit Card',
+//     Transfer: 'Transfer',
+//   }[method];
 
-  return (
-    <div className="flex items-center gap-2">
-      <Icon className="w-5 h-5" />
-      <span>{text}</span>
-    </div>
-  );
-}
+//   return (
+//     <div className="flex items-center gap-2">
+//       <Icon className="w-5 h-5" />
+//       <span>{text}</span>
+//     </div>
+//   );
+// }

@@ -1,8 +1,9 @@
 import {listBanks, getBankById, getBankByCode} from './banks.ts';
-import {transactions} from './transactions.ts';
+import {transactions, createTransaction} from './transactions.ts';
 
 export default {
   transactions,
+  createTransaction,
   listBanks,
   getBankById,
   getBankByCode,

@@ -1,97 +1,111 @@
 import {useApi} from '#services/backend/hooks/useApi.ts';
 import React from 'react';
+import {Bank} from './useBanks';
 
 export type Transaction = {
   id: number;
-  description: string;
+  currency: string;
+  amount: string;
+  origin: string;
+  destination: string;
+  status: string;
+  reason: string;
+};
+
+export type CreateTransaction = {
+  currency: string;
   amount: number;
-  account: string;
-  status: 'Processing' | 'Complete' | 'In Progress' | 'Cancelled';
-  method: 'Credit' | 'Check' | 'Transfer';
-  date: number;
+  origin: Bank;
+  destination: Bank;
+  status: string;
+  reason: string;
+};
+
+export type TransactionId = {
+  id: string;
 };
 
 const TRANSACTIONS: Transaction[] = [
   {
     id: 1,
-    description: "Victoria's Treats",
-    amount: -52.14,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '-52.14',
+    origin: "Victoria's Treats",
+    destination: 'xxx4565494',
     status: 'Processing',
-    method: 'Credit',
-    date: 1727323200,
+    reason: 'Credit',
   },
   {
     id: 2,
-    description: 'Morgan Seis, LLC',
-    amount: -428.47,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '-428.47',
+    origin: 'Morgan Seis, LLC',
+    destination: 'xxx4565494',
     status: 'Complete',
-    method: 'Credit',
-    date: 1727150400,
+    reason: 'Credit',
   },
   {
     id: 7,
-    description: 'Wallmart',
-    amount: -143.19,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '-143.19',
+    origin: 'Wallmart',
+    destination: 'xxx4565494',
     status: 'Complete',
-    method: 'Check',
-    date: 1727000600,
+    reason: 'Check',
   },
   {
     id: 3,
-    description: 'Wallmart',
-    amount: -112.23,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '-112.23',
+    origin: 'Wallmart',
+    destination: 'xxx4565494',
     status: 'In Progress',
-    method: 'Check',
-    date: 1726804800,
+    reason: 'Check',
   },
   {
     id: 4,
-    description: 'John Rowland',
-    amount: -950.0,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '-950.00',
+    origin: 'John Rowland',
+    destination: 'xxx4565494',
     status: 'Cancelled',
-    method: 'Transfer',
-    date: 1726734968,
+    reason: 'Transfer',
   },
   {
     id: 5,
-    description: "Harry's, LLC",
-    amount: -24.49,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '-24.49',
+    origin: "Harry's, LLC",
+    destination: 'xxx4565494',
     status: 'Complete',
-    method: 'Credit',
-    date: 1726734968,
+    reason: 'Credit',
   },
   {
     id: 6,
-    description: "Game's Store",
-    amount: -89.49,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '-89.49',
+    origin: "Game's Store",
+    destination: 'xxx4565494',
     status: 'Complete',
-    method: 'Credit',
-    date: 1726632000,
+    reason: 'Credit',
   },
   {
     id: 9,
-    description: 'Monthly Pay',
-    amount: 4331.57,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '4331.57',
+    origin: 'Monthly Pay',
+    destination: 'xxx4565494',
     status: 'Complete',
-    method: 'Credit',
-    date: 1726286400,
+    reason: 'Credit',
   },
   {
     id: 8,
-    description: 'Park Groceries',
-    amount: -31.22,
-    account: 'xxx4565494',
+    currency: 'USD',
+    amount: '-31.22',
+    origin: 'Park Groceries',
+    destination: 'xxx4565494',
     status: 'Complete',
-    method: 'Credit',
-    date: 1726286400,
+    reason: 'Credit',
   },
 ];
 
@@ -105,14 +119,7 @@ export function useTransactions(
   React.useEffect(() => {
     async function getTransactions() {
       if (isLoading) {
-        let transactionsResponse = await api.transactions(userId);
-        console.dir(transactionsResponse);
-        // if (transactionsResponse.error || transactionsResponse.data === null) {
-        //   await api.createUser(userId);
-        //   transactionsResponse = await api.transactions(userId);
-        // }
-        // const sorted = transactionsResponse.data.sort((a, b) => b.date - a.date);
-        // const selectedTransactions = selector?.(sorted) ?? sorted;
+        let transactionsResponse = await api.transactions();
         setTransactions(transactionsResponse.data);
         setIsLoading(false);
       }
@@ -122,7 +129,8 @@ export function useTransactions(
   }, [isLoading]);
 
   const balance = React.useMemo(
-    () => transactions.reduce((total, t) => total + Math.round(t.amount * 100), 0) / 100,
+    () =>
+      transactions.reduce((total, t) => total + Math.round(parseFloat(t.amount) * 100), 0) / 100,
     [transactions],
   );
 
