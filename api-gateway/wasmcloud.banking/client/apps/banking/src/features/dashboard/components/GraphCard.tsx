@@ -9,14 +9,12 @@ export function GraphCard({userInfo}: {userInfo: UserInformation}): React.ReactE
   const {transactions, balance, isLoading} = useTransactions(userInfo.login);
 
   let chartBalance = 0;
-  const chartData = transactions
-    // .sort((a, b) => a.date - b.date)
-    .map((t, i) => {
-      if (t.status !== 'Cancelled') {
-        chartBalance += parseFloat(t.amount);
-      }
-      return {x: i, y: chartBalance.toFixed(2)};
-    });
+  const chartData = transactions.map((t, i) => {
+    if (t.status !== 'Cancelled') {
+      chartBalance += parseFloat(t.amount);
+    }
+    return {x: i, y: chartBalance.toFixed(2)};
+  });
   const series: React.ComponentProps<typeof Chart>['series'] = [
     {
       data: chartData,
@@ -54,9 +52,6 @@ export function GraphCard({userInfo}: {userInfo: UserInformation}): React.ReactE
 }
 
 function RecentTransaction({transaction}: {transaction: Transaction}) {
-  // const formattedDate = new Date(transaction.date * 1000).toLocaleString(undefined, {
-  //   dateStyle: 'medium',
-  // });
   const amount = transaction.amount;
   const positive = parseFloat(amount) >= 1;
   const Icon = positive ? ArrowUpIcon : ArrowDownIcon;
@@ -65,9 +60,7 @@ function RecentTransaction({transaction}: {transaction: Transaction}) {
   return (
     <div className="flex items-center justify-center gap-x-2">
       <Icon className={`w-4 h-4 ${iconClass}`} />
-      <span className="font-sans text-sm text-foreground/40">
-        ${amount} {/*  {formattedDate} */}
-      </span>
+      <span className="font-sans text-sm text-foreground/40">${amount}</span>
     </div>
   );
 }
