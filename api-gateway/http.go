@@ -42,12 +42,17 @@ const (
 	defaultBankBackendURL     = "http://127.0.0.1:8080"
 	wasmPayProFeature         = "X-Wasmpay-Pro"
 	wasmPayStoreOnFail        = "X-WasmPay-Persist-Denied"
+	staticAssetsPath          = "static/dist"
 )
 
 // Router creates a [http.Handler] and registers the application-specific
 // routes with their respective handlers for the application.
 func Router() http.Handler {
 	router := httprouter.New()
+
+	logger := slog.New(wasilog.DefaultOptions().NewHandler())
+	logger.Info("Starting API Gateway")
+	logger.Info("Registering routes")
 
 	// Helper to know when the server is up
 	router.GET("/healthz", healthzHandler)
@@ -68,12 +73,9 @@ func Router() http.Handler {
 	// Send requests to LLM for fraud detection, then kick off transaction
 	router.POST("/api/v1/transactions", createTransactionHandler)
 
-	// Handling assets
-	router.GET("/", assetHandler)
-	router.GET("/config.json", assetHandler)
-	router.GET("/favicon.ico", assetHandler)
-	router.GET("/assets/*asset", assetHandler)
-	router.GET("/images/*image", assetHandler)
+	// Everything else should be assumed to be a static file
+	router.NotFound = staticFileRouter()
+
 	return router
 }
 
@@ -539,14 +541,39 @@ func healthzHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 	w.Write([]byte("OK"))
 }
 
-func assetHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	assets, err := fs.Sub(staticAssets, "static/dist")
-	if err != nil {
-		errorResponse(w, "Couldn't find static assets", http.StatusInternalServerError)
-		return
-	}
-	fs := http.FileServer(http.FS(assets))
-	http.StripPrefix("/", fs).ServeHTTP(w, r)
+func staticFileRouter() http.Handler {
+	router := httprouter.New()
+
+	// Serve static assets
+	router.GET("/*urlpath", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		urlPath := p.ByName("urlpath")
+		filePath := strings.TrimLeft(urlPath, "/")
+		logger := slog.New(wasilog.DefaultOptions().NewHandler())
+		logger.Info(fmt.Sprintf("Serving static file: %s", filePath))
+
+		assets, err := fs.Sub(staticAssets, staticAssetsPath)
+		if err != nil {
+			errorResponse(w, "Couldn't load assets", http.StatusInternalServerError)
+			return
+		}
+
+		fSrv := http.FileServer(http.FS(assets))
+
+		// if the file ain't there, send 'em the index and let the SPA handle it
+		if _, err := fs.Stat(assets, filePath); err != nil {
+			logger.Error(fmt.Sprintf("File not found: %s. Serving '/'", filePath))
+			// TODO(lh): why doesn't this work? compile error: "undefined: http.ServeFileFS"
+			// http.ServeFileFS(w, r, assets, "index.html")
+			// In the meantime, this works by stripping the whole path from the request
+			// path, leaving just "", which is the index.html file anyway.
+			http.StripPrefix(urlPath, fSrv).ServeHTTP(w, r)
+			return
+		}
+
+		http.StripPrefix("/", fSrv).ServeHTTP(w, r)
+	})
+
+	return router
 }
 
 type SuccessResponse struct {
