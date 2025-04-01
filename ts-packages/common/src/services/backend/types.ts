@@ -3,20 +3,9 @@ type ApiResponse<T> = {
   data?: T;
 };
 
-type MergeErrorData<ExtraData> = ExtraData extends {[key: string]: never}
-  ? {
-      message: string;
-    }
-  : {
-      [Key in keyof ExtraData | keyof {message: string}]: Key extends keyof {message: string}
-        ? {message: string}[Key]
-        : Key extends keyof ExtraData
-        ? ExtraData[Key]
-        : never;
-    };
-
-type ApiErrorResponse<Data = {[key: string]: never}> = {
-  [K in keyof ApiResponse<Data>]-?: K extends 'error' ? true : ApiResponse<MergeErrorData<Data>>[K];
+type ApiErrorResponse = {
+  code: string;
+  message: string;
 };
 
 type ApiSuccessResponse<T> = {
@@ -24,8 +13,14 @@ type ApiSuccessResponse<T> = {
 };
 
 class ApiError extends Error {
-  constructor(message: string, public response?: Response) {
+  name = 'ApiError';
+  code: string;
+  message: string;
+
+  constructor(message: string, code?: string, public response?: Response) {
     super(message);
+    this.code = code || 'unknown';
+    this.message = message;
   }
 }
 

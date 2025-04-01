@@ -11,9 +11,14 @@ function hasProperty<T extends Record<string, unknown>, K extends string>(
   return obj && prop in obj;
 }
 
-// TODO: gotta be code / message
-function isApiErrorResponse<ErrorData>(res: unknown): res is ApiErrorResponse<ErrorData> {
-  return isApiResponse(res) && hasProperty(res, 'error') && typeof res.error !== 'undefined';
+function isApiErrorResponse(res: unknown): res is ApiErrorResponse {
+  return (
+    isApiResponse(res) &&
+    hasProperty(res, 'code') &&
+    typeof res.code === 'string' &&
+    hasProperty(res, 'message') &&
+    typeof res.message === 'string'
+  );
 }
 
 function isApiSuccessResponse<Data = unknown>(res: unknown): res is ApiSuccessResponse<Data> {
