@@ -8,12 +8,9 @@ function loadApi() {
   const api = params.get('api') || 'default';
   console.log('Using API:', api);
 
-  const promise = Promise.resolve(
-    // api === 'v2'
-    //   ? import('#services/backend/mocks/index.ts')
-    //   :
-    import('#services/backend/api/index.ts'),
-  ).then((res) => (response = res.default));
+  const promise = Promise.resolve(import('#services/backend/api/index.ts')).then(
+    (res) => (response = res.default),
+  );
 
   return {
     load() {

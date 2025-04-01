@@ -1,21 +1,31 @@
-import {ApiSuccessResponse} from '#services/backend/types.ts';
+import type {Bank} from '#services/backend/api/banks.ts';
 import {apiFetch} from '#services/backend/utils/apiFetch.ts';
 import {getBaseUrl} from '#services/backend/utils/getBaseUrl.ts';
-import {hasProperty, isApiSuccessResponse, isObject} from '#services/backend/utils/typeGuards.ts';
+import {isApiSuccessResponse} from '#services/backend/utils/typeGuards.ts';
 import {ConfigResponse} from '#services/config/context.tsx';
-import {
-  CreateTransaction,
-  Transaction,
-  TransactionId,
-} from '#services/user/hooks/useTransactions.ts';
 
-type StandardError = {
-  code: string;
-  message: string;
+export type Transaction = {
+  id: number;
+  currency: string;
+  amount: string;
+  origin: string;
+  destination: string;
+  status: string;
+  reason: string;
 };
 
-type TransactionsResponse = ApiSuccessResponse<Transaction[]>;
-type CreateResponse = ApiSuccessResponse<TransactionId>;
+export type CreateTransaction = {
+  currency: string;
+  amount: number;
+  origin: Bank;
+  destination: Bank;
+  status: string;
+  reason: string;
+};
+
+export type TransactionId = {
+  id: string;
+};
 
 function transactions(config: ConfigResponse) {
   return async () => {
@@ -24,13 +34,9 @@ function transactions(config: ConfigResponse) {
       {
         method: 'Get',
       },
-      isTransactionsResponse,
+      isApiSuccessResponse<Transaction[]>,
     );
   };
-}
-
-function isTransactionsResponse(res: unknown): res is TransactionsResponse {
-  return isApiSuccessResponse(res) || isStandardErrorResponse(res);
 }
 
 function createTransaction(config: ConfigResponse) {
@@ -49,17 +55,9 @@ function createTransaction(config: ConfigResponse) {
         body: JSON.stringify(transaction),
         headers,
       },
-      isCreateResponse,
+      isApiSuccessResponse<TransactionId>,
     );
   };
 }
 
-function isCreateResponse(res: unknown): res is CreateResponse {
-  return isApiSuccessResponse(res);
-}
-
-function isStandardErrorResponse(res: unknown): res is StandardError {
-  return isObject(res) && hasProperty(res, 'code') && hasProperty(res, 'message');
-}
-
-export {transactions, createTransaction, isCreateResponse, isStandardErrorResponse};
+export {transactions, createTransaction};
