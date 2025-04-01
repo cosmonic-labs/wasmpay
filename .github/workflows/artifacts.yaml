@@ -51,7 +51,7 @@ jobs:
           working-directory: api-gateway
 
       - name: Push API Gateway
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'push-artifact')
         uses: ./.github/actions/wash-push
         with:
           working-directory: api-gateway
@@ -67,7 +67,7 @@ jobs:
           working-directory: transaction-manager
 
       - name: Push Transaction Manager
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'push-artifact')
         uses: ./.github/actions/wash-push
         with:
           working-directory: transaction-manager
@@ -83,7 +83,7 @@ jobs:
           working-directory: wasmpay-validator
 
       - name: Push wasmpay-validator
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'push-artifact')
         uses: ./.github/actions/wash-push
         with:
           working-directory: wasmpay-validator
@@ -99,7 +99,7 @@ jobs:
           working-directory: nordhaven-validator
 
       - name: Push nordhaven-validator
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'push-artifact')
         uses: ./.github/actions/wash-push
         with:
           working-directory: nordhaven-validator
@@ -115,7 +115,7 @@ jobs:
           working-directory: icamer-validator
 
       - name: Push icamer-validator
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'push-artifact')
         uses: ./.github/actions/wash-push
         with:
           working-directory: icamer-validator
