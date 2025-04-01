@@ -120,7 +120,8 @@ export function useTransactions(
     async function getTransactions() {
       if (isLoading) {
         let transactionsResponse = await api.transactions();
-        setTransactions(transactionsResponse.data);
+        let data = transactionsResponse.data ?? [];
+        setTransactions(data);
         setIsLoading(false);
       }
     }
