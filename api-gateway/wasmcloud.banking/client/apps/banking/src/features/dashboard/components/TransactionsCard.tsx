@@ -55,7 +55,6 @@ function TransactionsTable({children}: React.PropsWithChildren) {
           <th></th>
           <th></th>
           <th></th>
-          {/* <th></th> */}
         </tr>
       </thead>
       <tbody>{children}</tbody>
@@ -80,9 +79,6 @@ function TransactionRow({transaction}: {transaction: Transaction}) {
       <td className="py-2 px-4">
         <TransactionStatus status={transaction.status} />
       </td>
-      {/* <td className="py-2 px-4">
-        <TransactionMethod method={transaction.destination} />
-      </td> */}
     </tr>
   );
 }
@@ -100,28 +96,3 @@ function TransactionStatus({status}: {status: Transaction['status']}) {
     </span>
   );
 }
-
-// function TransactionMethod({method}: {method: Transaction['method']}) {
-//   const Icon = (() => {
-//     switch (method) {
-//       case 'Check':
-//         return SignatureIcon;
-//       case 'Credit':
-//         return CreditCardIcon;
-//       case 'Transfer':
-//         return ArrowLeftRightIcon;
-//     }
-//   })();
-//   const text = {
-//     Check: 'Check',
-//     Credit: 'Credit Card',
-//     Transfer: 'Transfer',
-//   }[method];
-
-//   return (
-//     <div className="flex items-center gap-2">
-//       <Icon className="w-5 h-5" />
-//       <span>{text}</span>
-//     </div>
-//   );
-// }
