@@ -52,7 +52,7 @@ export function useTransactions() {
         amount,
         origin,
         destination,
-        status: 'Pending',
+        status: 'pending',
         reason: '',
       };
 

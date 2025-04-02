@@ -21,7 +21,7 @@ type ChatContextType = {
     targetLanguage: string;
   }) => void;
   resetChat: () => void;
-  bank: string;
+  bank: string | undefined;
   setBank: (bank: string) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
@@ -33,7 +33,7 @@ export const ChatContext = React.createContext<ChatContextType | undefined>(unde
 export const ChatProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [bank, setBank] = React.useState<string>('Select a bank');
+  const [bank, setBank] = React.useState<string>();
   const {postChat} = useApi();
 
   const sendMessage = React.useCallback(

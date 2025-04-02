@@ -4,9 +4,11 @@ import {motion, AnimatePresence} from 'framer-motion';
 import {ArrowUpRight, ArrowDownLeft} from 'lucide-react';
 import {EmptyTransactionState} from './empty-state';
 import {Button} from '@/components/ui/button';
-import {Transaction} from '@repo/common/types';
+import {Bank, Transaction} from '@repo/common/types';
 import {Loader} from '@/components/ui/loader';
 import {useTransactionForm} from '@/features/transactions/context/use-transaction-form';
+import {cva} from 'class-variance-authority';
+import {cn} from '@/lib/utils';
 
 export function Transactions({
   transactions,
@@ -15,7 +17,7 @@ export function Transactions({
   transactions: Transaction[];
   isLoading: boolean;
 }) {
-  const {openForm} = useTransactionForm();
+  const {openForm, banks} = useTransactionForm();
 
   return (
     <section>
@@ -41,7 +43,12 @@ export function Transactions({
         <div className="space-y-2">
           <AnimatePresence>
             {transactions.map((transaction) => (
-              <TransationRow transaction={transaction} key={transaction.id} />
+              <TransactionRow
+                transaction={transaction}
+                banks={banks.all}
+                userBank={banks.user}
+                key={transaction.id}
+              />
             ))}
           </AnimatePresence>
         </div>
@@ -50,31 +57,39 @@ export function Transactions({
   );
 }
 
-function TransationRow({transaction}: {transaction: Transaction}) {
-  const {amount, status, reason, origin, destination, currency} = transaction;
-  // TODO: Check if the transaction is sending or receiving
-  const isSending = origin === 'me';
+function TransactionRow({
+  transaction,
+  banks,
+  userBank,
+}: {
+  transaction: Transaction;
+  banks: Bank[];
+  userBank: Bank | undefined;
+}) {
+  const {amount, status, origin, destination, currency} = transaction;
+  const isSending = origin === userBank?.code;
+  const bankName = banks.find((bank) => bank.code === destination)?.name;
+  const action = isSending ? 'Sent' : 'Requested';
+  const preposition = isSending ? 'to' : 'from';
+  const symbol = currencySymbol[currency as keyof typeof currencySymbol];
+  const amountWithSymbol = `${symbol}${amount} ${currency}`;
 
   return (
     <motion.div
       key={transaction.id}
-      initial={{opacity: 0, y: 10}}
+      initial={{opacity: 0, y: -10}}
       animate={{opacity: 1, y: 0}}
-      exit={{opacity: 0, y: -10}}
+      exit={{opacity: 0, y: 10}}
       className="flex items-center justify-between p-2 border-b"
     >
       <div className="flex items-center gap-2">
-        <TransactionStatus status={status} />
-        <div className={`p-1 rounded-full ${isSending ? 'bg-red-500/30' : 'bg-green-500/30'}`}>
-          {isSending ? (
-            <ArrowUpRight size={16} className="text-red-500" />
-          ) : (
-            <ArrowDownLeft size={16} className="text-green-500" />
-          )}
+        <TransactionStatus status={status as 'approved'} />
+        <div className="p-1 rounded-full bg-current/10 text-foreground">
+          {isSending ? <ArrowUpRight size={16} /> : <ArrowDownLeft size={16} />}
         </div>
         <div>
           <div className="font-medium">
-            {reason ? 'Sent to' : 'Requested from'} {destination}
+            {action} <span className="underline">{amountWithSymbol}</span> {preposition} {bankName}
           </div>
           {/* // TODO: need date in response */}
           {/* <div className="text-xs text-gray-500">
@@ -83,22 +98,45 @@ function TransationRow({transaction}: {transaction: Transaction}) {
         </div>
       </div>
       <div className={`font-medium ${isSending ? 'text-red-500' : 'text-green-500'}`}>
-        {isSending ? '-' : '+'} ${amount} {currency}
+        {isSending ? '-' : '+'} {amountWithSymbol}
       </div>
     </motion.div>
   );
 }
 
-function TransactionStatus({status}: {status: Transaction['status']}) {
-  const colorClass = {
-    Complete: 'bg-success/10 text-success',
-    Processing: 'bg-warning/10 text-warning',
-    'In Progress': 'bg-info/10 text-info',
-    Cancelled: 'bg-danger/10 text-danger',
+const currencySymbol = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  JPY: '¥',
+  AUD: 'A$',
+  CAD: 'C$',
+  CHF: 'CHF',
+  CNY: '¥',
+  INR: '₹',
+  RUB: '₽',
+};
+
+type TransactionStatusProps = {
+  // status: Transaction['status'];
+  status: 'approved' | 'denied'; // api-gateway/http.go#L173
+};
+
+const statusClass = cva(
+  'inline-block text-xs uppercase border leading-4 py-0.5 px-1.5 m-1 rounded-full border-current',
+  {
+    variants: {
+      status: {
+        approved: 'bg-green-900/50 text-green-500',
+        denied: 'bg-red-900/50 text-red-500',
+      },
+    },
+  },
+);
+function TransactionStatus({status}: TransactionStatusProps) {
+  const text = {
+    approved: 'Approved',
+    denied: 'Denied',
   }[status];
-  return (
-    <span className={`inline-block text-xs py-1.5 px-3 m-1 rounded-full ${colorClass}`}>
-      {status}
-    </span>
-  );
+  return <span className={cn(statusClass({status}))}>{text ?? status}</span>;
 }
