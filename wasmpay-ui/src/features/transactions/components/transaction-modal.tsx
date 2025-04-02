@@ -23,7 +23,7 @@ import React from 'react';
 import {Loader2Icon} from 'lucide-react';
 import {toast} from 'sonner';
 
-export function TransactionModal() {
+export function TransactionModal({reloadTransactions}: {reloadTransactions: () => void}) {
   const {banks} = useBanks();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -43,20 +43,21 @@ export function TransactionModal() {
     setIsSubmitting(true);
     setError(null);
     toast.loading('Processing transaction...');
-    createTransaction(origin, destination, false)
+    console.dir(form);
+    createTransaction(origin, destination, form.amount || 0, false)
       .then(() => {
         setIsSubmitting(false);
+        reloadTransactions();
+        toast.dismiss();
+        toast.success('Transaction completed successfully!');
+        closeForm();
       })
       .catch((error) => {
         setIsSubmitting(false);
         toast.error('Transaction failed. Please try again.');
-        setError(error.message);
+        setError(error.response.message);
+        console.dir(error);
         console.error('Transaction failed:', error);
-      })
-      .finally(() => {
-        toast.dismiss();
-        toast.success('Transaction completed successfully!');
-        closeForm();
       });
   };
 
@@ -113,7 +114,7 @@ export function TransactionModal() {
             <Input
               id="request-amount"
               value={form.amount}
-              onChange={(e) => updateForm('amount', e.target.value)}
+              onChange={(e) => updateForm('amount', parseFloat(e.target.value))}
               placeholder="Enter amount"
               type="number"
               min="0.01"

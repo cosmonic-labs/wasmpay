@@ -6,6 +6,7 @@ import {useApi} from '#services/backend/hooks/useApi.ts';
 export function useTransactions() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
+  const [reloadFlag, setReloadFlag] = React.useState(false);
   const api = useApi();
 
   const fetchTransactions = React.useCallback(async () => {
@@ -18,6 +19,10 @@ export function useTransactions() {
 
   React.useEffect(() => {
     fetchTransactions();
+  }, [reloadFlag]);
+
+  const reloadTransactions = React.useCallback(() => {
+    setReloadFlag((prev) => !prev);
   }, []);
 
   const balance = React.useMemo(
@@ -27,15 +32,24 @@ export function useTransactions() {
   );
 
   const createTransaction = React.useCallback(
-    async (origin: Bank | undefined, destination: Bank | undefined, pro: boolean) => {
+    async (
+      origin: Bank | undefined,
+      destination: Bank | undefined,
+      amount: number,
+      pro: boolean,
+    ) => {
       if (!origin || !destination) {
         console.error('Bank not found');
+        return;
+      }
+      if (amount <= 0) {
+        console.error('Amount cannot be zero');
         return;
       }
 
       const transaction: CreateTransaction = {
         currency: origin.currency,
-        amount: 100,
+        amount,
         origin,
         destination,
         status: 'Pending',
@@ -65,5 +79,5 @@ export function useTransactions() {
     [],
   );
 
-  return {transactions, balance, isLoading, createTransaction};
+  return {transactions, balance, isLoading, createTransaction, reloadTransactions};
 }

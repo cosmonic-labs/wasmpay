@@ -1,12 +1,18 @@
 import * as React from 'react';
 import Chart from 'react-apexcharts';
 import {ArrowDownIcon, ArrowUpIcon} from 'lucide-react';
-import {useTransactions} from '@repo/common/hooks/useTransactions';
 import {Transaction} from '@repo/common/types';
 import {DashboardCard} from '@/features/dashboard/components/dashboard-card';
 
-export function AccountBalance(): React.ReactElement {
-  const {transactions, balance, isLoading} = useTransactions();
+export function AccountBalance({
+  transactions,
+  balance,
+  isLoading,
+}: {
+  transactions: Transaction[];
+  balance: number;
+  isLoading: boolean;
+}): React.ReactElement {
   let chartBalance = 0;
   const chartData = transactions.map((t, i) => {
     if (t.status !== 'Cancelled') {

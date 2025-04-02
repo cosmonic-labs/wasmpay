@@ -5,12 +5,16 @@ import {ArrowUpRight, ArrowDownLeft} from 'lucide-react';
 import {EmptyTransactionState} from './empty-state';
 import {Button} from '@/components/ui/button';
 import {Transaction} from '@repo/common/types';
-import {useTransactions} from '@repo/common/hooks/useTransactions';
 import {Loader} from '@/components/ui/loader';
 import {useTransactionForm} from '@/features/transactions/context/use-transaction-form';
 
-export function Transactions() {
-  const {transactions, isLoading} = useTransactions();
+export function Transactions({
+  transactions,
+  isLoading,
+}: {
+  transactions: Transaction[];
+  isLoading: boolean;
+}) {
   const {openForm} = useTransactionForm();
 
   return (
