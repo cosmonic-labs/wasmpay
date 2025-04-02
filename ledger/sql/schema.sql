@@ -47,3 +47,9 @@ CREATE TABLE IF NOT EXISTS transactions (
   FOREIGN KEY(destination_id) REFERENCES banks(id),
   FOREIGN KEY(currency_id) REFERENCES currencies(id)
 );
+
+-- sqlc does not support aliasing joins, so we're using views to make the dx
+-- a little bit nicer. See sqlc-dev/sqlc#3177
+CREATE VIEW IF NOT EXISTS origins AS SELECT * FROM banks;
+
+CREATE VIEW IF NOT EXISTS destinations AS SELECT * FROM banks;
