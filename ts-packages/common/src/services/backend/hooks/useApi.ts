@@ -29,6 +29,7 @@ function useApi() {
   const api = apiLoader.load();
 
   return {
+    postChat: api.postChat(config),
     listBanks: api.listBanks(config),
     getBanksById: api.getBankById(config),
     getBanksByCode: api.getBankByCode(config),
