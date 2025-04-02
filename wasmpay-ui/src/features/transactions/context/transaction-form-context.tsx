@@ -1,4 +1,5 @@
 import {useBanks} from '@repo/common/hooks/useBanks';
+import {Bank} from '@repo/common/types';
 import * as React from 'react';
 
 type TransactionFormContextType = {
@@ -6,6 +7,11 @@ type TransactionFormContextType = {
   openForm: (mode: 'send' | 'request') => void;
   closeForm: () => void;
   mode: 'send' | 'request';
+  banks: {
+    all: Bank[];
+    user: Bank | undefined;
+    filtered: Bank[];
+  };
   form: {
     origin?: string;
     destination?: string;
@@ -20,6 +26,11 @@ type TransactionFormContextType = {
 export const TransactionFormContext = React.createContext<TransactionFormContextType>({
   isOpen: false,
   mode: 'send',
+  banks: {
+    all: [],
+    user: undefined,
+    filtered: [],
+  },
   form: {},
   updateForm: () => undefined,
   clearForm: () => undefined,
@@ -32,7 +43,13 @@ const USER_BANK_CODE = 'nordhaven';
 export function TransactionFormProvider({children}: {children: React.ReactNode}) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [mode, setMode] = React.useState<'send' | 'request'>('send');
-  const {banks} = useBanks();
+  const {banks: allBanks} = useBanks();
+  const userBank = allBanks.find((b) => b.code === USER_BANK_CODE);
+  const banks = {
+    all: allBanks,
+    user: userBank,
+    filtered: allBanks.filter((b) => b.code !== USER_BANK_CODE),
+  };
 
   const [form, setForm] = React.useState({
     origin: '',
@@ -40,39 +57,55 @@ export function TransactionFormProvider({children}: {children: React.ReactNode})
     amount: 0,
     currency: '',
   });
+  const openForm = React.useCallback(
+    (mode: 'send' | 'request') => {
+      const defaultBankIfOnlyOne = banks.filtered.length === 1 ? banks.filtered[0] : undefined;
+      if (mode === 'request') {
+        setForm((prev) => ({
+          ...prev,
+          // requesting from other bank to user bank
+          origin: defaultBankIfOnlyOne?.id || '',
+          destination: userBank?.id || '',
+          currency: defaultBankIfOnlyOne?.currency || '',
+          amount: 0,
+        }));
+      } else {
+        setForm((prev) => ({
+          ...prev,
+          // sending from user bank to other bank
+          destination: defaultBankIfOnlyOne?.id || '',
+          origin: userBank?.id || '',
+          currency: defaultBankIfOnlyOne?.currency || '',
+          amount: 0,
+        }));
+      }
+      setMode(mode);
+      setIsOpen(true);
+    },
+    [banks.filtered, userBank],
+  );
 
-  const userBank = banks.find((b) => b.code === USER_BANK_CODE);
-  const openForm = (mode: 'send' | 'request') => {
-    if (mode === 'send') {
-      setForm((prev) => ({...prev, origin: userBank?.id || ''}));
-    } else {
-      setForm((prev) => ({...prev, destination: userBank?.id || ''}));
-    }
-    setMode(mode);
-    setIsOpen(true);
-  };
-
-  const closeForm = () => {
-    setIsOpen(false);
-    clearForm();
-  };
-
-  const updateForm = (key: string, value: string | number) => {
-    setForm((prev) => ({...prev, [key]: value}));
-  };
-
-  const clearForm = () => {
+  const clearForm = React.useCallback(() => {
     setForm({
       origin: '',
       destination: '',
       amount: 0,
       currency: '',
     });
-  };
+  }, []);
+
+  const closeForm = React.useCallback(() => {
+    setIsOpen(false);
+    clearForm();
+  }, [clearForm]);
+
+  const updateForm = React.useCallback((key: string, value: string | number) => {
+    setForm((prev) => ({...prev, [key]: value}));
+  }, []);
 
   return (
     <TransactionFormContext.Provider
-      value={{isOpen, openForm, closeForm, mode, form, updateForm, clearForm}}
+      value={{isOpen, openForm, closeForm, mode, form, updateForm, clearForm, banks}}
     >
       {children}
     </TransactionFormContext.Provider>

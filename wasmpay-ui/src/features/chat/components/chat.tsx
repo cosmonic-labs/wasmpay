@@ -16,11 +16,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {useChat} from '@/features/chat/context/use-chat';
+import {useBanks} from '@repo/common/hooks/useBanks';
 
 export function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const [proMode, setProMode] = useState(false);
   const {messages, loading, sendMessage, resetChat} = useChat();
+  const {banks} = useBanks();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -42,18 +44,24 @@ export function Chat() {
     setInputMessage('');
   };
 
+  const noMessages = messages.length === 0;
+
   return (
     <DashboardCard className="h-[min(500px,80lvh)] py-0 gap-0">
-      <CardHeader className="border-b p-2 [.border-b]:pb-1 flex gap-1">
+      <CardHeader className="border-b p-2 [.border-b]:pb-2 flex gap-2">
         <Select>
           <SelectTrigger className="w-full mb-0">
             <SelectValue placeholder="Select a bank" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="apple">Apple</SelectItem>
+            {banks.map((bank) => (
+              <SelectItem key={bank.id} value={bank.name}>
+                {bank.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        <Button variant={'secondary'} className="h-8" onClick={resetChat}>
+        <Button variant="outline" className="" onClick={resetChat} disabled={loading || noMessages}>
           <PlusCircle className="w-4 h-4" />
           New chat
         </Button>
@@ -67,7 +75,7 @@ export function Chat() {
               </div>
             ) : (
               <div className="space-y-4 my-4">
-                {messages.map((msg, key) => (
+                {messages.map((msg) => (
                   <MessageBubble
                     key={msg.id}
                     // translation="yeah man"
