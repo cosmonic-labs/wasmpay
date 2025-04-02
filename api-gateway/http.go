@@ -56,7 +56,7 @@ func Router() http.Handler {
 	// Send requests to the LLM for translation
 	router.POST("/api/v1/chat", chatHandler)
 	// Send request to identity store to fetch a JWT-SVID
-	// router.POST("/api/v1/token", tokenHandler)
+	router.POST("/api/v1/token", tokenHandler)
 
 	// Send request to the backend to manage banks
 	router.GET("/api/v1/banks", getBankHandler)
