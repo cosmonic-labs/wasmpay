@@ -9,7 +9,7 @@ type AppProviderProps = React.PropsWithChildren<{
 
 function AppProvider({children, providers = []}: AppProviderProps) {
   const Providers = ({children}: React.PropsWithChildren) =>
-    providers.reduce((acc, Provider) => {
+    providers.reduceRight((acc, Provider) => {
       return <Provider>{acc}</Provider>;
     }, children);
 
