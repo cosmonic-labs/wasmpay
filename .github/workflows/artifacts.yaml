@@ -40,10 +40,9 @@ jobs:
       # Component: API Gateway
       # build static UI so it can be embedded in the wasm binary.
       - name: Build Banking UI
-        working-directory: api-gateway/wasmcloud.banking
         run: |
           npm ci
-          npm run build --workspaces --if-present
+          npm run build
 
       - name: Build API Gateway
         uses: ./.github/actions/wash-build

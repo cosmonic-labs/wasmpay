@@ -1,0 +1,28 @@
+{
+  "name": "@repo/common",
+  "version": "0.0.1",
+  "author": "Cosmonic",
+  "license": "Apache-2.0",
+  "type": "module",
+  "devDependencies": {
+    "@repo/tsconfig": "^0.0.0",
+    "@types/react": "^19.1.0",
+    "react": "^19.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0"
+  },
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    "./services/config": "./src/services/config/index.ts",
+    "./services/backend/useApi": "./src/services/backend/hooks/useApi.ts",
+    "./services/backend/types": "./src/services/backend/types.ts",
+    "./services/backend/utils/getBaseUrl": "./src/services/backend/utils/getBaseUrl.ts",
+    "./services/backend/utils/toBytesString": "./src/services/backend/utils/toBytesString.ts",
+    "./hooks/useTransactions": "./src/hooks/useTransactions.ts",
+    "./hooks/useBanks": "./src/hooks/useBanks.ts",
+    "./types": "./src/types.ts"
+  }
+}

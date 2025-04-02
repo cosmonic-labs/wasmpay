@@ -1,0 +1,25 @@
+{
+  "name": "vite-plugin-build-copy",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "fs-extra": "^11.3.0",
+    "tsup": "8.4.0",
+    "vite": "^6.2.4"
+  },
+  "scripts": {
+    "build": "tsup ./src/index.ts --format esm,cjs --dts --sourcemap --clean"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "^0.0.0",
+    "@types/fs-extra": "^11.0.4"
+  }
+}

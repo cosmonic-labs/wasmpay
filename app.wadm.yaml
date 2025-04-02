@@ -95,7 +95,7 @@ spec:
     - name: httpserver
       type: capability
       properties:
-        image: wasmcloud+builtin://http-server
+        image: ghcr.io/wasmcloud/http-server:0.27.0
       traits:
         - type: link
           properties:
