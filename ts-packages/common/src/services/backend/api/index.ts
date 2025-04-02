@@ -8,3 +8,6 @@ export default {
   getBankById,
   getBankByCode,
 };
+
+export type {Bank} from './banks.ts';
+export type {Transaction, CreateTransaction, TransactionId} from './transactions.ts';

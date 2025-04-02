@@ -1,4 +1,5 @@
 import * as React from 'react';
+<<<<<<< HEAD
 import {GraphCard} from './GraphCard';
 import {TransactionsCard} from './TransactionsCard';
 import {AccountStatusCard} from './AccountStatusCard';
@@ -77,6 +78,26 @@ function Dashboard({user}: DashboardCardProps): React.ReactElement {
           )}
         </>
       ) : null}
+=======
+import {AccountBalance} from './account-balance';
+import {Transactions} from '@/features/transactions/components/transactions';
+import {Chat} from '@/features/chat/components/chat';
+import {TransactionModal} from '@/features/transactions/components/transaction-modal';
+
+function Dashboard(): React.ReactElement {
+  return (
+    <div className="grid grid-cols-12 gap-3">
+      <div className="col-span-12 md:col-span-6">
+        <Chat />
+      </div>
+      <div className="col-span-12 md:col-span-6">
+        <AccountBalance />
+      </div>
+      <div className="col-span-12">
+        <Transactions />
+        <TransactionModal />
+      </div>
+>>>>>>> b260222 (chore: can we just like, start again, or whatever?)
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import {cn} from '@repo/ui/cn';
 import React, {HTMLProps} from 'react';
+import {cn} from '@/lib/utils';
 
 const Container = React.forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
   ({children, className, ...props}, ref) => {
