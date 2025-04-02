@@ -8,18 +8,17 @@ export function useTransactions() {
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const api = useApi();
 
-  React.useEffect(() => {
-    async function getTransactions() {
-      if (isLoading) {
-        let transactionsResponse = await api.transactions();
-        let data = transactionsResponse.data ?? [];
-        setTransactions(data);
-        setIsLoading(false);
-      }
-    }
+  const fetchTransactions = React.useCallback(async () => {
+    setIsLoading(true);
+    let transactionsResponse = await api.transactions();
+    let data = transactionsResponse.data ?? [];
+    setTransactions(data);
+    setIsLoading(false);
+  }, [api]);
 
-    getTransactions();
-  }, [isLoading]);
+  React.useEffect(() => {
+    fetchTransactions();
+  }, []);
 
   const balance = React.useMemo(
     () =>
@@ -28,7 +27,7 @@ export function useTransactions() {
   );
 
   const createTransaction = React.useCallback(
-    async (origin: Bank | undefined, destination: Bank | undefined) => {
+    async (origin: Bank | undefined, destination: Bank | undefined, pro: boolean) => {
       if (!origin || !destination) {
         console.error('Bank not found');
         return;
@@ -56,12 +55,12 @@ export function useTransactions() {
 
       console.log('Creating transaction', transaction);
 
-      const response = await api.createTransaction(transaction);
+      const response = await api.createTransaction(transaction, pro);
       console.log(`Transaction ${response.data.id} created successfully`);
       console.dir(JSON.stringify(response.data, null, 2));
 
       // setting loading to start the fetch again
-      setIsLoading(true);
+      fetchTransactions();
     },
     [],
   );

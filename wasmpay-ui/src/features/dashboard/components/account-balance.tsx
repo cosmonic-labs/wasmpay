@@ -1,28 +1,12 @@
 import * as React from 'react';
 import Chart from 'react-apexcharts';
 import {ArrowDownIcon, ArrowUpIcon} from 'lucide-react';
-<<<<<<< HEAD:wasmpay-ui/src/features/dashboard/components/GraphCard.tsx
-import {Transaction} from '@repo/common/services/user/useTransactions';
-import {DashboardCard} from './DashboardCard';
-=======
 import {useTransactions} from '@repo/common/hooks/useTransactions';
 import {Transaction} from '@repo/common/types';
 import {DashboardCard} from '@/features/dashboard/components/dashboard-card';
 
 export function AccountBalance(): React.ReactElement {
   const {transactions, balance, isLoading} = useTransactions();
->>>>>>> b260222 (chore: can we just like, start again, or whatever?):wasmpay-ui/src/features/dashboard/components/account-balance.tsx
-
-export function GraphCard({
-  transactions,
-  isLoading,
-  balance,
-}: {
-  transactions: Transaction[];
-  isLoading: boolean;
-  balance: number;
-  additionalInfo?: string;
-}): React.ReactElement {
   let chartBalance = 0;
   const chartData = transactions.map((t, i) => {
     if (t.status !== 'Cancelled') {
