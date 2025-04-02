@@ -3,7 +3,7 @@ import {CardContent, CardFooter, CardHeader} from '@/components/ui/card';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {SendHorizontalIcon} from 'lucide-react';
+import {Loader2, PlusCircle, SendHorizontalIcon} from 'lucide-react';
 import {ProSwitch} from '@/features/chat/components/pro-switch';
 import {MessageBubble} from '@/features/chat/components/message-bubble';
 import {DashboardCard} from '@/features/dashboard/components/dashboard-card';
@@ -15,18 +15,12 @@ import {
   SelectItem,
   SelectValue,
 } from '@/components/ui/select';
-
-type Message = {
-  id: string;
-  content: string;
-  sender: 'user' | 'system';
-  timestamp: Date;
-};
+import {useChat} from '@/features/chat/context/use-chat';
 
 export function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [proMode, setProMode] = useState(false);
+  const {messages, loading, sendMessage, resetChat} = useChat();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -39,20 +33,18 @@ export function Chat() {
 
     if (!inputMessage.trim()) return;
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      content: inputMessage,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-
-    setMessages([...messages, newMessage]);
+    sendMessage({
+      pro: proMode,
+      message: inputMessage,
+      sourceLanguage: 'en',
+      targetLanguage: 'en',
+    });
     setInputMessage('');
   };
 
   return (
     <DashboardCard className="h-[min(500px,80lvh)] py-0 gap-0">
-      <CardHeader className="border-b p-2 [.border-b]:pb-1">
+      <CardHeader className="border-b p-2 [.border-b]:pb-1 flex gap-1">
         <Select>
           <SelectTrigger className="w-full mb-0">
             <SelectValue placeholder="Select a bank" />
@@ -61,6 +53,10 @@ export function Chat() {
             <SelectItem value="apple">Apple</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant={'secondary'} className="h-8" onClick={resetChat}>
+          <PlusCircle className="w-4 h-4" />
+          New chat
+        </Button>
       </CardHeader>
       <CardContent className="flex-grow h-full overflow-hidden p-0">
         <ScrollArea className="size-full px-4">
@@ -74,10 +70,9 @@ export function Chat() {
                 {messages.map((msg, key) => (
                   <MessageBubble
                     key={msg.id}
-                    translation="yeah man"
+                    // translation="yeah man"
                     amount={0}
-                    isOutgoing={key % 2 === 0}
-                    // isOutgoing={msg.sender === 'user'}
+                    isOutgoing={msg.sender === 'user'}
                     text={msg.content}
                   />
                 ))}
@@ -100,8 +95,15 @@ export function Chat() {
             className="flex-grow border-0 focus-visible:ring-0 pl-0 bg-transparent dark:bg-transparent focus-visible:border-0"
             onChange={(e) => setInputMessage(e.target.value)}
           />
-          <Button size="sm" type="submit" className="p-1 h-8 rounded-full">
-            Send
+          <Button size="sm" type="submit" className="p-1 h-8 rounded-full" disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin h-4 w-4" />
+                Loading
+              </>
+            ) : (
+              'Send'
+            )}
             <SendHorizontalIcon />
           </Button>
         </form>
