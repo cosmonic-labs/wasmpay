@@ -117,12 +117,16 @@ export function useTransactions(
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const api = useApi();
   React.useEffect(() => {
+    console.log('effect reloaded');
     async function getTransactions() {
+      console.log('getting');
       if (isLoading) {
+        console.log('is loading');
         let transactionsResponse = await api.transactions();
         let data = transactionsResponse.data ?? [];
         setTransactions(data);
         setIsLoading(false);
+        console.log('done');
       }
     }
 

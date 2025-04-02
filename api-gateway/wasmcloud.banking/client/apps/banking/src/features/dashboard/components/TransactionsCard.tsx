@@ -1,31 +1,71 @@
 import * as React from 'react';
 import {ArrowDownToLineIcon, ArrowUpFromLineIcon} from 'lucide-react';
-import {useTransactions, Transaction} from '@repo/common/services/user/useTransactions';
+import {Transaction} from '@repo/common/services/user/useTransactions';
 import {DashboardCard} from './DashboardCard';
-import {UserInformation} from '@/App';
 import {Button} from '@repo/ui/Button';
 import {TransactionCard} from './TransactionCard';
+import {Bank} from '../../../../../../packages/common/src/services/user/hooks/useBanks';
 
 interface TransactionsCardProps {
-  user: UserInformation;
+  userBank: Bank;
+  banks: Array<Bank>;
+  transactions: Transaction[];
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
 }
-
-export function TransactionsCard({user}: TransactionsCardProps): React.ReactElement {
-  const {transactions} = useTransactions(user.login);
+export function TransactionsCard({
+  userBank,
+  banks,
+  transactions,
+  setIsLoading,
+}: TransactionsCardProps): React.ReactElement {
   const [showTransactionPopUp, setShowTransactionPopUp] = React.useState(false);
+  const [sendingMoney, setSendingMoney] = React.useState(false);
 
   return (
     <DashboardCard cols={12}>
-      {showTransactionPopUp ? <TransactionCard /> : null}
+      {showTransactionPopUp ? (
+        sendingMoney ? (
+          <TransactionCard
+            onClose={() => {
+              setShowTransactionPopUp(false);
+              setIsLoading(false);
+              setIsLoading(true);
+            }}
+            selectedOriginBank={userBank}
+            banks={banks}
+          />
+        ) : (
+          <TransactionCard
+            onClose={() => {
+              setShowTransactionPopUp(false);
+              setIsLoading(false);
+              setIsLoading(true);
+            }}
+            selectedDestinationBank={userBank}
+            banks={banks}
+          />
+        )
+      ) : null}
       <div className="p-2">
         <div className="sm:flex items-center justify-between">
           <h4 className="font-heading font-semibold text-sm uppercase">Recent Transactions</h4>
           <a className="inline-flex items-center gap-3 text-primary hover:text-primary-400 transition-colors duration-300">
-            <Button onClick={() => setShowTransactionPopUp(true)}>
+            <Button
+              onClick={() => {
+                setShowTransactionPopUp(true);
+                setSendingMoney(true);
+              }}
+            >
               <ArrowUpFromLineIcon className="w-4 h-4" />
               Send Money
             </Button>
-            <Button onClick={() => setShowTransactionPopUp(true)}>
+            <Button
+              onClick={() => {
+                setShowTransactionPopUp(true);
+                setSendingMoney(false);
+              }}
+            >
               <ArrowDownToLineIcon className="w-4 h-4" />
               Request Money
             </Button>

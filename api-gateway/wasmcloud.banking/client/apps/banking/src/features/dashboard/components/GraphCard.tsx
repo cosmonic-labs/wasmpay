@@ -1,13 +1,19 @@
 import * as React from 'react';
 import Chart from 'react-apexcharts';
 import {ArrowDownIcon, ArrowUpIcon} from 'lucide-react';
-import {Transaction, useTransactions} from '@repo/common/services/user/useTransactions';
+import {Transaction} from '@repo/common/services/user/useTransactions';
 import {DashboardCard} from './DashboardCard';
-import {UserInformation} from '@/App';
 
-export function GraphCard({userInfo}: {userInfo: UserInformation}): React.ReactElement {
-  const {transactions, balance, isLoading} = useTransactions(userInfo.login);
-
+export function GraphCard({
+  transactions,
+  isLoading,
+  balance,
+}: {
+  transactions: Transaction[];
+  isLoading: boolean;
+  balance: number;
+  additionalInfo?: string;
+}): React.ReactElement {
   let chartBalance = 0;
   const chartData = transactions.map((t, i) => {
     if (t.status !== 'Cancelled') {

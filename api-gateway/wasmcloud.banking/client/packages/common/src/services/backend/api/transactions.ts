@@ -34,12 +34,20 @@ function isTransactionsResponse(res: unknown): res is TransactionsResponse {
 }
 
 function createTransaction(config: ConfigResponse) {
-  return async (transaction: CreateTransaction) => {
+  return async (transaction: CreateTransaction, wasmpayPro: boolean) => {
+    const headers: [string, string][] = wasmpayPro
+      ? [
+          ['Content-Type', 'application/json'],
+          ['X-Wasmpay-Pro', 'true'],
+        ]
+      : [['Content-Type', 'application/json']];
+
     return apiFetch(
       getBaseUrl(config)(config.apiPaths.transactions),
       {
         method: 'POST',
         body: JSON.stringify(transaction),
+        headers,
       },
       isCreateResponse,
     );
