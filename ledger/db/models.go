@@ -30,6 +30,24 @@ type Currency struct {
 	MinorUnit int64
 }
 
+type Destination struct {
+	ID         int64
+	Bid        string
+	Code       string
+	Name       string
+	CountryID  int64
+	CurrencyID int64
+}
+
+type Origin struct {
+	ID         int64
+	Bid        string
+	Code       string
+	Name       string
+	CountryID  int64
+	CurrencyID int64
+}
+
 type Transaction struct {
 	ID            int64
 	Tid           string

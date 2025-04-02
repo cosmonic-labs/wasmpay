@@ -109,8 +109,8 @@ SELECT
   sqlc.embed(currencies)
 FROM
   transactions
-  JOIN banks AS origin ON origin.id = transactions.destination_id
-  JOIN banks AS destination ON destination.id = transactions.origin_id
+  JOIN origins AS origin ON origin.id = transactions.origin_id
+  JOIN destinations AS destination ON destination.id = transactions.destination_id
   JOIN currencies ON currencies.id = transactions.currency_id
 ORDER BY
-  created_at;
+  created_at DESC;

@@ -383,17 +383,17 @@ SELECT
   currencies.id, currencies.code, currencies.name, currencies.minor_unit
 FROM
   transactions
-  JOIN banks AS origin ON origin.id = transactions.destination_id
-  JOIN banks AS destination ON destination.id = transactions.origin_id
+  JOIN origins AS origin ON origin.id = transactions.origin_id
+  JOIN destinations AS destination ON destination.id = transactions.destination_id
   JOIN currencies ON currencies.id = transactions.currency_id
 ORDER BY
-  created_at
+  created_at DESC
 `
 
 type ListTransactionsRow struct {
 	Transaction Transaction
-	Bank        Bank
-	Bank_2      Bank
+	Origin      Origin
+	Destination Destination
 	Currency    Currency
 }
 
@@ -416,18 +416,18 @@ func (q *Queries) ListTransactions(ctx context.Context) ([]ListTransactionsRow, 
 			&i.Transaction.Status,
 			&i.Transaction.Reason,
 			&i.Transaction.CreatedAt,
-			&i.Bank.ID,
-			&i.Bank.Bid,
-			&i.Bank.Code,
-			&i.Bank.Name,
-			&i.Bank.CountryID,
-			&i.Bank.CurrencyID,
-			&i.Bank_2.ID,
-			&i.Bank_2.Bid,
-			&i.Bank_2.Code,
-			&i.Bank_2.Name,
-			&i.Bank_2.CountryID,
-			&i.Bank_2.CurrencyID,
+			&i.Origin.ID,
+			&i.Origin.Bid,
+			&i.Origin.Code,
+			&i.Origin.Name,
+			&i.Origin.CountryID,
+			&i.Origin.CurrencyID,
+			&i.Destination.ID,
+			&i.Destination.Bid,
+			&i.Destination.Code,
+			&i.Destination.Name,
+			&i.Destination.CountryID,
+			&i.Destination.CurrencyID,
 			&i.Currency.ID,
 			&i.Currency.Code,
 			&i.Currency.Name,

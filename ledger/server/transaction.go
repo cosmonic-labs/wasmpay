@@ -90,8 +90,8 @@ func (srv *TransactionServer) ListTransactions(ctx context.Context, req *connect
 	for _, result := range results {
 		txns = append(txns, &ledgerv1.Transaction{
 			Id:          result.Transaction.Tid,
-			Origin:      result.Bank.Code,
-			Destination: result.Bank_2.Code,
+			Origin:      result.Origin.Code,
+			Destination: result.Destination.Code,
 			Amount:      uint64(result.Transaction.Amount),
 			Currency:    result.Currency.Code,
 			Status:      result.Transaction.Status,
