@@ -7,6 +7,7 @@ import {ConfigProvider} from '@repo/common/services/config';
 import {ThemeProvider} from 'next-themes';
 import {TransactionFormProvider} from '@/features/transactions/context/transaction-form-context';
 import {Toaster} from '@/components/ui/sonner';
+import {ChatProvider} from '@/features/chat/context/chat-context';
 
 export interface UserInformation {
   login: string;
@@ -16,7 +17,7 @@ export interface UserInformation {
 
 function App() {
   return (
-    <AppProvider providers={[ThemeProvider, ConfigProvider, TransactionFormProvider]}>
+    <AppProvider providers={[ThemeProvider, ChatProvider, ConfigProvider, TransactionFormProvider]}>
       <div>
         <TopNav />
         <PageContent>

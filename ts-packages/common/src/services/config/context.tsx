@@ -4,6 +4,7 @@ export type ConfigResponse = {
   baseUrl: string;
   appName: string;
   apiPaths: {
+    chat: string;
     transactions: string;
     listBanks: string;
     getBankByCode: string;
@@ -15,6 +16,7 @@ const DEFAULT_CONFIG: ConfigResponse = {
   baseUrl: '/',
   appName: 'wasmpay',
   apiPaths: {
+    chat: '/api/v1/chat',
     transactions: '/api/v1/transactions',
     listBanks: '/api/v1/banks',
     getBankByCode: '/api/v1/banks?code=:code',
