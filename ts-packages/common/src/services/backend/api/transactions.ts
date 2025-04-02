@@ -41,12 +41,10 @@ function transactions(config: ConfigResponse) {
 
 function createTransaction(config: ConfigResponse) {
   return async (transaction: CreateTransaction, wasmpayPro: boolean) => {
-    const headers: [string, string][] = wasmpayPro
-      ? [
-          ['Content-Type', 'application/json'],
-          ['X-Wasmpay-Pro', 'true'],
-        ]
-      : [['Content-Type', 'application/json']];
+    const headers: [string, string][] = [
+      ['Accept', 'application/json'],
+      ...((wasmpayPro ? [['X-Wasmpay-Pro', 'true']] : []) as [string, string][]),
+    ];
 
     return apiFetch(
       getBaseUrl(config)(config.apiPaths.transactions),

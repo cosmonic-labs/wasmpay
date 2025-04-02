@@ -21,6 +21,7 @@ import {useBanks} from '@repo/common/hooks/useBanks';
 import {useTransactions} from '@repo/common/hooks/useTransactions';
 import React from 'react';
 import {Loader2Icon} from 'lucide-react';
+import {toast} from 'sonner';
 
 export function TransactionModal() {
   const {banks} = useBanks();
@@ -41,20 +42,21 @@ export function TransactionModal() {
     const destination = banks.find((bank) => bank.id === form.destination);
     setIsSubmitting(true);
     setError(null);
-    createTransaction(origin, destination)
+    toast.loading('Processing transaction...');
+    createTransaction(origin, destination, false)
       .then(() => {
         setIsSubmitting(false);
       })
       .catch((error) => {
         setIsSubmitting(false);
+        toast.error('Transaction failed. Please try again.');
         setError(error.message);
         console.error('Transaction failed:', error);
       })
       .finally(() => {
-        setTimeout(() => {
-          setError(null);
-          closeForm();
-        }, 3000);
+        toast.dismiss();
+        toast.success('Transaction completed successfully!');
+        closeForm();
       });
   };
 
