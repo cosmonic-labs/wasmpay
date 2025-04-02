@@ -56,7 +56,7 @@ func Router() http.Handler {
 	// Send requests to the LLM for translation
 	router.POST("/api/v1/chat", chatHandler)
 	// Send request to identity store to fetch a JWT-SVID
-	router.POST("/api/v1/token", tokenHandler)
+	// router.POST("/api/v1/token", tokenHandler)
 
 	// Send request to the backend to manage banks
 	router.GET("/api/v1/banks", getBankHandler)
@@ -322,7 +322,6 @@ func createBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 
 	resp, err := httpClient.Post(url, "application/json", bytes.NewReader(requestBytes))
-
 	if err != nil {
 		errorResponse(w, fmt.Sprintf("Failed to create bank: %v", err), http.StatusInternalServerError)
 		return
@@ -370,7 +369,6 @@ func getBankHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 	}
 
 	resp, err := httpClient.Post(url, "application/json", bytes.NewReader(body))
-
 	if err != nil {
 		errorResponse(w, fmt.Sprintf("Failed to fetch banks: %v", err), http.StatusInternalServerError)
 		return
