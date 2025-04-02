@@ -17,7 +17,7 @@ export interface UserInformation {
 
 function App() {
   return (
-    <AppProvider providers={[ThemeProvider, ChatProvider, ConfigProvider, TransactionFormProvider]}>
+    <AppProvider providers={[ThemeProvider, ConfigProvider, ChatProvider, TransactionFormProvider]}>
       <div>
         <TopNav />
         <PageContent>
