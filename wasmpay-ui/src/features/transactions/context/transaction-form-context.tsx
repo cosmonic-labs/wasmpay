@@ -1,3 +1,4 @@
+import {useBanks} from '@repo/common/hooks/useBanks';
 import * as React from 'react';
 
 type TransactionFormContextType = {
@@ -26,11 +27,12 @@ export const TransactionFormContext = React.createContext<TransactionFormContext
   closeForm: () => undefined,
 });
 
-const USER_BANK_ID = 'bk_s5MuMcA';
+const USER_BANK_CODE = 'nordhaven';
 
 export function TransactionFormProvider({children}: {children: React.ReactNode}) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [mode, setMode] = React.useState<'send' | 'request'>('send');
+  const {banks} = useBanks();
 
   const [form, setForm] = React.useState({
     origin: '',
@@ -39,11 +41,12 @@ export function TransactionFormProvider({children}: {children: React.ReactNode})
     currency: '',
   });
 
+  const userBank = banks.find((b) => b.code === USER_BANK_CODE);
   const openForm = (mode: 'send' | 'request') => {
     if (mode === 'send') {
-      setForm((prev) => ({...prev, origin: USER_BANK_ID}));
+      setForm((prev) => ({...prev, origin: userBank?.id || ''}));
     } else {
-      setForm((prev) => ({...prev, destination: USER_BANK_ID}));
+      setForm((prev) => ({...prev, destination: userBank?.id || ''}));
     }
     setMode(mode);
     setIsOpen(true);
