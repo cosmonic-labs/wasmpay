@@ -8,3 +8,5 @@ node_modules
 
 # ignore db backups
 *.db
+
+.DS_Store
