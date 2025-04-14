@@ -80,7 +80,7 @@ func Router() http.Handler {
 	router.POST("/api/v1/transactions", createTransactionHandler)
 
 	// Anything that isn't a registered route should be served as a static file
-	router.NotFound = staticFileRouter(assets)
+	router.NotFound = getStaticAssetHandler(assets)
 
 	return router
 }
@@ -547,7 +547,7 @@ func healthzHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params)
 	w.Write([]byte("OK"))
 }
 
-func staticFileRouter(assets fs.FS) http.Handler {
+func getStaticAssetHandler(assets fs.FS) http.Handler {
 	logger := slog.New(wasilog.DefaultOptions().NewHandler())
 	fileServer := http.FileServer(http.FS(assets))
 

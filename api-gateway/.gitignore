@@ -3,5 +3,5 @@ build/*
 
 .env*
 
-dist/
-!dist/.gitkeep
+static/dist/*
+!static/dist/.gitkeep
