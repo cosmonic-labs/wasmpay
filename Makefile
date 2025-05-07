@@ -31,10 +31,10 @@ test-e2e: build ## Build all components and deploy the local wadm
 	@wash down --all
 
 test-validate: ## curl the API gateway with a test validation that should succeed after deploy
-	curl localhost:8000/api/v1/transaction -d '{"origin": {"id": "bank1", "code": "nordhaven", "country": "US", "currency": "USD", "name": "Bank One"}, "destination": {"id": "bank2", "code": "BNK2", "country": "UK", "currency": "GBP", "name": "Bank Two"}, "amount": 1000, "currency": "USD", "status": "Approved"}'
+	curl localhost:8000/api/v1/transactions -d '{"origin": {"id": "bank1", "code": "nordhaven", "country": "USA", "currency": "USD", "name": "Bank One"}, "destination": {"id": "icamer", "code": "icamer", "country": "GBR", "currency": "GBP", "name": "Bank Two"}, "amount": 1000, "currency": "USD", "status": "Approved"}'
 
 test-validate-invalid: ## curl the API gateway with a test validation that should fail after deploy
-	curl localhost:8000/api/v1/transaction -d '{"origin": {"id": "bank1", "code": "nordhaven", "country": "US", "currency": "USD", "name": "Bank One"}, "destination": {"id": "bank2", "code": "BNK2", "country": "UK", "currency": "GBP", "name": "Bank Two"}, "amount": 1000, "currency": "JPY", "status": "Approved"}'
+		curl localhost:8000/api/v1/transactions -d '{"origin": {"id": "bank1", "code": "nordhaven", "country": "USA", "currency": "USD", "name": "Bank One"}, "destination": {"id": "icamer", "code": "icamer", "country": "GBR", "currency": "GBP", "name": "Bank Two"}, "amount": 1000, "currency": "GBP", "status": "Approved"}'
 
 test-scale: ## Run a single validator 10000 times, then invoke them all
 	nats-server -js -c ./hack/scale.conf &

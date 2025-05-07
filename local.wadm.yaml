@@ -13,7 +13,7 @@ spec:
     - name: api-gateway
       type: component
       properties:
-        image: ghcr.io/cosmonic-labs/wasmpay/api-gateway:0f82ed36c5916af7ccd07dbb826f7674098b0e92
+        image: file://./api-gateway/build/api-gateway_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -35,7 +35,7 @@ spec:
     - name: transaction-manager
       type: component
       properties:
-        image: ghcr.io/cosmonic-labs/wasmpay/transaction-manager:0f82ed36c5916af7ccd07dbb826f7674098b0e92
+        image: file://./transaction-manager/build/transaction_manager_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -67,7 +67,7 @@ spec:
     - name: wasmpay-validator
       type: component
       properties:
-        image: ghcr.io/cosmonic-labs/wasmpay/wasmpay-validator:0f82ed36c5916af7ccd07dbb826f7674098b0e92
+        image: file://./wasmpay-validator/build/wasmpay-validator.composed_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -77,7 +77,7 @@ spec:
     - name: icamer-validator
       type: component
       properties:
-        image: ghcr.io/cosmonic-labs/wasmpay/icamer-validator:0f82ed36c5916af7ccd07dbb826f7674098b0e92
+        image: file://./icamer-validator/build/icamer_validator.composed_s.wasm
       traits:
         - type: spreadscaler
           properties:
@@ -85,7 +85,7 @@ spec:
     - name: nordhaven-validator
       type: component
       properties:
-        image: ghcr.io/cosmonic-labs/wasmpay/nordhaven-validator:0f82ed36c5916af7ccd07dbb826f7674098b0e92
+        image: file://./nordhaven-validator/build/nordhaven-validator.composed_s.wasm
       traits:
         - type: spreadscaler
           properties:
